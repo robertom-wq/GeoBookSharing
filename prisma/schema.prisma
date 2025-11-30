@@ -7,9 +7,253 @@
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
+  previewFeatures = ["views"]
 }
 
+// definizione della sorgente dei dati
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+/*
+********************************************************************************
+TABELLE - Utilizzare nomi in minuscolo per evitare di usa le virgolette con psql
+********************************************************************************
+*/
+
+model tipi_condivisione {
+  id                              Int       @id @default(autoincrement())
+  dettagli                        String?   @db.VarChar(100) @unique(map: "idx_tipo_condivisione_dettagli")
+  descrizione                     String?   @db.VarChar(2000)
+  libri                           libri[]
+  condivisioni                    condivisioni[]
+}
+
+model generi {
+  id                               Int       @id @default(autoincrement())
+  dettagli                         String    @db.VarChar(100)
+  libri                            libri[]
+  libri_master                     libri_master[]
+
+}
+
+model utenti {
+  id                              Int       @id @default(autoincrement())
+  nome                            String    @db.VarChar(100) 
+  cognome                         String    @db.VarChar(100) 
+  username                        String    @db.VarChar(100) @unique(map:"idx_utenti_username") //sfrutta indice di unicità idx_utenti_username per garantire unicità del campo
+  email                           String    @db.VarChar(255) @unique(map:"idx_utenti_email")    //sfrutta indice di unicità idx_utenti_email per garantire unicità del campo
+  hashed_password                 String    @db.VarChar(255)
+  biografia                       String    @db.VarChar(1000)
+  avatar                          String?   @db.VarChar(1000)
+  avatar_thumb                    String?   @db.VarChar(1000)
+  bannato                         Boolean   @default(false)                                     // Di default banalmente gli utenti sono tutti Non bannati
+  data_creazione                  DateTime  @db.Timestamp(6) @default(now())                    // Imposta come data di creazione, il momento in cui viene creato il record
+  ruolo                           String    @db.VarChar(50) @default("user")
+  richiesta_eliminazione          Boolean?  @default(false)
+  data_richiesta_eliminazione     DateTime? @db.Timestamp(6)
+  data_ultima_modifica            DateTime? @db.Timestamp(6) @updatedAt
+  visualizzazioni                 Int       @default(0)
+  
+  // RELAZIONI e INTEGRITA REFERENZIALE
+  libri                           libri[]               // un utente può possedere 0..n libri
+  scaffali                        scaffali[]            // un utente può possedere 0..n scaffali
+  condivisioni_ricevute           condivisioni[]        @relation("condivisione_proprietario")
+  condivisioni_inviate            condivisioni[]        @relation("condivisione_richiedente")
+  valutazioni_date                utente_valutazioni[]  @relation("recensioni_date")
+  valutazioni_ricevute            utente_valutazioni[]  @relation("recensioni_ricevute")
+
+  // CREAZIONE DEGLI INDICI PER VELOCIZZARE LE RICERCHE
+  @@index([bannato], map: "idx_utenti_bannato")
+  @@index([ruolo], map: "idx_utenti_ruolo")
+  @@index([richiesta_eliminazione], map: "idx_utenti_richiesta_eliminazione")
+
+}
+
+model libri_master {
+  id                           Int       @id @default(autoincrement())
+  titolo                       String    @db.VarChar(300)
+  autore                       String    @db.VarChar(1000) @default("Sconosciuto")
+  anno                         Int?
+  isbn                         String    @unique @db.VarChar(20)
+  descrizione                  String?   @db.VarChar(2000)
+  copertina                    String?   @db.VarChar(1000)
+  copertina_thumb              String?   @db.VarChar(1000)
+  genere_id                    Int?      @default(999) // genere 999 creato ad hoc come "Non definito"
+  data_creazione               DateTime  @db.Timestamp(6) @default(now())
+  data_aggiornamento           DateTime  @db.Timestamp(6) @updatedAt
+
+  // RELAZIONI e INTEGRITA REFERENZIALE
+  genere                       generi?   @relation(fields: [genere_id], references: [id], onDelete: SetDefault, onUpdate: NoAction)
+  libri                        libri[] 
+  // VINCOLI
+  @@unique([titolo,autore,anno], name: "unique_titolo_autore_anno")
+
+  // CREAZIONE DEGLI INDICI PER VELOCIZZARE LE RICERCHE
+  @@index([titolo])
+  @@index([autore])
+  @@index([isbn])
+  @@index([genere_id])
+}
+
+model libri {
+  id                              Int       @id @default(autoincrement())
+  titolo                          String    @db.VarChar(300)
+  autore                          String    @db.VarChar(1000) @default("Sconosciuto")
+  anno                            Int?
+  copertina                       String?    @db.VarChar(1000)
+  copertina_thumb                 String?    @db.VarChar(1000)
+  descrizione                     String?    @db.VarChar(2000)
+  genere_id                       Int?       @default(999) // genere 999 creato ad hoc come "Non definito"
+  tipo_condivisione_id            Int?       @default(999) // tipo di condivione 999 creato ad hoc come "Non definito"
+  proprietario_id                 Int                      // obbligatorio: ogni libro deve avere un proprietario  
+  scaffale_id                     Int                      // obbligatorio: ogni libro deve far parte di uno scaffale
+  is_disponibile                  Boolean    @default(true)
+  data_creazione                  DateTime?  @db.Timestamp(6) @default(now())
+  data_ultima_modifica            DateTime   @db.Timestamp(6) @updatedAt
+  master_id                       Int?                     // facoltativo: il libro può essere stato creato manualmente
+  visualizzazioni                 Int        @default(0)
+  
+  // RELAZIONI e INTEGRITA REFERENZIALE
+  genere                          generi?            @relation(fields: [genere_id], references: [id], onDelete: SetDefault, onUpdate: NoAction)
+  proprietario                    utenti             @relation(fields: [proprietario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tipo_condivisione               tipi_condivisione? @relation(fields: [tipo_condivisione_id], references: [id], onDelete: SetDefault, onUpdate: NoAction)
+  libro_master                    libri_master?      @relation(fields: [master_id], references: [id], onDelete: SetNull, onUpdate: NoAction)    
+  scaffale                        scaffali           @relation(fields: [scaffale_id],references: [id], onDelete: Cascade, onUpdate: NoAction )
+  condivisioni                    condivisioni[]
+
+  // CREAZIONE DEGLI INDICI PER VELOCIZZARE LE RICERCHE
+  @@index([is_disponibile], map: "idx_libri_disponibili")
+  @@index([genere_id, tipo_condivisione_id], map: "idx_libri_filtri") // utile per esempio per cercare libri di fantascienza con tipo condivisione prestito
+  @@index([proprietario_id], map: "idx_libri_prorprietario")
+  @@index([scaffale_id], map: "idx_libri_scaffale")
+  @@index([titolo])
+  @@index([autore])
+}
+
+
+model scaffali {
+  id                                Int       @id @default(autoincrement())
+  nome                              String    @db.VarChar(300)
+  descrizione                       String?   @db.VarChar(1000)
+  proprietario_id                   Int
+  posizione                         Unsupported("geography")
+  data_creazione                    DateTime?  @db.Timestamp(6) @default(now())
+  data_ultima_modifica              DateTime   @db.Timestamp(6) @updatedAt
+
+  // RELAZIONI e INTEGRITA REFERENZIALE
+  libri                             libri[]
+  proprietario                      utenti     @relation(fields: [proprietario_id],references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  // VINCOLI
+  @@unique([proprietario_id,nome], map: "idx_scaffali_proprietario_id_nome")
+
+  // CREAZIONE DEGLI INDICI PER VELOCIZZARE LE RICERCHE
+  @@index([posizione],map: "idx_scaffali_posizione", type: Gist)
+}
+
+model condivisioni {
+  id                                Int       @id @default(autoincrement())
+  libro_id                          Int
+  proprietario_id                   Int
+  richiedente_id                    Int
+  tipo_condivisione_id              Int
+  data_dal                          DateTime? @db.Date // In questo contesto mi serve solo una data
+  data_al                           DateTime? @db.Date // In questo contesto mi serve solo una data
+  note                              String?   @db.VarChar(1000)
+  is_confermato                     Boolean   @default(false)
+  is_completato                     Boolean   @default(false)
+  data_creazione                    DateTime  @db.Timestamp(6) @default(now())
+  data_completato                   DateTime  @db.Timestamp(6) 
+  data_ultima_modifica              DateTime  @db.Timestamp(6) @updatedAt
+
+   // RELAZIONI e INTEGRITA REFERENZIALE
+  libro                             libri               @relation(fields: [libro_id],references: [id], onDelete: Cascade, onUpdate: NoAction)
+  proprietario                      utenti              @relation("condivisione_proprietario",fields: [proprietario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  richiedente                       utenti              @relation("condivisione_richiedente", fields: [richiedente_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tipo_condivisione                 tipi_condivisione   @relation(fields: [tipo_condivisione_id], references: [id], onDelete: SetDefault, onUpdate: NoAction)
+  valutazione                       utente_valutazioni[]
+
+  // CREAZIONE DEGLI INDICI PER VELOCIZZARE LE RICERCHE
+  @@index([is_completato], map: "idx_condivisioni_completato")
+  @@index([is_confermato], map: "idx_condivisioni_confermato")
+  @@index([data_dal, data_al], map: "idx_condivisioni_date")
+  @@index([proprietario_id], map: "idx_condivisioni_proprietario")
+  @@index([richiedente_id], map: "idx_condivisioni_richiedente")
+  @@index([tipo_condivisione_id], map: "idx_condivisioni_tipocondivisione")  
+}
+
+model utente_valutazioni {
+  id                                 Int       @id @default(autoincrement())
+  voto                               Int       // il vincolo da 0 a 5 sarà impostato tramite joi
+  recensione                         String?   @db.VarChar(1000)
+  data_creazione                     DateTime  @db.Timestamp(6) @default(now())
+  recensore_id                       Int
+  recensito_id                       Int   
+  condivisione_id                    Int 
+
+   // RELAZIONI e INTEGRITA REFERENZIALE
+   recensore                         utenti       @relation("recensioni_date",fields: [recensore_id],references: [id], onDelete: Cascade, onUpdate: NoAction)
+   recensito                         utenti       @relation("recensioni_ricevute",fields: [recensito_id],references: [id], onDelete: Cascade, onUpdate: NoAction)
+   condivisione                      condivisioni @relation(fields: [condivisione_id], references: [id], onDelete: Cascade, onUpdate: NoAction)  
+  
+  // VINCOLI
+  @@unique([condivisione_id, recensore_id, recensito_id], name: "unique_recensione_per_condivisione") // garantisce unica recensione (bidirezionale per transazione t, a->b b->a)
+
+  // CREAZIONE DEGLI INDICI PER VELOCIZZARE LE RICERCHE
+  @@index([recensito_id])
+  @@index([recensore_id])
+
+  
+}
+
+
+/*
+********************************************************************************
+AUDIT - Non usano references in quanto devono sopravvivere ai delete
+        Verranno popolati di volta in volta tramite controllers
+********************************************************************************
+*/
+
+
+model storico_utente_valutazioni {
+  id                                Int      @id @default(autoincrement())  
+  voto                              Int
+  recensione                        String?  @db.VarChar(1000)
+  recensore_username                String   @db.VarChar(100) 
+  recensito_username                String   @db.VarChar(100)
+  data_creazione                    DateTime @db.Timestamp(6) @default(now())
+
+  // CREAZIONE DEGLI INDICI PER VELOCIZZARE LE RICERCHE
+  @@index([recensito_username])
+  @@index([recensore_username])
+
+}
+
+enum TipiAzione {
+  DELETE_UTENTE
+  DELETE_LIBRO
+  DELETE_SCAFFALE
+  DELETE_CONDIVISIONE
+  DELETE_VALUTAZIONE // Admin può usarla se ritenuta offensiva
+  BAN_UTENTE
+  MODIFICA_RUOLO
+}
+
+
+model storico_eliminazioni {
+  id                                 Int       @id @default(autoincrement())
+  timestamp                          DateTime  @db.Timestamp(6) @default(now())
+  esecutore_id                       Int
+  esecutore_username                 String    @db.VarChar(100)
+  target_ID                          Int
+  target_nome                        String    @db.VarChar(100) // identificativo tipo username, titolo, nome scaffale etc
+  azione                             TipiAzione
+  dettagli                           String?   @db.VarChar(1000)
+
+    // CREAZIONE DEGLI INDICI PER VELOCIZZARE LE RICERCHE
+  @@index([azione])
+  @@index([esecutore_username])
+  @@index([azione, target_nome])
 }
