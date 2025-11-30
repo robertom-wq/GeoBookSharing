@@ -5,8 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
   previewFeatures = ["views"]
 }
 
@@ -45,7 +44,7 @@ model utenti {
   username                        String    @db.VarChar(100) @unique(map:"idx_utenti_username") //sfrutta indice di unicità idx_utenti_username per garantire unicità del campo
   email                           String    @db.VarChar(255) @unique(map:"idx_utenti_email")    //sfrutta indice di unicità idx_utenti_email per garantire unicità del campo
   hashed_password                 String    @db.VarChar(255)
-  biografia                       String    @db.VarChar(1000)
+  biografia                       String?    @db.VarChar(1000)
   avatar                          String?   @db.VarChar(1000)
   avatar_thumb                    String?   @db.VarChar(1000)
   bannato                         Boolean   @default(false)                                     // Di default banalmente gli utenti sono tutti Non bannati

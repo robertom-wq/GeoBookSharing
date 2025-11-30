@@ -6,16 +6,17 @@
   "license": "ISC",
   "author": "Roberto Marongiu",
   "type": "module",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "@prisma/client": "^7.0.1",
+    "@prisma/client": "^6.18.0",
+    "bcryptjs": "^3.0.3",
     "express": "^5.1.0",
+    "joi": "^18.0.1",
     "nodemon": "^3.1.11",
-    "prisma": "^6.19.0"
-  },
-  "devDependencies": {}
+    "prisma": "^6.18.0"
+  }
 }
