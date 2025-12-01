@@ -6,13 +6,51 @@ GESTISCE LA LOGICA DI BUSINNESS DI:
 FUNZIONALITA PRINCIPALI:
 
 Password criptata con bcryptjs con Work Factor 12. Essendo bcrypt legacy, possibile miglioria Argon2 raccomandato OSWAP 
+
+L'Access Token è impostato per durare 7 giorni a scopo dimostrativo. In un ambiente di produzione, la durata dovrebbe essere 
+ridotta a pochi minuti (e.g., 15m), implementando un meccanismo di Refresh Token per mantenere la sessione a lungo termine, 
+per mitigare il rischio di furto del token (XSS).
 */
 
-import { PrismaClient } from "@prisma/client";
+//import { PrismaClient } from "@prisma/client";
 import bcrypt from 'bcryptjs'
+import jwt  from 'jsonwebtoken'
+import { generateCsrfToken } from "../middleware/csrf.js";
 
-const prisma = new PrismaClient()
+//const prisma = new PrismaClient()
+import prisma from '../config/prisma.js'
 
+/*
+SETUP INIZIALE JWT E COOKIES
+ */
+const JWT_SECRET = process.env.JWT_SECRET
+const JWT_EXPIRATION = '7d';
+
+// controllo se la chiave JVW_SECRET è stata definita in .env
+if (!JWT_SECRET) {
+    console.error("JWT_SECRET non definito. Imposta una chiave sicura in .env")
+    process.exit(1)
+}
+
+// Settagio parametri dei cookies
+const COOKIE_OPTIONS = {
+    httpOnly: true, // Blocca accesso da Javascript, previene furto xss
+    secure: false, // false in ambiente di sviluppo in quanto non si dispone di https
+    sameSite: 'lax',
+    maxAge:  7*24*60*60 // 7 giorni
+}
+
+const CSFR_COOKIE_OPTIONS = {
+    httpOnly: false, // il frontend deve poterlo leggere per inviarlo in X-CSFR-Token
+    secure: false, // false in ambiente di sviluppo in quanto non si dispone di https
+    sameSite: 'lax',
+    maxAge: 7*24*60*60 // 7 giorni
+}
+
+
+/*
+REGISTRAZIONE
+*/
 export const registrazione = async (req, res) => {
     const { email, cognome, nome, password, username} = req.body    
     try {
@@ -52,10 +90,19 @@ export const registrazione = async (req, res) => {
             }
 
         });
+        const csrf_token_value = generateCsrfToken(req, res);
+
+        // creo un token firmato da inviare il browser
+        const token = jwt.sign( {
+            useId: utente.id,
+            csrf_token: csrf_token_value,
+            }, JWT_SECRET, {expiresIn: JWT_EXPIRATION})
+        res.cookie('jwt', token, COOKIE_OPTIONS)
 
         res.status(201).json({ 
             mesage: "Registrazione completata con successo",
-            utente
+            utente,
+            csrf_token: csrf_token_value
         })
 
     } catch (err) {
@@ -66,6 +113,9 @@ export const registrazione = async (req, res) => {
 
 }
 
+/*
+LOGIN
+*/
 export const login = async (req, res) => {
     console.log(req)
 
@@ -91,6 +141,20 @@ export const login = async (req, res) => {
         if (!password_valida) {
             return res.status(401).json({error: "Credenziali non valide"})
         }
+        
+        // creo token CSRF tramite apposita funzione creata nel middleware csrf
+        const csrf_token_value = generateCsrfToken(req, res)
+
+        // creo un token jwt firmato da inviare il browser tramite cookie
+        const token = jwt.sign( {
+            userId: utente.id,
+            userRuolo: utente.ruolo,
+            csrfToken: csrf_token_value
+        }, JWT_SECRET, {expiresIn: JWT_EXPIRATION})
+
+        res.cookie('jwt', token, COOKIE_OPTIONS)
+
+
 
         // Risponsta positiva alla richiesta
         res.json({
@@ -99,7 +163,8 @@ export const login = async (req, res) => {
                 id: utente.id,
                 username: utente.username,
                 ruolo: utente.ruolo
-            }
+            },
+            csrf_token: csrf_token_value
         })
 
     } catch (err) {
@@ -108,3 +173,17 @@ export const login = async (req, res) => {
     }
 }
 
+/*
+LOGOUT
+*/
+export const logout = (req, res) => {
+    // invalida entrambi i cookies
+    res.cookie('jwt', '', { ...COOKIE_OPTIONS, maxAge: 0})
+    res.cookie('csrf_token', '', { ...COOKIE_OPTIONS, maxAge: 0})
+
+    res.json({message: 'Logout effettuato'})
+}
+
+export const demoget = (req,res) => {
+    res.json({message: "Ok...demo get"})
+}
