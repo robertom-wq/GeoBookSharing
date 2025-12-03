@@ -3,7 +3,7 @@
 import Joi from "joi";
 
 export const schema_registrazione = Joi.object({
-    nome: Joi.string().min(2).max(50).required().messages({
+    nome: Joi.string().min(3).max(50).required().messages({
         "string.min": "Il nome deve avere almeno 2 caratteri",
         "string.max": "Il nome può contenere al massimo 50 caratteri",
         "any.required" : "Il nome è obbligatorio"

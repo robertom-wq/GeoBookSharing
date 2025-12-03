@@ -39,12 +39,11 @@ const auth = async (req, res, next) => {
         // provo a decodificare il token
         const decodificato = jwt.verify(token, JWT_SECRET)
         req.userId = decodificato.userId
-        req.isAdmin = decodificato.ruolo === 'admin' // true se l'utente è admin
-
+        req.isAdmin = decodificato.userRuolo === 'admin' // true se l'utente è admin
         // verifico che l'utente esista ancora o non sia bannato ( SELECT id, bannato FROM utenti WHERE id = decodificato.id)
         const utente = prisma.utenti.findUnique({
             where: {id: decodificato.id},
-            select: {id:true, bannato: true}
+            select: {id:true, bannato: true, username: true}
         })
 
         // se utente non esiste oppure è bannato restituisce 400 Bad Request
@@ -69,12 +68,14 @@ const auth = async (req, res, next) => {
                 res.status(400).json({error: 'ID Non valido'})
             }
             req.targetId = targetId
-            req.userId = decodificato.id
-            req.ruolo = decodificato.ruolo || 'user' //'user' come fallback
+        }
+            req.userId = decodificato.userId
+            req.userRuolo = decodificato.ruolo || 'user' //'user' come fallback
+            //req.username = utente.username
 
             // passaggio al middleware successivo
             next()
-        }
+        
         
 
 

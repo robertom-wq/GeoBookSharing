@@ -4,7 +4,18 @@ Scritto per evitare la ripetizione del codice sottostante
 
 const valida_dati = (schema) => {
     return (req, res, next) => {
-        const { error, value } = schema.validate(req.body, {
+
+        let schemaDaValidare = schema
+        //se lo schema ha un contesto dinamico, es utilizzo di isAdmin
+        //in updateUtente dove lo schema è definito come factory function
+        if (typeof schema === 'function') {
+            schemaDaValidare = schema(req.context || {})
+        } else if (schema.context){
+            schemaDaValidare = schema.context(req.context || {})
+        }
+        ////////////////////////////////////////////////////////////////
+
+        const { error, value } = schemaDaValidare.validate(req.body, {
             abortEarly: false,
             stripUnknown: true,
             context: req.context || {}
