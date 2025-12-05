@@ -4,6 +4,7 @@ import auth from "../middleware/auth.js";
 import { csrf_protection } from "../middleware/csrf.js";
 import valida_dati from "../middleware/validate.js";
 import { richiestaEliminazioneSchema, updateUtenteSchema } from "../validators/utenteValidator.js";
+import uploadImgERidimensiona from "../middleware/uploadImgERidimensiona.js";
 
 const utentiRouter = express.Router()
 
@@ -14,7 +15,7 @@ utentiRouter.patch("/richiestaCancellazione", auth, csrf_protection, valida_dati
 
 utentiRouter.get("/profilo{/:id}", auth, getProfilo)
 
-utentiRouter.patch("/profilo{/:id}", auth, csrf_protection, valida_dati(updateUtenteSchema), updateUtente)
+utentiRouter.patch("/profilo{/:id}", auth, csrf_protection, uploadImgERidimensiona, valida_dati(updateUtenteSchema), updateUtente)
 
 utentiRouter.delete("/profilo{/:id}", auth, csrf_protection, deleteUtente)
 

@@ -13,7 +13,8 @@ Operazioni CRUD su utenti
 import prisma from "../config/prisma.js"
 import logger from "../config/logging.js"
 import bcrypt from "bcryptjs"
-
+import fs from 'fs'
+import path from 'path'
 
 /*
 Restituisce la lista di tutti gli utenti, funzionalità utile per gli admin per 
@@ -190,7 +191,6 @@ export const updateUtente = async (req, res) => {
     const targetId = req.targetId // auth stabilisce se esiste un parametro oppure se usare utente loggato
     const mioId = req.userId
     const isAdmin = req.isAdmin
-    
     //uso i dati già validati da Joi
     let data = {...req.dati_validati}
 
@@ -201,7 +201,50 @@ export const updateUtente = async (req, res) => {
         // sovrascrivo oggetto data con i dati effettivamente aggiornabili
         data = dati_puliti
     }
-    ///////////////inserire qui gestione upload immagine /////////
+
+    ///////////////aggiornamento: gestione upload immagine /////////
+    if (req.fileRidimensionato) {
+        data.avatar = req.fileRidimensionato.main
+        data.avatar_thumb = req.fileRidimensionato.thumb
+    }
+    
+
+    // rimoziono vecchie immagini
+    try {
+        // cerco i vecchi path
+        const vecchi_path = await prisma.utenti.findUnique({
+            where: {id: targetId },
+            select: { avatar: true, avatar_thumb: true}
+        }) 
+        console.log(vecchi_path)
+        if (vecchi_path) {
+            //procedo all'eliminazione
+            [vecchi_path.avatar, vecchi_path.avatar_thumb].forEach( url => {
+                console.log("url: ", path.join(process.cwd(), url))
+                // solitamente i libri caricati da google.books non hanno entrambe le immagini
+                // ma solo la main, quindi verifico se esistono i path
+                if (url) {
+                    const file_path = path.join(process.cwd(), url)
+                    console.log("provo ad eliminare: ", file_path)
+                    fs.unlink(file_path, err => {
+                        if (err && err.code !=='ENOENT') {
+                            console.error("Non è stato possibile rimuovere vecchie immagini")
+                            logger.warn("Non è stato possibile rimuovere vecchie immagini")
+                        }
+                    })
+                    console.log("File eliminato con successo: ",path.join(process.cwd(), url))
+                }
+            })
+        } 
+        
+    } catch (err) {
+        // non bloccante, in caso di mancata eliminazione immagine
+        console.warn("Impossibile rimuovere vecchie immagini")
+        logger.warn("Non è stato possibile rimuovere vecchie immagini")
+        
+    }
+    ///////////////FINE aggiornamento: gestione upload immagine /////////
+
 
     //se non c'è nulla da aggiornare, risposta anticipata
     if (Object.keys(data).length === 0) {
@@ -286,7 +329,7 @@ export const deleteUtente = async (req, res) => {
         try {
             const utente = await prisma.utenti.findUnique({
                 where: {id: targetId },
-                select: {richiesta_eliminazione: true}
+                select: {richiesta_eliminazione: true, avatar: true, avatar_thumb: true}
             })
             
             if (!utente) {
@@ -296,7 +339,34 @@ export const deleteUtente = async (req, res) => {
                 return res.status(400).json({error: "Richiesta di eliminazione non presente per l'utente id:" + targetId})
             }
 
-            /////////// implementare ELIMINAZIONE AVATAR dal disco fisso/////////////
+            /////////// aggiornamento: implementare ELIMINAZIONE AVATAR dal disco fisso/////////////
+            try {
+                if (utente.avatar || utente.avatar_thumb) {
+                    //procedo all'eliminazione
+                    [utente.avatar, utente.avatar_thumb].forEach( url => {
+                        // solitamente i libri caricati da google.books non hanno entrambe le immagini
+                        // ma solo la main, quindi verifico se esistono i path
+                        if (url) {
+                            const file_path = path.join(process.cwd(), url)
+                            fs.unlink(file_path, err => {
+                                if (err && err.code !=='ENOENT') {
+                                    console.error("Non è stato possibile rimuovere vecchie immagini")
+                                    logger.warn("Non è stato possibile rimuovere vecchie immagini")
+                                }
+                            })
+                        }
+                    })
+                } 
+                
+            } catch (err) {
+                // non bloccante, in caso di mancata eliminazione immagine
+                console.warn("Impossibile rimuovere vecchie immagini")
+                logger.warn("Non è stato possibile rimuovere vecchie immagini")
+                
+            }
+
+            /////////// fine aggiornamento: implementare ELIMINAZIONE AVATAR dal disco fisso/////////////
+
 
             //cancellazione dal database
             logger.warn("L'utente con id:"+ mioId+ " sta per eliminare l'account id:" + targetId)
@@ -314,7 +384,7 @@ export const deleteUtente = async (req, res) => {
         } catch (err) {
             logger.error('Errore deleteUtente -> : Errore generico')
             console.error('Errore "deleteUtente":', err)
-            res.status(500).json({ error: "Errore server"})
+            res.status(500).json({ error: "Errore server - Cancellazione utente"})
         }
     } else {
         logger.warn("L'utente con id:"+ mioId+ " ha tentato di eliminare l'account id:" + targetId + "senza averne autorizzazione")
