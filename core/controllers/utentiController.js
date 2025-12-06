@@ -191,8 +191,18 @@ export const updateUtente = async (req, res) => {
     const targetId = req.targetId // auth stabilisce se esiste un parametro oppure se usare utente loggato
     const mioId = req.userId
     const isAdmin = req.isAdmin
+
     //uso i dati già validati da Joi
     let data = {...req.dati_validati}
+
+    //verifica autorizzazione
+    const isAutorizzato = isAdmin || (targetId === mioId);
+
+    if (!isAutorizzato) {
+        // Se non è autorizzato, restituisci immediatamente l'errore 403.
+        logger.warn(`L'utente id:${mioId} ha tentato di aggiornare il profilo id:${targetId} senza autorizzazione. Richiesta bloccata`);
+        return res.status(403).json({ error: `Non hai le autorizzazioni per modificare un altro profilo` });
+    }
 
     //rimuovo il campo type dall'oggetto.. è utile solo per l'upload dell'immagine ma non fa parte dei campi db
     if (data.type) {
@@ -257,7 +267,7 @@ export const updateUtente = async (req, res) => {
         data.hashed_password = hashed
     }
 
-    try {
+    try {       
         const utente = await prisma.utenti.update({
             where: {id: targetId},
             data,
@@ -387,7 +397,7 @@ export const deleteUtente = async (req, res) => {
             res.status(500).json({ error: "Errore server - Cancellazione utente"})
         }
     } else {
-        logger.warn("L'utente con id:"+ mioId+ " ha tentato di eliminare l'account id:" + targetId + "senza averne autorizzazione")
+        logger.warn("L'utente con id:"+ mioId+ " ha tentato di eliminare l'account id:" + targetId + "senza averne autorizzazione. Richiesta bloccata")
         return res.status(401).json({error: "Attensione solo gli utenti Admin possono procedere con l'eliminazione"})
     }
 }
