@@ -100,12 +100,13 @@ model libri {
   id                              Int       @id @default(autoincrement())
   titolo                          String    @db.VarChar(300)
   autore                          String    @db.VarChar(1000) @default("Sconosciuto")
+  isbn                            String    @db.VarChar(20) @default("Non definito")                             
   anno                            Int?
-  copertina                       String?    @db.VarChar(1000)
-  copertina_thumb                 String?    @db.VarChar(1000)
-  descrizione                     String?    @db.VarChar(2000)
-  genere_id                       Int?       @default(999) // genere 999 creato ad hoc come "Non definito"
-  tipo_condivisione_id            Int?       @default(999) // tipo di condivione 999 creato ad hoc come "Non definito"
+  copertina                       String?   @db.VarChar(1000)
+  copertina_thumb                 String?   @db.VarChar(1000)
+  descrizione                     String?   @db.VarChar(2000)
+  genere_id                       Int       @default(999) // genere 999 creato ad hoc come "Non definito"
+  tipo_condivisione_id            Int       @default(999) // tipo di condivione 999 creato ad hoc come "Non definito"
   proprietario_id                 Int                      // obbligatorio: ogni libro deve avere un proprietario  
   scaffale_id                     Int                      // obbligatorio: ogni libro deve far parte di uno scaffale
   is_disponibile                  Boolean    @default(true)

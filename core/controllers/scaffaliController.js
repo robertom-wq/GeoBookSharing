@@ -62,7 +62,6 @@ export const updateScaffale = async (req, res) => {
 
     const {nome, descrizione, lat, lng } = req.dati_validati
     const mioId = req.userId
-    const isAdmin = req.isAdmin
 
     // verifico se id esiste ed è valido
     if (!id_scaffale || isNaN(id_scaffale)) {
@@ -93,11 +92,13 @@ export const updateScaffale = async (req, res) => {
         }
         // procedo all'aggiornamento solamente se vi sono dati da aggiornare
         // prima fase
-        if (Object.keys(dati_in_aggiornamento) > 0) {
-            await prisma.scaffali.update({
-                where: { id: id_scaffale},
-                data: dati_in_aggiornamento
-            })
+        if (Object.keys(dati_in_aggiornamento).length > 0) {
+            await prisma.$transaction(async (tx) => {
+                await tx.scaffali.update({
+                    where: { id: id_scaffale },
+                    data: dati_in_aggiornamento,
+                });
+            });
         }
         //seconda fase
         if (lat !== undefined && lng !== undefined) {
@@ -108,6 +109,7 @@ export const updateScaffale = async (req, res) => {
                 posizione =  ST_GeomFromText(${punto_geografico}, 4326)
             WHERE id = ${id_scaffale}
             `
+            logger.info(`Posizione scaffale ${id_scaffale} aggiornata separatamente.`);
         }
 
         //ritorna lo scaffale con posizione
@@ -125,7 +127,7 @@ export const updateScaffale = async (req, res) => {
             id=${id_scaffale}
         `
 
-        res.status(200).json({message: `Scaffale ${id_scaffale} aggiornato con successo`})
+        return res.status(200).json({message: `Scaffale ${id_scaffale} aggiornato con successo`, data: scaffale_aggiornato})
 
 
     } catch (err) {
@@ -230,9 +232,14 @@ export const deleteScaffale = async (req, res) => {
         }
 
         //Delete
-        await prisma.$queryRaw`
+        await prisma.$transaction(async (tx) => { 
+            await tx.scaffali.delete({
+                 where: { id: id_scaffale }
+             });
+        })
+/*         await prisma.$queryRaw`
         DELETE FROM scaffali WHERE id = ${id_scaffale}
-        `
+        ` */
         res.status(200).json({message: `Lo scaffale ${id_scaffale} è stato eliminato con successo`})
 
     } catch (err) {
@@ -255,6 +262,7 @@ export const getScaffaliVicini = async (req, res) => {
     // Preparazione della stringa di ricerca, trasformandola in minuscolo e aggiungendo i wildcards di PostgreSQL
     const termine_ricercato = `%${q.toLowerCase()}%`
 
+    //controllo che tutti i parametri di posizione siano numerici
     if (isNaN(lat_num) || isNaN(lng_num) || isNaN(dist_num)) {
         return res.status(400).json({ error: "Parametri non validi"})
     }
@@ -376,9 +384,17 @@ export const getAllScaffaliConLibri = async (req, res) => {
         `)
     } 
 
-    const whereCondizione = condizioni.length > 0
-    ? Prisma.sql`WHERE ${Prisma.join(condizioni, Prisma.sql` AND `)}`
-    : Prisma.sql``; // Se non ci sono condizioni, la stringa WHERE è vuota
+    let whereCondizione;
+
+    if (condizioni.length > 0) {
+        // Unisco le condizioni con una stringa ' AND ' 
+        const joinedConditions = Prisma.join(condizioni, ' AND '); 
+        
+        // Racchiudo il tutto nel template literal WHERE per l'interpolazione finale
+        whereCondizione = Prisma.sql`WHERE ${joinedConditions}`;
+    } else {
+        whereCondizione = Prisma.sql``; // Se non ci sono condizioni
+    }
 
     try {
         const scaffali = await prisma.$queryRaw`
