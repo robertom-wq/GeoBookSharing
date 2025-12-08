@@ -31,7 +31,7 @@ model tipi_condivisione {
 
 model generi {
   id                               Int       @id @default(autoincrement())
-  dettagli                         String    @db.VarChar(100)
+  dettagli                         String    @db.VarChar(100) @unique(map: "idx_genere_dettagli")
   libri                            libri[]
   libri_master                     libri_master[]
 
@@ -234,6 +234,7 @@ model storico_utente_valutazioni {
 enum TipiAzione {
   DELETE_UTENTE
   DELETE_LIBRO
+  DELETE_LIBRO_MASTER
   DELETE_SCAFFALE
   DELETE_CONDIVISIONE
   DELETE_VALUTAZIONE // Admin può usarla se ritenuta offensiva
@@ -248,7 +249,7 @@ model storico_eliminazioni {
   esecutore_id                       Int
   esecutore_username                 String    @db.VarChar(100)
   target_ID                          Int
-  target_nome                        String    @db.VarChar(100) // identificativo tipo username, titolo, nome scaffale etc
+  target_nome                        String    @db.VarChar(300) // identificativo tipo username, titolo, nome scaffale etc
   azione                             TipiAzione
   dettagli                           String?   @db.VarChar(1000)
 

@@ -22,9 +22,12 @@ const upload  = multer({
 
 // Ridimensionamento dell'immagine caricata
 const ridimensiona = async (req, res, next) => {
+    console.log("UPLOAD")
+
     if (!req.file) {
         return next() // se il file non cè passa al prossimo middleware
     }
+    console.log("FILE PRESENTE")
     const tipo = req.body.type // il tipo di immagine viene inviato durante aggiornamento Utente/Libro e può essere "avatar" o "copertina"
     const cartella = tipo === 'avatar' ? AVATAR_PATH: COPERTINE_PATH // 
     const estensione = path.extname(req.file.originalname) || '.jpg'
@@ -48,6 +51,7 @@ const ridimensiona = async (req, res, next) => {
             main: path_immagine_principale,
             thumb: path_immagine_anteprima
         }
+        console.log( req.fileRidimensionato)
         next()
 
     } catch (err) {

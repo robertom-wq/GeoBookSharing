@@ -5,6 +5,7 @@ import logger from './core/config/logging.js';
 import utentiRouter from './core/routes/utentiRoute.js';
 import scaffaliRouter from './core/routes/scaffaliRoute.js';
 import libriRouter from './core/routes/libriRoute.js';
+import libriMasterRouter from './core/routes/libriMasterRoute.js';
 
 const app = express();
 
@@ -19,6 +20,8 @@ app.use('/api/utenti', utentiRouter)
 app.use('/api/scaffali', scaffaliRouter)
 
 app.use('/api/libri', libriRouter)
+
+app.use('/api/libriMaster', libriMasterRouter)
 
 app.listen(3000,'localhost', () => {
     logger.info("Server Backend avviato - API su http://localhost:3000")

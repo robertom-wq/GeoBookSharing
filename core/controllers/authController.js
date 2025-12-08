@@ -95,7 +95,8 @@ export const registrazione = async (req, res) => {
 
         // creo un token firmato da inviare il browser
         const token = jwt.sign( {
-            useId: utente.id,
+            userId: utente.id,
+            userUsername: utente.username,
             csrf_token: csrf_token_value,
             }, JWT_SECRET, {expiresIn: JWT_EXPIRATION})
         res.cookie('jwt', token, COOKIE_OPTIONS)
@@ -150,6 +151,7 @@ export const login = async (req, res) => {
         // creo un token jwt firmato da inviare il browser tramite cookie
         const token = jwt.sign( {
             userId: utente.id,
+            userUsername: utente.username,
             userRuolo: utente.ruolo,
             csrfToken: csrf_token_value
         }, JWT_SECRET, {expiresIn: JWT_EXPIRATION})

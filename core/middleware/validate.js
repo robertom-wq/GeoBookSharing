@@ -6,6 +6,7 @@ const valida_dati = (schema) => {
     return (req, res, next) => {
 
         let schemaDaValidare = schema
+        console.log("body",req.body)
         //se lo schema ha un contesto dinamico, es utilizzo di isAdmin
         //in updateUtente dove lo schema è definito come factory function
         if (typeof schema === 'function') {
@@ -24,6 +25,7 @@ const valida_dati = (schema) => {
         const errors = error.details.map(d => d.message)
         return res.status(400).json({ errors: "Dati non Validi", details: errors });
      }
+     console.log("VALIDA DATI -> VALUE:", value)
      req.dati_validati = value
      next()
     }

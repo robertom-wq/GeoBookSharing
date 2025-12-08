@@ -1,0 +1,75 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 1,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "XnCb0QEACAAJ",
+      "etag": "9DaFTeuk5I8",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/XnCb0QEACAAJ",
+      "volumeInfo": {
+        "title": "Software Engineering",
+        "authors": [
+          "Matteo Camilli",
+          "Elisabetta Di Nitto",
+          "Alfonso Fuggetta",
+          "Alessandro Margara",
+          "Matteo Rossi",
+          "Damian Andrew Tamburri"
+        ],
+        "publishedDate": "2025",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9791280623508"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 0,
+        "printType": "BOOK",
+        "categories": [
+          "Computers"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=XnCb0QEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=XnCb0QEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.it/books?id=XnCb0QEACAAJ&dq=isbn:9791280623508&hl=&cd=1&source=gbs_api",
+        "infoLink": "http://books.google.it/books?id=XnCb0QEACAAJ&dq=isbn:9791280623508&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Software_Engineering.html?hl=&id=XnCb0QEACAAJ"
+      },
+      "saleInfo": {
+        "country": "IT",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "IT",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=XnCb0QEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      }
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import prisma from "../config/prisma.js"
 import path from 'path'
 import fs from 'fs'
 import logger from "../config/logging.js"
-import { Prisma } from '@prisma/client'; // Importa l'oggetto Prisma
+import { Prisma, TipiAzione } from '@prisma/client'; // Importa l'oggetto Prisma
 
 /*
 Creazione manuale di un libro
@@ -165,7 +165,7 @@ export const getLibroById = async (req, res) => {
 
 
 /*
-Ricerca libri con query di ricerca autore o titolo
+Ricerca libri con query di ricerca autore, titolo o genere
 */
 export const getAllLibri = async (req, res) => {
     const mioId = req.userID
@@ -198,6 +198,7 @@ export const getAllLibri = async (req, res) => {
                     // username like %queryString%
                     {titolo: { contains: queryString, mode: 'insensitive'}},
                     {autore: { contains: queryString, mode: 'insensitive'}},
+                    {genere: { dettagli: { contains: queryString, mode: 'insensitive'}}}
                  ]
         }
         const [libri, conteggioTotale] = await prisma.$transaction([
@@ -337,16 +338,15 @@ export const updateLibro = async (req, res) => {
     const mioId = req.userId
     let nuovaCopertina = null
     let nuovaCopertina_thumb = null
-    const temp_data = req.body
     
     // verifico se nella richiesta vi sono files per la copertina proveniente dal middleware uploadImgERidimensiona
     if(req.fileRidimensionato) {
         //verifico che il type sia giusto
-        if(temp_data.type !== 'copertina'){
+        if(req.body.type !== 'copertina'){
             return res.status(400).json({error: "Il type deve essere 'copertina'"})
         }
-        nuovaCopertina = fileRidimensionato.main
-        nuovaCopertina_thumb = fileRidimensionato.thumb
+        nuovaCopertina = req.fileRidimensionato.main
+        nuovaCopertina_thumb = req.fileRidimensionato.thumb
     }
     // dati validati da validate(updateLibriSchema)
     const data = {...req.dati_validati}
@@ -424,12 +424,13 @@ export const deleteLibro = async (req, res) => {
     const targetId = parseInt(req.params.id)
     const isAdmin = req.isAdmin
     const mioId = req.userId
+    const mioUsername = req.userUsername
+
     try {
         // ricerco il libro da eliminare, verificando se utente non ha prestiti in atto
         const libro = await prisma.libri.findUnique({
         where: {id: targetId, is_disponibile: true},
-        select: {proprietario_id: true, titolo: true, copertina: true, copertina_thumb:true,
-        }
+        select: {proprietario_id: true, titolo: true, copertina: true, copertina_thumb:true},
         })
         if(!libro) {
             return res.status(404).json({error: `Libro ${targetId} non trovato oppure in prestito`})
@@ -442,6 +443,15 @@ export const deleteLibro = async (req, res) => {
                 await tx.libri.delete({
                     where: { id: targetId }
                 });
+                await tx.storico_eliminazioni.create({
+                    data: {
+                        esecutore_id: mioId,
+                        esecutore_username: mioUsername,
+                        target_ID: targetId,
+                        target_nome: libro.titolo,
+                        azione: TipiAzione.DELETE_LIBRO
+                    }
+                })
             });
 
             /////////// aggiornamento: implementare ELIMINAZIONE COPERTINA dal disco fisso/////////////
@@ -555,6 +565,10 @@ export const getLibriPiuVisitati = async (req, res) => {
      }
 }
 
+
+/*
+Ricerca libri per titolo/autore, genere e posizione
+*/
 export const getLibriVicini = async (req, res) => {
     const {lat, lng, dist=5000, q='' } = req.query
 
@@ -569,13 +583,13 @@ export const getLibriVicini = async (req, res) => {
     }
     
     try {
-        // Preparazione della stringa di ricerca da usare come filtro where, per titolo o autore,
+        // Preparazione della stringa di ricerca da usare come filtro where, per titolo/autore o genere,
         // trasformandola in minuscolo e aggiungendo i LIKE se presente
         let sql_where_filtro = Prisma.empty
         if (q && q.trim()){
             const termine_ricercato = `%${q.trim().toLowerCase()}%`
             sql_where_filtro = `
-            AND (l.titolo LIKE ${termine_ricercato} OR l.autore LIKE ${termine_ricercato})`
+            AND (l.titolo LIKE ${termine_ricercato} OR l.autore LIKE ${termine_ricercato} OR genere LIKE ${termine_ricercato})`
         }
         
         //preparo la query principale parametrizzata tramite prisma.sql, per evitare sql injections
@@ -661,3 +675,6 @@ export const getLibriVicini = async (req, res) => {
     
 }
 
+export const getGeneriPiuComuni = async (req, res) => {
+    console.log('implementare')
+}

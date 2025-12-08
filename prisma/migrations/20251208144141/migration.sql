@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "TipiAzione" ADD VALUE 'DELETE_LIBRO_MASTER';

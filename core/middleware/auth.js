@@ -69,9 +69,9 @@ const auth = async (req, res, next) => {
             }
             req.targetId = targetId
         }
+            req.userUsername = decodificato.userUsername
             req.userId = decodificato.userId
             req.userRuolo = decodificato.ruolo || 'user' //'user' come fallback
-            //req.username = utente.username
 
             // passaggio al middleware successivo
             next()

@@ -15,6 +15,7 @@ import logger from "../config/logging.js"
 import bcrypt from "bcryptjs"
 import fs from 'fs'
 import path from 'path'
+import { TipiAzione } from '@prisma/client'
 
 /*
 Restituisce la lista di tutti gli utenti, funzionalità utile per gli admin per 
@@ -221,6 +222,7 @@ export const updateUtente = async (req, res) => {
 
     //uso i dati già validati da Joi
     let data = {...req.dati_validati}
+    console.log(data)
     let vecchi_path_file = null; // Variabile per i path da eliminare
 
     //verifica autorizzazione
@@ -360,12 +362,13 @@ export const deleteUtente = async (req, res) => {
     const isAdmin = req.isAdmin
     const targetId = req.targetId  
     const mioId = req.userId
+    const mioUsername = req.userUsername
 
     if (isAdmin && targetId!==mioId ) {
         try {
             const utente = await prisma.utenti.findUnique({
                 where: {id: targetId },
-                select: {richiesta_eliminazione: true, avatar: true, avatar_thumb: true}
+                select: {username: true, richiesta_eliminazione: true, avatar: true, avatar_thumb: true}
             })
             
             if (!utente) {
@@ -383,8 +386,17 @@ export const deleteUtente = async (req, res) => {
                 // Elimina il record dal database. Se questo fallisce, l'intera transazione fallisce 
                 await tx.utenti.delete({ 
                     where: { id: targetId}
-                });
-            });
+                })
+                await tx.storico_eliminazioni.create({
+                    data: {
+                        esecutore_id: mioId,
+                        esecutore_username: mioUsername,
+                        target_ID: targetId,
+                        target_nome: utente.username,
+                        azione: TipiAzione.DELETE_UTENTE
+                    }
+                })
+            })
 
             /////////// aggiornamento: implementare ELIMINAZIONE AVATAR dal disco fisso/////////////
             if (utente.avatar || utente.avatar_thumb) {

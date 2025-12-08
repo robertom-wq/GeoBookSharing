@@ -34,12 +34,12 @@ export const createLibroSchema = Joi.object({
         'number.min': 'L\'ID dello scaffale deve essere maggiore o uguale a 1.',
         'any.required': 'L\'ID dello scaffale è obbligatorio.'
     }),
-    genere_id: Joi.number().integer().min(1).empty('').messages({
+    genere_id: Joi.number().integer().min(1).allow(null).messages({
         'number.base': 'L\'ID del genere deve essere un numero intero.',
         'number.integer': 'L\'ID del genere deve essere un numero intero.',
         'number.min': 'L\'ID del genere deve essere maggiore o uguale a 1.',
     }),
-    tipo_condivisione_id: Joi.number().integer().min(1).empty('').messages({
+    tipo_condivisione_id: Joi.number().integer().min(1).allow(null).messages({
         'number.base': 'L\'ID del tipo di condivisione deve essere un numero intero.',
         'number.integer': 'L\'ID del tipo di condivisione deve essere un numero intero.',
         'number.min': 'L\'ID del tipo di condivisione deve essere maggiore o uguale a 1.',
@@ -57,7 +57,7 @@ export const updateLibroSchema = Joi.object({
         'string.min': 'Il titolo deve contenere almeno 3 caratteri.',
         'string.max': 'Il titolo non può superare i 255 caratteri.',
     }),
-    autore: Joi.string().empty('').trim().optional().messages({
+    autore: Joi.string().empty('').max(255).trim().optional().messages({
         'string.base': 'L\'autore deve essere una stringa di testo.',
     }),
     isbn: Joi.string().max(20).min(10).trim().empty('').optional().messages({
@@ -75,17 +75,17 @@ export const updateLibroSchema = Joi.object({
         'string.base': 'La descrizione deve essere una stringa di testo.',
         'string.max': 'La descrizione non può superare i 1000 caratteri.',
     }),
-    scaffale_id: Joi.number().integer().min(1).empty('').optional().messages({
+    scaffale_id: Joi.number().integer().min(1).allow(null).optional().messages({
         'number.base': 'L\'ID dello scaffale deve essere un numero intero.',
         'number.integer': 'L\'ID dello scaffale deve essere un numero intero.',
         'number.min': 'L\'ID dello scaffale deve essere maggiore o uguale a 1.'
     }),
-    genere_id: Joi.number().integer().min(1).empty('').optional().messages({
+    genere_id: Joi.number().integer().min(1).allow(null).optional().messages({
         'number.base': 'L\'ID del genere deve essere un numero intero.',
         'number.integer': 'L\'ID del genere deve essere un numero intero.',
         'number.min': 'L\'ID del genere deve essere maggiore o uguale a 1.'
     }),
-    tipo_condivisione_id: Joi.number().integer().min(1).empty('').optional().messages({
+    tipo_condivisione_id: Joi.number().integer().min(1).allow(null).optional().messages({
         'number.base': 'L\'ID del tipo di condivisione deve essere un numero intero.',
         'number.integer': 'L\'ID del tipo di condivisione deve essere un numero intero.',
         'number.min': 'L\'ID del tipo di condivisione deve essere maggiore o uguale a 1.'
@@ -97,7 +97,9 @@ export const updateLibroSchema = Joi.object({
 }).options({
     stripUnknown: true,
     convert: true
-})
+}).min(1).messages({
+    'object.min': 'La richiesta di aggiornamento deve contenere almeno un campo da modificare.'
+});
 
 export const createLibroFromMasterSchema = Joi.object({
     master_id: Joi.number().integer().required().messages({

@@ -1,6 +1,6 @@
 import prisma from "../config/prisma.js"
 import logger from "../config/logging.js"
-import { Prisma } from '@prisma/client'; // Importa l'oggetto Prisma
+import { Prisma, TipiAzione } from '@prisma/client'; // Importa l'oggetto Prisma
 /*
 NOTE - RIMUOVERE E AGGIUNGERE IN TEMPLATE
 Ho optato per l'uso di prisma.$queryRaw perchè Prisma non supporta nativamente i tipi di dati spaziali come geometry o geography
@@ -202,6 +202,7 @@ contiene libri. Prima vanno eliminati i libri
 export const deleteScaffale = async (req, res) => {
     const id_scaffale = parseInt(req.params.id)
     const mioId = req.userId
+    const mioUsername = req.userUsername
 
     if (!id_scaffale || isNaN(id_scaffale)) {
          return res.status(400).json({error: "ID scaffale NON valido"})
@@ -235,7 +236,16 @@ export const deleteScaffale = async (req, res) => {
         await prisma.$transaction(async (tx) => { 
             await tx.scaffali.delete({
                  where: { id: id_scaffale }
-             });
+             })
+            await tx.storico_eliminazioni.create({
+                data: {
+                    esecutore_id: mioId,
+                    esecutore_username: mioUsername,
+                    target_ID: id_scaffale,
+                    target_nome: id_scaffale.toString(),
+                    azione: TipiAzione.DELETE_SCAFFALE
+                }
+            })
         })
 /*         await prisma.$queryRaw`
         DELETE FROM scaffali WHERE id = ${id_scaffale}
@@ -384,7 +394,7 @@ export const getAllScaffaliConLibri = async (req, res) => {
         `)
     } 
 
-    let whereCondizione;
+    let whereCondizione = {}
 
     if (condizioni.length > 0) {
         // Unisco le condizioni con una stringa ' AND ' 

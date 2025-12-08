@@ -12,7 +12,7 @@ const libriRouter = express.Router()
 
 libriRouter.post('/', auth, csrf_protection, uploadImgERidimensiona, valida_dati(createLibroSchema), createLibro)
 
-libriRouter.post('daMaster/', auth, csrf_protection, uploadImgERidimensiona, valida_dati(createLibroFromMasterSchema), createLibroFromMaster)
+libriRouter.post('/daMaster', auth, csrf_protection, uploadImgERidimensiona, valida_dati(createLibroFromMasterSchema), createLibroFromMaster)
 
 libriRouter.get('/all', auth, getAllLibri)
 
