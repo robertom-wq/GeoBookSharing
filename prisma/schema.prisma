@@ -165,7 +165,7 @@ model condivisioni {
   is_confermato                     Boolean   @default(false)
   is_completato                     Boolean   @default(false)
   data_creazione                    DateTime  @db.Timestamp(6) @default(now())
-  data_completato                   DateTime  @db.Timestamp(6) 
+  data_completato                   DateTime? @db.Timestamp(6) 
   data_ultima_modifica              DateTime  @db.Timestamp(6) @updatedAt
 
    // RELAZIONI e INTEGRITA REFERENZIALE

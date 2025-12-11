@@ -64,43 +64,43 @@ export const getAllUtenti = async (req, res) => {
     const skipElementi = (pagina - 1) * limit;
 
     try {
-       let where = {
-        // escludo utente loggato
-        id : {not: mioId }
-       }
-       if (q) {
-        // elimino spazi bianchi
-        const queryString = q.trim()
-        // verifico se queryString è un numero (usato nella ricerca tramite ID)
-        const isQueryStringANumber = !isNaN(queryString) && queryString !== '' 
+        let where = {
+            // escludo utente loggato
+            id: { not: mioId }
+        }
+        if (q) {
+            // elimino spazi bianchi
+            const queryString = q.trim()
+            // verifico se queryString è un numero (usato nella ricerca tramite ID)
+            const isQueryStringANumber = !isNaN(queryString) && queryString !== ''
 
-        // costruisco filtro dinamico where, diffenziando tra admin e user
-        if (req.isAdmin) {
-            // admin
-            if (isQueryStringANumber) {
-                // se queryString è un numero sicuramente è un id da ricercare
-                where.id = parseInt(queryString)
+            // costruisco filtro dinamico where, diffenziando tra admin e user
+            if (req.isAdmin) {
+                // admin
+                if (isQueryStringANumber) {
+                    // se queryString è un numero sicuramente è un id da ricercare
+                    where.id = parseInt(queryString)
+                } else {
+                    where.OR = [
+                        // username like %queryString%
+                        { username: { contains: queryString, mode: 'insensitive' } },
+                        { cognome: { contains: queryString, mode: 'insensitive' } },
+                        { nome: { contains: queryString, mode: 'insensitive' } },
+                        { email: { contains: queryString, mode: 'insensitive' } },
+                        { ruolo: { contains: queryString, mode: 'insensitive' } }
+                    ]
+                }
             } else {
-                where.OR = [
-                    // username like %queryString%
-                    {username: { contains: queryString, mode: 'insensitive'}},
-                    {cognome: { contains: queryString, mode: 'insensitive'}},
-                    {nome : { contains: queryString, mode: 'insensitive'}},
-                    {email: { contains: queryString, mode: 'insensitive'}},
-                    {ruolo: { contains: queryString, mode: 'insensitive'}}
-                ]
-            }
-        } else {
-            // utente
-            if (!isQueryStringANumber) {
-                where.username = { contains: queryString, mode: 'insensitive'}
-            } else {
-                return res.status(401).json({error: "Non sei autorizzato alla ricerca tramite ID"})
+                // utente
+                if (!isQueryStringANumber) {
+                    where.username = { contains: queryString, mode: 'insensitive' }
+                } else {
+                    return res.status(401).json({ error: "Non sei autorizzato alla ricerca tramite ID" })
+                }
             }
         }
-       }
 
-       const [utenti, conteggioTotale] = await prisma.$transaction([
+        const [utenti, conteggioTotale] = await prisma.$transaction([
             prisma.utenti.findMany({
                 //clausola where dinamicamente costruita in precedenza
                 where,
@@ -122,7 +122,7 @@ export const getAllUtenti = async (req, res) => {
                         data_ultima_modifica: true,
                         richiesta_eliminazione: true,
                         data_richiesta_eliminazione: true,
-                    })            
+                    })
                 },
                 orderBy: { username: 'asc' },
                 take: limit,
@@ -133,18 +133,18 @@ export const getAllUtenti = async (req, res) => {
             })
         ])
         return res.status(200).json({
-        message: "Utenti trovati",
-        paginaCorrente: pagina,
-        elementiPerPagina: limit,
-        conteggioTotale: conteggioTotale,
-        pagineTotali: Math.ceil(conteggioTotale / limit),
-        data: utenti
-    })
+            message: "Utenti trovati",
+            paginaCorrente: pagina,
+            elementiPerPagina: limit,
+            conteggioTotale: conteggioTotale,
+            pagineTotali: Math.ceil(conteggioTotale / limit),
+            data: utenti
+        })
 
-    } catch(err) {
+    } catch (err) {
         logger.error('Errore getAllUtenti -> : Errore generico')
         console.error('Errore "getAllUtenti":', err)
-        return res.status(500).json({ error: "Errore server"})
+        return res.status(500).json({ error: "Errore server" })
     }
 
 }
@@ -164,7 +164,7 @@ export const getProfilo = async (req, res) => {
     try {
         //query per recupero utente
         const utente = await prisma.utenti.findUnique({
-            where: { id: targetId},
+            where: { id: targetId },
             select: {
                 id: true,
                 username: true,
@@ -181,19 +181,19 @@ export const getProfilo = async (req, res) => {
                     data_ultima_modifica: true,
                     richiesta_eliminazione: true,
                     data_richiesta_eliminazione: true,
-                }:{}) // se non è admin oppure utente loggato, mostra solo informazioni pubbliche            
+                } : {}) // se non è admin oppure utente loggato, mostra solo informazioni pubbliche            
             }
         })
-        
+
         if (!utente) {
-            res.status(404).json({ error: 'Utente non trovato'})
+            res.status(404).json({ error: 'Utente non trovato' })
         }
 
         //incremento visualizzazioni utente (se profilo visitato è diverso dal suo)
-            if (targetId !== mioId) {
-                const utenteVisualizzazioneUpdated = await prisma.utenti.update({
-                    data: {visualizzazioni: {increment: 1 }},
-                    where: {id: targetId}
+        if (targetId !== mioId) {
+            const utenteVisualizzazioneUpdated = await prisma.utenti.update({
+                data: { visualizzazioni: { increment: 1 } },
+                where: { id: targetId }
             })
             utente.visualizzazioni = utenteVisualizzazioneUpdated.visualizzazioni;
         }
@@ -204,7 +204,7 @@ export const getProfilo = async (req, res) => {
     } catch (err) {
         logger.error('Errore getProfilo -> : Errore generico')
         console.error('Errore "getProfilo":', err)
-        return res.status(500).json({ error: "Errore server"})
+        return res.status(500).json({ error: "Errore server" })
 
     }
 }
@@ -221,7 +221,7 @@ export const updateUtente = async (req, res) => {
     const isAdmin = req.isAdmin
 
     //uso i dati già validati da Joi
-    let data = {...req.dati_validati}
+    let data = { ...req.dati_validati }
     console.log(data)
     let vecchi_path_file = null; // Variabile per i path da eliminare
 
@@ -237,7 +237,7 @@ export const updateUtente = async (req, res) => {
     //rimuovo il campo type dall'oggetto.. è utile solo per l'upload dell'immagine ma non fa parte dei campi db
     if (data.type) {
         //destrutturazione
-        const {type, ...dati_puliti } = data
+        const { type, ...dati_puliti } = data
         // sovrascrivo oggetto data con i dati effettivamente aggiornabili
         data = dati_puliti
     }
@@ -249,15 +249,15 @@ export const updateUtente = async (req, res) => {
         try {
             // cerco i vecchi path
             const vecchi_path = await prisma.utenti.findUnique({
-                where: {id: targetId },
-                select: { avatar: true, avatar_thumb: true}
-            }) 
-                    
+                where: { id: targetId },
+                select: { avatar: true, avatar_thumb: true }
+            })
+
         } catch (err) {
             // non bloccante, in caso di mancata eliminazione immagine
             console.warn(`Errore nel recupero vecchi path utente ${targetId}:`, err)
             logger.warn("Non è stato possibile rimuovere vecchie immagini")
-            
+
         }
         data.avatar = req.fileRidimensionato.main
         data.avatar_thumb = req.fileRidimensionato.thumb
@@ -267,7 +267,7 @@ export const updateUtente = async (req, res) => {
     if (Object.keys(data).length === 0) {
         return res.json({ message: 'Niente da aggiornare' })
     }
-    
+
     if (data.hashed_password) {
         const hashed = await bcrypt.hash(data.hashed_password, 12)
         data.hashed_password = hashed
@@ -278,30 +278,30 @@ export const updateUtente = async (req, res) => {
     try {
         utenteAggiornato = await prisma.$transaction(async (tx) => {
             return await prisma.utenti.update({
-                        where: {id: targetId},
-                        data,
-                        select: {
-                            id: true,
-                            nome: true,
-                            cognome: true,
-                            username: true,
-                            biografia: true,
-                            avatar: true,
-                            avatar_thumb: true,
-                            email: true,
-                            ...(isAdmin && {ruolo: true, bannato: true, richiesta_eliminazione: true})
+                where: { id: targetId },
+                data,
+                select: {
+                    id: true,
+                    nome: true,
+                    cognome: true,
+                    username: true,
+                    biografia: true,
+                    avatar: true,
+                    avatar_thumb: true,
+                    email: true,
+                    ...(isAdmin && { ruolo: true, bannato: true, richiesta_eliminazione: true })
 
-                        }
-                    })
+                }
+            })
         })
 
         if (req.fileRidimensionato && vecchi_path_file) {
-            
+
             const filesToDelete = [vecchi_path_file.avatar, vecchi_path_file.avatar_thumb].filter(Boolean);
-            
+
             filesToDelete.forEach(url => {
                 const file_path = path.join(process.cwd(), url);
-                
+
                 fs.unlink(file_path, err => {
                     if (err && err.code !== 'ENOENT') {
                         // Logghiamo l'errore non bloccante
@@ -309,16 +309,16 @@ export const updateUtente = async (req, res) => {
                         logger.warn("Non è stato possibile rimuovere vecchie immagini");
                     }
                 });
-            }); 
+            });
         }
 
         logger.info("L'utente id:" + mioId + " ha aggiornato il profilo id:" + targetId)
-        return res.status(200).json({message:`Profilo ${targetId} aggiornato`, data: utenteAggiornato})
+        return res.status(200).json({ message: `Profilo ${targetId} aggiornato`, data: utenteAggiornato })
 
     } catch (err) {
         logger.error('Errore updateProfilo -> : Errore generico')
         console.error('Errore "updateProfilo":', err)
-        return res.status(500).json({ error: "Errore server"})
+        return res.status(500).json({ error: "Errore server" })
 
     }
 }
@@ -331,24 +331,24 @@ Solo l'utente stesso può richiedere la cancellazione o revocarla.
 
 export const softDeleteUtente = async (req, res) => {
     const mioId = req.userId
-    let data = {...req.dati_validati}
-    
+    let data = { ...req.dati_validati }
+
     try {
         const utente = await prisma.utenti.update({
-            where: { id: mioId},
-            data: {richiesta_eliminazione: data.richiesta_eliminazione},
+            where: { id: mioId },
+            data: { richiesta_eliminazione: data.richiesta_eliminazione },
             select: {
                 id: true,
                 username: true,
                 richiesta_eliminazione: true,
-                data_richiesta_eliminazione: true                
+                data_richiesta_eliminazione: true
             }
         })
-        return res.status(200).json({message: "Richiesta di eliminazione inviata con successo", utente})
+        return res.status(200).json({ message: "Richiesta di eliminazione inviata con successo", utente })
     } catch (err) {
         logger.error('Errore softDelete -> : Errore generico')
         console.error('Errore "softDelete":', err)
-        return res.status(500).json({ error: "Errore server"})
+        return res.status(500).json({ error: "Errore server" })
     }
 }
 
@@ -358,34 +358,34 @@ Questa funzionalità è riservata agli admin che possono cancella definitivament
 sempre che quest'ultimo abbia flaggato richietsa_eliminazione a true
 */
 export const deleteUtente = async (req, res) => {
-    
+
     const isAdmin = req.isAdmin
-    const targetId = req.targetId  
+    const targetId = req.targetId
     const mioId = req.userId
     const mioUsername = req.userUsername
 
-    if (isAdmin && targetId!==mioId ) {
+    if (isAdmin && targetId !== mioId) {
         try {
             const utente = await prisma.utenti.findUnique({
-                where: {id: targetId },
-                select: {username: true, richiesta_eliminazione: true, avatar: true, avatar_thumb: true}
+                where: { id: targetId },
+                select: { username: true, richiesta_eliminazione: true, avatar: true, avatar_thumb: true }
             })
-            
+
             if (!utente) {
-                return res.status(404).json({error: "Utente non trovato"})
+                return res.status(404).json({ error: "Utente non trovato" })
             }
             if (!utente.richiesta_eliminazione) {
-                return res.status(400).json({error: "Richiesta di eliminazione non presente per l'utente id:" + targetId})
+                return res.status(400).json({ error: "Richiesta di eliminazione non presente per l'utente id:" + targetId })
             }
 
-            logger.warn("L'utente con id:"+ mioId+ " sta per eliminare l'account id:" + targetId)
+            logger.warn("L'utente con id:" + mioId + " sta per eliminare l'account id:" + targetId)
 
             //cancellazione dal database
             // se transazione fallisce, esegue ROLLBACK e solleva eccezione e salta al blocco catch
             await prisma.$transaction(async (tx) => {
                 // Elimina il record dal database. Se questo fallisce, l'intera transazione fallisce 
-                await tx.utenti.delete({ 
-                    where: { id: targetId}
+                await tx.utenti.delete({
+                    where: { id: targetId }
                 })
                 await tx.storico_eliminazioni.create({
                     data: {
@@ -402,30 +402,30 @@ export const deleteUtente = async (req, res) => {
             if (utente.avatar || utente.avatar_thumb) {
                 const filesToDelete = [utente.avatar, utente.avatar_thumb].filter(Boolean);
                 //procedo all'eliminazione
-                filesToDelete.forEach( url => {
+                filesToDelete.forEach(url => {
                     if (url) {
                         const file_path = path.join(process.cwd(), url)
                         fs.unlink(file_path, err => {
-                            if (err && err.code !=='ENOENT') {
+                            if (err && err.code !== 'ENOENT') {
                                 console.error("Non è stato possibile rimuovere vecchie immagini")
                                 logger.warn("Non è stato possibile rimuovere vecchie immagini")
                             }
                         })
                     }
                 })
-            } 
+            }
             /////////// fine aggiornamento: implementare ELIMINAZIONE AVATAR dal disco fisso/////////////
 
-            logger.warn("L'utente con id:"+ mioId+ " HA ELIMINATO l'account id:" + targetId)
-            return res.status(200).json({message: "Utente eliminato definitivamente con successo"})
+            logger.warn("L'utente con id:" + mioId + " HA ELIMINATO l'account id:" + targetId)
+            return res.status(200).json({ message: "Utente eliminato definitivamente con successo" })
 
         } catch (err) {
             logger.error('Errore deleteUtente -> : Errore generico')
             console.error('Errore "deleteUtente":', err)
-            return res.status(500).json({ error: "Errore server - Cancellazione utente"})
+            return res.status(500).json({ error: "Errore server - Cancellazione utente" })
         }
     } else {
-        logger.warn("L'utente con id:"+ mioId+ " ha tentato di eliminare l'account id:" + targetId + "senza averne autorizzazione. Richiesta bloccata")
-        return res.status(401).json({error: "Attensione solo gli utenti Admin possono procedere con l'eliminazione"})
+        logger.warn("L'utente con id:" + mioId + " ha tentato di eliminare l'account id:" + targetId + "senza averne autorizzazione. Richiesta bloccata")
+        return res.status(401).json({ error: "Attensione solo gli utenti Admin possono procedere con l'eliminazione" })
     }
 }

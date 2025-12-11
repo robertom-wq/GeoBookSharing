@@ -237,7 +237,7 @@ export const getAllLibri = async (req, res) => {
 }
 
 /*
-Ricerca tutti libri disponibili
+Ricerca tutti libri disponibili (da eliminare)
 */
 export const getAllDisponibili = async (req, res) => {
     // utilizzo la paginazione, il risultato potrebbe contenere parecchi elementi
