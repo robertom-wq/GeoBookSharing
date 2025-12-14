@@ -62,7 +62,7 @@ export const addLibroMasterFromISBN = async (req, res) => {
         const titolo = (libro_trovato.title || 'Sconosciuto').substring(0,500)
         const autore = (libro_trovato.authors?.join(', ') || 'Sconosciuto').substring(0,300)
         const anno = libro_trovato.publishedDate ? parseInt(libro_trovato.publishedDate.split('-')[0], 10) : null 
-        const descrizione = libro_trovato.description || null
+        const descrizione = libro_trovato.description?.substring(0,2000) || null
         // mi appoggio ad un oggetto json costruito con le traduzioni dei generi letterali piu usati su google Books
         // in modo da averli tradotti in italiano
         const genere_nome = tabella_conversioni_generi[libro_trovato.categories?.[0].toUpperCase()] || 'Non definito' 
@@ -143,7 +143,14 @@ export const getAllLibriMaster = async (req, res) => {
                 include: {
                     genere: {select: {dettagli: true}},
                 },
-                orderBy: { titolo: 'asc'},
+                orderBy: [
+                    { 
+                        genere: {dettagli: 'asc'}
+                    },
+                    {
+                        titolo: 'asc'
+                    }
+                ],
                 take: limit,
                 skip: skipElementi
             }),

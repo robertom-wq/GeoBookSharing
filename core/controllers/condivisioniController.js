@@ -22,7 +22,7 @@ export const creaRichiestaCondivisione = async (req, res) => {
     if (richiedenteId === libro_ricercato.proprietario_id) {
         return res.status(400).json({ error: 'Non puoi richiedere un tuo stesso libro' })
     }
-
+    let nuovaCondivisione;
     try {
         //uso una transazione per prevenire la Race Condition.
         //Se la condizione di findFirst è falsa al momento della creazione 
@@ -321,6 +321,7 @@ export const getMieCondivisioni = async (req, res) => {
                 include: {
                     libro: { select: { titolo: true, copertina: true, copertina_thumb: true } },
                     proprietario: { select: { id: true, username: true, avatar: true, avatar_thumb: true } },
+                    richiedente: { select: { id: true, username: true, avatar: true, avatar_thumb: true } },
                     tipo_condivisione: { select: { dettagli: true } },
                     //aggiungere recensione utente una volta implementata
                 },

@@ -128,7 +128,7 @@ export const getAllUtenti = async (req, res) => {
                 take: limit,
                 skip: skipElementi
             }),
-            prisma.libri.count({ // Query per il conteggio
+            prisma.utenti.count({ // Query per il conteggio
                 where
             })
         ])

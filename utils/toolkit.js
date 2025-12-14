@@ -13,7 +13,8 @@ const CARTELLA_COPERTINE = path.join(process.cwd(), 'uploads', 'copertine')
 export function checkISBN(isbn) {
     const cleanISBN = isbn.replace(/[-\s]/g, '').toUpperCase(); // Pulizia manuale di base
     const length = cleanISBN.length;
-    console.log(length)
+    console.log(length, cleanISBN)
+
     // Controllo della lunghezza di base
     if (length !== 10 && length !== 13) {
         return { 
@@ -23,7 +24,7 @@ export function checkISBN(isbn) {
         };
     }
 
-    // Validazione Ufficiale: Usiamo ISBN.isValid() o ISBN.parse()
+    // Validazione Ufficiale con ISBN.parse()
     const parsedIsbn = ISBN.parse(cleanISBN); 
     const valid = parsedIsbn !== null; 
     console.log(valid)
