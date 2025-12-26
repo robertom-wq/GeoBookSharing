@@ -60,7 +60,7 @@ export const createLibro = async (req, res) => {
             }
         })
 
-        return res.status(201).json({message: `Libro ${libro.titolo}, creato con successo`, data: libro})
+        return res.status(201).json({message: `Libro ${libro.titolo}, creato con successo`, libro: libro})
         
     } catch (err) {
         logger.error('Errore createLibro -> : Errore generico')
@@ -116,7 +116,7 @@ export const getMieiLibri = async (req, res) => {
             elementiPerPagina: limit,
             conteggioTotale: conteggioTotale,
             pagineTotali: Math.ceil(conteggioTotale / limit),
-            data: libri})
+            libri: libri})
 
     } catch (err) {
         logger.error('Errore getMieiLibri -> : Errore generico')
@@ -155,7 +155,7 @@ export const getLibroById = async (req, res) => {
         })
         libro.visualizzazioni = libroVisualizzazioneUpdated.visualizzazioni;
         }
-        return res.status(200).json({message: `Libro id:${targetId} trovato`, data: libro})
+        return res.status(200).json({message: `Libro id:${targetId} trovato`, libro: libro})
     } catch (err) {
         logger.error('Errore getLibroById -> : Errore generico')
         console.error('Errore "getLibroById":', err)
@@ -225,7 +225,7 @@ export const getAllLibri = async (req, res) => {
             elementiPerPagina: limit,
             conteggioTotale: conteggioTotale,
             pagineTotali: Math.ceil(conteggioTotale / limit),
-            data: libri
+            libri: libri
         })
 
     } catch (err) {
@@ -283,7 +283,7 @@ export const getAllDisponibili = async (req, res) => {
         elementiPerPagina: limit,
         conteggioTotale: conteggioTotale,
         pagineTotali: Math.ceil(conteggioTotale / limit),
-        data: libri})
+        libri: libri})
 
     } catch (err) {
         logger.error('Errore getAllDisponibili -> : Errore generico')
@@ -302,7 +302,7 @@ export const getAllTipiCondivisione = async (req, res) => {
         })
         return res.status(200).json({
             message: 'Tipi di condivisione trovati',
-            data: tipiCondivisione
+            tipiCondivisione: tipiCondivisione
         })
     } catch(err) {
         logger.error('Errore getAllTipiCondivisione -> : Errore generico')
@@ -321,7 +321,7 @@ export const getAllGeneriLetterari = async (req, res) => {
         })
         return res.status(200).json({
             message: 'Generi letterari trovati',
-            data: generiLetterari
+            generiLetterari: generiLetterari
         })
     } catch(err) {
         logger.error('Errore getAllLibri -> : Errore generico')
@@ -407,7 +407,7 @@ export const updateLibro = async (req, res) => {
             })   
         }
         logger.info("L'utente id:" + mioId + " ha aggiornato il profilo id:" + targetId)
-        return res.status(200).json({message:`Libro id:${targetId} aggiornato: `, data: libroAggiornato})
+        return res.status(200).json({message:`Libro id:${targetId} aggiornato: `, libro: libroAggiornato})
 
     } catch (err) {
         logger.error('Errore updateLibro -> : Errore generico')
@@ -507,7 +507,7 @@ export const createLibroFromMaster = async (req, res) => {
             return res.status(404).json({ error: `Scaffale id:${scaffale_id} non trovato.`})
         }
         // verifico se l'utente che effettua la richiesta è il proprietario dello scaffale
-        if (!scaffale.proprietario_id !== mioId) {
+        if (scaffale.proprietario_id !== mioId) {
             logger.warn(`L'utente id:${mioId} ha tentato di associare un libro ad uno scaffale non suo (id:${scaffale_id}). Operazione bloccata.`)
             return res.status(403).json({ error: `Scaffale id:${scaffale_id} non tuo.`})
         }
@@ -533,11 +533,11 @@ export const createLibroFromMaster = async (req, res) => {
                 descrizione: master.descrizione,
                 copertina: master.copertina,
                 genere_id: master.genere_id,
-                tipo_condivision_id: 999, //default
+                tipo_condivisione_id: 999, //default
                 is_disponibile: true
             }
         })
-        return res.status(201),json({ message: 'Libro aggiunto alla tua libreria', data: nuovo_libro})
+        return res.status(201).json({ message: 'Libro aggiunto alla tua libreria', libro: nuovo_libro})
     } catch (err) {
         logger.error('Errore createLibroFromMaster -> : Errore generico')
         console.error('Errore "createLibroFromMaster":', err)
@@ -638,7 +638,7 @@ export const getLibriVicini = async (req, res) => {
         const libri = await prisma.$queryRaw(sql_query)
 
         //mappo il risultato
-        const result = libri.map(libro => ({
+        const libri_vicini = libri.map(libro => ({
             id: libro.id,
             titolo: libro.titolo,
             autore: libro.autore,
@@ -663,9 +663,9 @@ export const getLibriVicini = async (req, res) => {
             distanza_km: (libro.distanza_metri / 1000).toFixed(2)
         }))
         return res.status(200).json({
-            trovati: result.length,
+            trovati: libri_vicini.length,
             parametri: { lat: lat_num, lng: lng_num, dist: dist_num, q: q || null},
-            data: result
+            libri: libri_vicini
         })
         } catch (err) {
             logger.error('Errore getLibriVicini -> : Errore generico')

@@ -48,6 +48,11 @@ const CSFR_COOKIE_OPTIONS = {
     maxAge: 7*24*60*60*1000 // 7 giorni
 }
 
+function exclude(user, keys) {
+  return Object.fromEntries(
+    Object.entries(user).filter(([key]) => !keys.includes(key))
+  );
+}
 
 /*
 REGISTRAZIONE
@@ -124,13 +129,13 @@ export const login = async (req, res) => {
     try {
         const utente = await prisma.utenti.findUnique({
             where: { username: username.toLowerCase()},
-            select: {
+/*             select: {
                 id: true,
                 username: true,
                 hashed_password: true,
                 bannato: true,
                 ruolo: true
-            }
+            }  */
         });
         // verifico se l'account è presente nel db o se l'utente non è stato bannato
         if (!utente || utente.bannato) {
@@ -163,11 +168,17 @@ export const login = async (req, res) => {
         // Risponsta positiva alla richiesta
         res.json({
             message: "Login Effettuato",
-            utente: {
+            utente:
+             {
                 id: utente.id,
                 username: utente.username,
-                ruolo: utente.ruolo
-            },
+                ruolo: utente.ruolo,
+                avatar: utente.avatar,
+                avatar_thumb: utente.avatar_thumb,
+                biografia: utente.biografia,
+                visualizzazioni: utente.visualizzazioni,
+                email: utente.email
+            }, 
             csrf_token: csrf_token_value
         })
 

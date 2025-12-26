@@ -14,7 +14,7 @@ import prisma from "../config/prisma.js"
 Creazione di uno scaffale, basato su posizione geografica, che andreà popolato con i vari libri
 */
 export const createScaffale = async (req, res) => {
-    const {nome, descrizione, lat, lng } = req.dati_validati
+    const { nome, descrizione, lat, lng } = req.dati_validati
     const mioId = req.userId
     // Well-Known Text (WKT) è uno standard per rappresentare oggetti geometrici utilizzato da PostGIS
     //Singolo punto (POINT) più i parametri di longitudine e latitudine
@@ -45,11 +45,11 @@ export const createScaffale = async (req, res) => {
                 id, nome, descrizione, COALESCE(ST_AsText(posizione), 'Nessuna Posizione') AS posizione, data_creazione, data_ultima_modifica
         `
 
-        return res.status(201).json({message: "Scaffale creato con successo", scaffale})
+        return res.status(201).json({ message: "Scaffale creato con successo", scaffale })
     } catch (err) {
         logger.error('Errore createScaffale -> : Errore generico')
         console.error('Errore "createScaffale":', err)
-        res.status(500).json({ error: "Errore server - Impossibile creare lo scaffale"})
+        res.status(500).json({ error: "Errore server - Impossibile creare lo scaffale" })
     }
 }
 
@@ -60,27 +60,27 @@ export const updateScaffale = async (req, res) => {
     //recupero id dello scaffale da modificare dai parametri
     const id_scaffale = parseInt(req.params.id)
 
-    const {nome, descrizione, lat, lng } = req.dati_validati
+    const { nome, descrizione, lat, lng } = req.dati_validati
     const mioId = req.userId
 
     // verifico se id esiste ed è valido
     if (!id_scaffale || isNaN(id_scaffale)) {
-        return res.status(400).json({error: "ID scaffale NON valido"})
+        return res.status(400).json({ error: "ID scaffale NON valido" })
     }
 
     try {
         const scaffale = await prisma.scaffali.findUnique({
-            where: { id: id_scaffale},
-            select: { proprietario_id: true}
+            where: { id: id_scaffale },
+            select: { proprietario_id: true }
         })
 
         // verifico se esiste lo scaffale
-        if(!scaffale) {
-            return res.status(404).json({error: `Scaffale ${id_scaffale} non trovato`})
+        if (!scaffale) {
+            return res.status(404).json({ error: `Scaffale ${id_scaffale} non trovato` })
         }
         //verifico la proprietà dello scaffale
         if (scaffale.proprietario_id != mioId) {
-            return res.status(403).json({error: `Non sei autorizzato alla modifica dello scaffale ${id_scaffale}`})
+            return res.status(403).json({ error: `Non sei autorizzato alla modifica dello scaffale ${id_scaffale}` })
         }
         // aggiornamnto dati in due fasi, prima i dati standard e poi queryRaw per posizione
         const dati_in_aggiornamento = {}
@@ -88,7 +88,7 @@ export const updateScaffale = async (req, res) => {
             dati_in_aggiornamento.nome = nome
         }
         if (descrizione !== undefined) {
-             dati_in_aggiornamento.descrizione = descrizione          
+            dati_in_aggiornamento.descrizione = descrizione
         }
         // procedo all'aggiornamento solamente se vi sono dati da aggiornare
         // prima fase
@@ -127,13 +127,13 @@ export const updateScaffale = async (req, res) => {
             id=${id_scaffale}
         `
 
-        return res.status(200).json({message: `Scaffale ${id_scaffale} aggiornato con successo`, data: scaffale_aggiornato})
+        return res.status(200).json({ message: `Scaffale ${id_scaffale} aggiornato con successo`, data: scaffale_aggiornato })
 
 
     } catch (err) {
         logger.error('Errore updateScaffale -> : Errore generico')
         console.error('Errore "updateScaffale":', err)
-        res.status(500).json({ error: "Errore server - Impossibile aggiornare lo scaffale"})
+        res.status(500).json({ error: "Errore server - Impossibile aggiornare lo scaffale" })
     }
 
 }
@@ -141,7 +141,7 @@ export const updateScaffale = async (req, res) => {
 /*
 Restituisce la lista di tutti gli scaffali personali 
 */
-export const getMieiScaffali = async (req,res) => {
+export const getMieiScaffali = async (req, res) => {
     const mioId = req.userId
 
     try {
@@ -173,7 +173,7 @@ export const getMieiScaffali = async (req,res) => {
             ORDER BY s.data_creazione ASC
         `
         // preparo result
-        const result = scaffali.map(s =>({
+        const scaffali_da_restituire = scaffali.map(s => ({
             id: s.id,
             nome: s.nome,
             descrizione: s.descrizione || null,
@@ -185,12 +185,12 @@ export const getMieiScaffali = async (req,res) => {
             libri: (s.libri_array || []).filter(book => book != null)
         }))
 
-        res.status(200).json(result)
+        res.status(200).json({scaffali: scaffali_da_restituire})
 
     } catch (err) {
         logger.error('Errore getMieiScaffali -> : Errore generico')
         console.error('Errore "getMieiScaffali":', err)
-        res.status(500).json({ error: "Errore server - Impossibile visualizzare scaffali personali"})
+        res.status(500).json({ error: "Errore server - Impossibile visualizzare scaffali personali" })
     }
 
 }
@@ -205,7 +205,7 @@ export const deleteScaffale = async (req, res) => {
     const mioUsername = req.userUsername
 
     if (!id_scaffale || isNaN(id_scaffale)) {
-         return res.status(400).json({error: "ID scaffale NON valido"})
+        return res.status(400).json({ error: "ID scaffale NON valido" })
     }
     try {
         const [scaffale] = await prisma.$queryRaw`
@@ -218,25 +218,25 @@ export const deleteScaffale = async (req, res) => {
         WHERE s.id = ${id_scaffale}
         GROUP BY s.proprietario_id        
         `
-         // verifico se esiste lo scaffale
-        if(!scaffale) {
-            return res.status(404).json({error: `Scaffale ${id_scaffale} non trovato`})
+        // verifico se esiste lo scaffale
+        if (!scaffale) {
+            return res.status(404).json({ error: `Scaffale ${id_scaffale} non trovato` })
         }
         //verifico la proprietà dello scaffale
         if (scaffale.proprietario_id != mioId) {
             logger.warn(`L'utente con id:${mioId} ha tentato di eliminare lo scaffale id:${id_scaffale} senza autorizzazione. Richiesta bloccata`)
-            return res.status(403).json({error: `Non sei autorizzato all'eliminazione dello scaffale ${id_scaffale}`})
+            return res.status(403).json({ error: `Non sei autorizzato all'eliminazione dello scaffale ${id_scaffale}` })
         }
         //verifico la presenza di libri
         if (Number(scaffale.libri_disponibili) > 0) {
-            res.status(409).json({error: "Impossibile eliminare lo scaffale, contiene ancora dei libri. Eliminare prima i libri contenuti"})
+            res.status(409).json({ error: "Impossibile eliminare lo scaffale, contiene ancora dei libri. Eliminare prima i libri contenuti" })
         }
 
         //Delete
-        await prisma.$transaction(async (tx) => { 
+        await prisma.$transaction(async (tx) => {
             await tx.scaffali.delete({
-                 where: { id: id_scaffale }
-             })
+                where: { id: id_scaffale }
+            })
             await tx.storico_eliminazioni.create({
                 data: {
                     esecutore_id: mioId,
@@ -247,15 +247,15 @@ export const deleteScaffale = async (req, res) => {
                 }
             })
         })
-/*         await prisma.$queryRaw`
-        DELETE FROM scaffali WHERE id = ${id_scaffale}
-        ` */
-        res.status(200).json({message: `Lo scaffale ${id_scaffale} è stato eliminato con successo`})
+        /*         await prisma.$queryRaw`
+                DELETE FROM scaffali WHERE id = ${id_scaffale}
+                ` */
+        res.status(200).json({ message: `Lo scaffale ${id_scaffale} è stato eliminato con successo` })
 
     } catch (err) {
         logger.error('Errore deleteScaffale -> : Errore generico')
         console.error('Errore "deleteScaffale":', err)
-        res.status(500).json({ error: "Errore server - Impossibile eliminare lo scaffale"})        
+        res.status(500).json({ error: "Errore server - Impossibile eliminare lo scaffale" })
     }
 }
 
@@ -263,7 +263,7 @@ export const deleteScaffale = async (req, res) => {
 Ricerca di scaffali vicini ad una posizione in base ad una distanza
 */
 export const getScaffaliVicini = async (req, res) => {
-    const {lat, lng, dist=5000, q='' } = req.query
+    const { lat, lng, dist = 5000, q = '' } = req.query
 
     const mioId = req.userId
     const lat_num = parseFloat(lat)
@@ -274,7 +274,7 @@ export const getScaffaliVicini = async (req, res) => {
 
     //controllo che tutti i parametri di posizione siano numerici
     if (isNaN(lat_num) || isNaN(lng_num) || isNaN(dist_num)) {
-        return res.status(400).json({ error: "Parametri non validi"})
+        return res.status(400).json({ error: "Parametri non validi" })
     }
 
     try {
@@ -343,23 +343,24 @@ export const getScaffaliVicini = async (req, res) => {
             distanza_metri: Number(s.distanza_metri),
             distanza_km: (s.distanza_metri / 1000).toFixed(2),
             libri: s.libri.filter(book => book !== null)
-    }))
+        }))
 
-    res.status(200).json({message: `Scaffali vicini trovati`,
-        trovati : result.length,
-        scaffali: result
-    })
+        res.status(200).json({
+            message: `Scaffali vicini trovati`,
+            trovati: result.length,
+            scaffali: result
+        })
 
     } catch (err) {
         logger.error('Errore getScaffaliVicini -> : Errore generico')
         console.error('Errore "getScaffaliVicini":', err)
-        res.status(500).json({ error: "Errore server - Impossibile completare la ricerca di scaffali vicini"})        
+        res.status(500).json({ error: "Errore server - Impossibile completare la ricerca di scaffali vicini" })
     }
 
 }
 
 /*
-ricerca di scaffali tramite parametri (username proprietario, nome scaffale, libro)
+ricerca di scaffali (non del proprietario) tramite parametri (username proprietario, nome scaffale, libro)
 */
 export const getAllScaffaliConLibri = async (req, res) => {
     // estrae solo il parametro di ricerca 'q'
@@ -368,11 +369,11 @@ export const getAllScaffaliConLibri = async (req, res) => {
     const mioId = req.userId;
 
     const is_q_popolato = q.trim().length > 0;
-    
-    
+
+
 
     const termine_ricercato = `%${q.toLowerCase()}%`;
-    
+
     // costruisco la clausola WHERE in modo dinamico
     let condizioni = [];
     // escludo utente loggato
@@ -392,14 +393,14 @@ export const getAllScaffaliConLibri = async (req, res) => {
                 AND LOWER(l2.titolo) LIKE ${termine_ricercato}
             )
         `)
-    } 
+    }
 
     let whereCondizione = {}
 
     if (condizioni.length > 0) {
         // Unisco le condizioni con una stringa ' AND ' 
-        const joinedConditions = Prisma.join(condizioni, ' AND '); 
-        
+        const joinedConditions = Prisma.join(condizioni, ' AND ');
+
         // Racchiudo il tutto nel template literal WHERE per l'interpolazione finale
         whereCondizione = Prisma.sql`WHERE ${joinedConditions}`;
     } else {
@@ -453,7 +454,7 @@ export const getAllScaffaliConLibri = async (req, res) => {
         // costruisco la response
         const result = scaffali.map(s => ({
             id: s.id,
-            nome: s.nome, 
+            nome: s.nome,
             descrizione: s.descrizione || null,
             posizione: s.posizione,
             proprietario: {
@@ -467,13 +468,101 @@ export const getAllScaffaliConLibri = async (req, res) => {
 
         res.status(200).json({
             message: `Scaffali ${messaggio}`,
-            trovati : result.length,
+            trovati: result.length,
             scaffali: result
         });
 
     } catch (err) {
         logger.error('Errore getAllScaffaliConLibri -> : Errore generico', err)
         console.error('Errore "getAllScaffaliConLibri":', err)
-        res.status(500).json({ error: "Errore server - Impossibile completare la ricerca."}) 
+        res.status(500).json({ error: "Errore server - Impossibile completare la ricerca." })
+    }
+}
+
+/*
+restituisce scaffale tramite id
+*/
+export const getScaffaleById = async (req, res) => {
+    const id_scaffale = parseInt(req.params.id)
+    const mioId = req.userId
+
+    if (!id_scaffale || isNaN(id_scaffale)) {
+        return res.status(400).json({ error: 'ID non valido' })
+    }
+    try {
+        //verifico esistenza e proprietà scaffale
+        const esiste_scaffale = await prisma.scaffali.findUnique({
+            where: { id: id_scaffale },
+            select: { proprietario_id: true }
+        })
+        if (!esiste_scaffale) {
+            return res.status(404).json({ error: 'Scaffale non trovato' })
+        }
+
+        const [scaffale] = await prisma.$queryRaw`
+        SELECT
+            s.id,
+            s.nome,
+            s.descrizione,
+            COALESCE(ST_AsText(s.posizione), 'Nessuna Posizione') AS posizione,
+            s.data_creazione,
+            s.data_ultima_modifica,
+            u.id AS utente_id,
+            u.username AS proprietario_username,
+            u.avatar || u.avatar_thumb AS proprietario_avatar,
+            COALESCE (
+                    json_agg(
+                        CASE
+                            WHEN l.is_disponibile = true THEN 
+                                json_build_object(
+                                    'id', l.id,
+                                    'titolo', l.titolo,
+                                    'anno', l.anno,
+                                    'descrizione', l.descrizione,
+                                    'copertina', l.copertina,
+                                    'copertina_thumb', l.copertina_thumb,
+                                    'is_disponibile', l.is_disponibile,
+                                    'tipo_condivisione', json_build_object(
+                                        'dettagli', t.dettagli
+                                    ),
+                                    'genere', json_build_object(
+                                        'dettagli', g.dettagli
+                                    )
+                                )
+                            ELSE NULL 
+                        END 
+                    ) FILTER (WHERE l.id IS NOT NULL), '[]' 
+                ) AS libri
+            FROM scaffali s
+            LEFT JOIN utenti u ON u.id = s.proprietario_id
+            LEFT JOIN libri l ON l.scaffale_id = s.id AND l.is_disponibile
+            LEFT JOIN generi g ON g.id = l.genere_id
+            LEFT JOIN tipi_condivisione t ON t.id = l.tipo_condivisione_id
+            WHERE s.id = ${id_scaffale}
+            GROUP BY s.id, u.username, u.id
+        `
+        if(!scaffale) {
+            return res.status(404).json({error: 'Scaffale non trovato'})
+        }
+
+        const scaffale_da_restiturie = {
+            id: scaffale.id,
+            nome: scaffale.nome,
+            descrizione: scaffale.descrizione,
+            posizione: scaffale.posizione,
+            data_creazione: scaffale.data_creazione,
+            data_ultima_modifica: scaffale.data_ultima_modifica,
+            utente: {
+                id: scaffale.utente_id,
+                username: scaffale.proprietario_username,
+                avatar: scaffale.proprietario_avatar
+            },
+            libri: scaffale.libri.filter(libro => libro != null)
+        }
+
+        return res.status(200).json({message: 'Scaffale recuperato con successo', scaffale: scaffale_da_restiturie})
+    } catch (err) {
+        console.error('Errore getScaffaleById', err)
+        return res.status(500).json({ error: 'Errore server - Impossibile completare la richiesta', err })
     }
 }

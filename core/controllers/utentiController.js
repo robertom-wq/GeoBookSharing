@@ -172,6 +172,7 @@ export const getProfilo = async (req, res) => {
                 avatar_thumb: true,
                 visualizzazioni: true,
                 biografia: true,
+                email: true,
                 ...(targetId === mioId || isAdmin ? {
                     nome: true,
                     cognome: true,
@@ -199,7 +200,7 @@ export const getProfilo = async (req, res) => {
         }
         console.log(utente)
 
-        return res.status(200).json(utente);
+        return res.status(200).json({message: 'Profilo recuperato con successo', utente: utente});
 
     } catch (err) {
         logger.error('Errore getProfilo -> : Errore generico')
