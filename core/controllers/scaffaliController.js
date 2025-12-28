@@ -518,6 +518,7 @@ export const getScaffaleById = async (req, res) => {
                                     'id', l.id,
                                     'titolo', l.titolo,
                                     'anno', l.anno,
+                                    'autore',l.autore,
                                     'descrizione', l.descrizione,
                                     'copertina', l.copertina,
                                     'copertina_thumb', l.copertina_thumb,

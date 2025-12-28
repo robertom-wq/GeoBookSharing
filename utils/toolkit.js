@@ -49,6 +49,8 @@ export function checkISBN(isbn) {
 }
 
 export const downloadERidimensionaCopertine = async (url_immagine) => {
+    console.log("CARTELLA_COPERTINE", CARTELLA_COPERTINE)
+
     if (!url_immagine) {
         // Se l'URL non è fornito, restituisce subito il fallback.
         return {main: null, thumb: null}
@@ -79,8 +81,8 @@ export const downloadERidimensionaCopertine = async (url_immagine) => {
         // Esegue il resize e salvataggio in parallelo per velocità
         //await Promise.all([main_promise, thumb_promise])
         return {
-            main: `/uploads/copertine/${path.basename(main_namefile)}`,
-            thumb: `/uploads/copertine/${path.basename(thumb_namefile)}`
+            main: `uploads/copertine/${path.basename(main_namefile)}`,
+            thumb: `uploads/copertine/${path.basename(thumb_namefile)}`
         }
     } catch (err) {
         logger.error('Errore downloadERidimensionaCopertine -> : Errore generico')

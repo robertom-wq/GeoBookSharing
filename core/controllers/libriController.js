@@ -570,16 +570,21 @@ export const getLibriPiuVisitati = async (req, res) => {
 Ricerca libri per titolo/autore, genere e posizione
 */
 export const getLibriVicini = async (req, res) => {
-    const {lat, lng, dist=5000, q='' } = req.query
+    const {lat, lng, dist=5000, q='', limit } = req.query
 
     const mioId = req.userId
     const lat_num = parseFloat(lat)
     const lng_num = parseFloat(lng)
     const dist_num = parseFloat(dist)
+    let limit_num = parseInt(limit)
+
+    if (isNaN(limit_num)) {
+        limit_num = 50
+    }
 
     //controllo che tutti i parametri di posizione siano numerici
-    if (isNaN(lat_num) || isNaN(lng_num) || isNaN(dist_num)) {
-        return res.status(400).json({ error: "Parametri lat, lng o dist non validi"})
+    if (isNaN(lat_num) || isNaN(lng_num) || isNaN(dist_num) || isNaN(limit_num)) {
+        return res.status(400).json({ error: "Parametri lat, lng, dist o limit non validi",limit_num})
     }
     
     try {
@@ -588,8 +593,8 @@ export const getLibriVicini = async (req, res) => {
         let sql_where_filtro = Prisma.empty
         if (q && q.trim()){
             const termine_ricercato = `%${q.trim().toLowerCase()}%`
-            sql_where_filtro = `
-            AND (l.titolo LIKE ${termine_ricercato} OR l.autore LIKE ${termine_ricercato} OR genere LIKE ${termine_ricercato})`
+            sql_where_filtro = Prisma.sql`
+            AND (LOWER(l.titolo) LIKE ${termine_ricercato} OR LOWER(l.autore) LIKE ${termine_ricercato} OR LOWER(g.dettagli) LIKE ${termine_ricercato})`
         }
         
         //preparo la query principale parametrizzata tramite prisma.sql, per evitare sql injections
@@ -624,7 +629,7 @@ export const getLibriVicini = async (req, res) => {
             WHERE
                 l.is_disponibile = true --Valutare se utile oppure se è utile vederli tutti
                 AND s.posizione IS NOT NULL
-                -- AND u.id != ${mioId} -- escludo i propri scaffali dalla ricerca
+                AND u.id != ${mioId} -- escludo i propri scaffali dalla ricerca
                 AND ST_DWithin(
                         s.posizione::geography,
                         ST_SetSRID(ST_MakePoint(${lng_num}, ${lat_num}), 4326)::geography,
@@ -632,7 +637,7 @@ export const getLibriVicini = async (req, res) => {
                     )
                 ${sql_where_filtro} -- altri filtri provenienti dalla query della req
                 ORDER BY distanza_metri ASC
-                LIMIT 20
+                LIMIT ${limit_num}
         `
         //esegu la query appena creata
         const libri = await prisma.$queryRaw(sql_query)
@@ -663,6 +668,7 @@ export const getLibriVicini = async (req, res) => {
             distanza_km: (libro.distanza_metri / 1000).toFixed(2)
         }))
         return res.status(200).json({
+            limite_ricerca: limit_num,
             trovati: libri_vicini.length,
             parametri: { lat: lat_num, lng: lng_num, dist: dist_num, q: q || null},
             libri: libri_vicini
