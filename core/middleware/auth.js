@@ -32,7 +32,7 @@ const auth = async (req, res, next) => {
     
     // se non trovo il token resrtituisco 401 Unauthorized
     if (!token) {
-        res.status(401).json( {error : "Accesso negato: JWT mancante"})
+        return res.status(401).json( {error : "Accesso negato: JWT mancante"})
     }
 
     try {
@@ -41,8 +41,8 @@ const auth = async (req, res, next) => {
         req.userId = decodificato.userId
         req.isAdmin = decodificato.userRuolo === 'admin' // true se l'utente è admin
         // verifico che l'utente esista ancora o non sia bannato ( SELECT id, bannato FROM utenti WHERE id = decodificato.id)
-        const utente = prisma.utenti.findUnique({
-            where: {id: decodificato.id},
+        const utente = await prisma.utenti.findUnique({
+            where: {id: decodificato.userId},
             select: {id:true, bannato: true, username: true}
         })
 
@@ -65,14 +65,15 @@ const auth = async (req, res, next) => {
             //parsifico il parametro come intero in base 10
             const targetId = parseInt(req.params.id, 10)
             if (isNaN(targetId)) {
-                res.status(400).json({error: 'ID Non valido'})
+                return res.status(400).json({error: 'ID Non valido'})
             }
             req.targetId = targetId
         }
             req.userUsername = decodificato.userUsername
-            req.userId = decodificato.userId
             req.userRuolo = decodificato.ruolo || 'user' //'user' come fallback
-
+            req.context = {
+                isAdmin: req.isAdmin
+            }
             // passaggio al middleware successivo
             next()
         
@@ -81,11 +82,11 @@ const auth = async (req, res, next) => {
 
     } catch (err) {
         // caso 1, Token scaduto
-        if (err.name = 'TokenExpiredError') {
+        if (err.name === 'TokenExpiredError') {
             return res.status(401).json({error: "Token scaduto"})
         }
         // caso 2, Token non valido
-        if (err.name = 'JsonWebTokenError') {
+        if (err.name === 'JsonWebTokenError') {
             return res.status(401).json({error: "Token non valido"})
         }
         console.error('Errore JWT', err);

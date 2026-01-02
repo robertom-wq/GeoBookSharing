@@ -50,10 +50,12 @@ export const updateLibroMasterSchema = Joi.object({
             'string.max': 'Il campo autore non può superare i 1000 caratteri.'
         }),
 
-    anno: Joi.number().integer().min(1000).allow(null).max(new Date().getFullYear()).optional().messages({
-            'number.base': 'L\'anno deve essere un numero intero.',
-            'number.max': 'L\'anno non può essere nel futuro.'
-        }),
+    anno: Joi.number().integer().min(1000).max(new Date().getFullYear() + 1).optional().messages({
+        'number.base': 'L\'anno deve essere un numero intero.',
+        'number.integer': 'L\'anno deve essere un numero intero.',
+        'number.min': 'L\'anno minimo valido è 1000.',
+        'number.max': `L\'anno non può superare l'anno corrente più uno.`
+    }),
 
     descrizione: Joi.string().max(2000).optional().allow(null, '').trim().empty().messages({ 
         'string.max': 'La descrizione non può superare i 2000 caratteri.' }),

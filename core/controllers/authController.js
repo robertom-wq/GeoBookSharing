@@ -105,7 +105,7 @@ export const registrazione = async (req, res) => {
             csrf_token: csrf_token_value,
             }, JWT_SECRET, {expiresIn: JWT_EXPIRATION})
         res.cookie('jwt', token, COOKIE_OPTIONS)
-        logger.info("Tentativo di registrazione -> " + utente.username + ": Effettuato con successo")
+        logger.info("["+ req.ip +"] Tentativo di registrazione -> " + utente.username + ": Effettuato con successo")
         res.status(201).json({ 
             mesage: "Registrazione completata con successo",
             utente,
@@ -113,7 +113,7 @@ export const registrazione = async (req, res) => {
         })
 
     } catch (err) {
-        logger.error("Errore Registrazione -> : Errore generico")
+        logger.error("["+ req.ip +"] Errore Registrazione -> : Errore generico", err)
         console.error("Errore di registrazione:", err)
         res.status(500).json({error: "Errore server"})
     }
@@ -139,14 +139,14 @@ export const login = async (req, res) => {
         });
         // verifico se l'account è presente nel db o se l'utente non è stato bannato
         if (!utente || utente.bannato) {
-            logger.error("Tentativo di accesso -> " + username + ": credenziali non valide, utente non esistente o bannato")
+            logger.error("["+ req.ip +"] Tentativo di accesso -> " + username + ": credenziali non valide, utente non esistente o bannato")
             return res.status(401).json({ error: "Credenziali non valide"})
         }
 
         // verifico se la password è corretta
         const password_valida = await bcrypt.compare(password, utente.hashed_password);
         if (!password_valida) {
-            logger.error("Tentativo di accesso -> " + username + ": credenziali non valide, password errata")
+            logger.error("["+ req.ip +"] Tentativo di accesso -> " + username + ": credenziali non valide, password errata")
             return res.status(401).json({error: "Credenziali non valide"})
         }
         
@@ -163,8 +163,7 @@ export const login = async (req, res) => {
 
         res.cookie('jwt', token, COOKIE_OPTIONS)
 
-
-        logger.info("Tentativo di accesso -> " + username + ": Effettuato con successo")
+        logger.info(" ["+ req.ip +"] Tentativo di accesso ->" + username + ": Effettuato con successo")
         // Risponsta positiva alla richiesta
         res.json({
             message: "Login Effettuato",
@@ -183,7 +182,7 @@ export const login = async (req, res) => {
         })
 
     } catch (err) {
-        logger.error("Errore Login -> : Errore generico")
+        logger.error("["+ req.ip +"] Errore Login -> : Errore generico", err)
         res.status(500).json({error: "Errore server"})
     }
 }
@@ -195,7 +194,6 @@ export const logout = (req, res) => {
     // invalida entrambi i cookies
     res.cookie('jwt', '', { ...COOKIE_OPTIONS, maxAge: 0})
     res.cookie('csrf_token', '', { ...COOKIE_OPTIONS, maxAge: 0})
-    //logger.info("Logout utente -> : Effettuato con successo")
 
     res.json({message: 'Logout effettuato'})
 }

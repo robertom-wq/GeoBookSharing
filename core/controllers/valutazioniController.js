@@ -25,7 +25,7 @@ export const creaValutazione = async (req, res) => {
     }
 
     if (mioId !== condivisione.proprietario_id && mioId !== condivisione.richiedente_id) {
-        logger.warn(`L'utente con id:${mioId} (${mioUsername}), ha tentato di rilasciare una valutazione per la condivisione id:${dati_validati.condivisione_id}, per cui non è autorizzato. Richiesta bloccata`)
+        logger.warn(`[${req.ip}] L'utente con id:${mioId} (${mioUsername}), ha tentato di rilasciare una valutazione per la condivisione id:${dati_validati.condivisione_id}, per cui non è autorizzato. Richiesta bloccata`)
         return res.status(403).json({ error: `Non sei autorizzato a rilasciare  una valutazione per la condivisione id:${dati_validati.condivisione_id}` })
     }
 
@@ -52,7 +52,7 @@ export const creaValutazione = async (req, res) => {
 
         return res.status(201).json({ message: `Valtazione inserita con successo`, data: nuovaValutazione })
     } catch (err) {
-        logger.error('Errore creaValutazione -> : Errore generico')
+        logger.error('['+ req.ip +'] Errore creaValutazione -> : Errore generico', err)
         console.error('Errore "creaValutazione":', err)
         return res.status(500).json({ error: "Errore server - Impossibile inserire la tua valutazione" })
     }
@@ -110,7 +110,7 @@ export const getVotazioneMediaUtente = async (req, res) => {
         })
 
     } catch (err) {
-        logger.error('Errore getVotazioneMediaUtente -> : Errore generico')
+        logger.error('['+ req.ip +'] Errore getVotazioneMediaUtente -> : Errore generico', err)
         console.error('Errore "getVotazioneMediaUtente":', err)
         return res.status(500).json({ error: `Errore server - Impossibile visualizzare la valutazione` })
     }
@@ -152,7 +152,7 @@ export const getAllValutazioni = async (req, res) => {
                 where = { recensito_id: mioId }
                 includeDinamico = { recensore: { select: { username: true, avatar: true, avatar_thumb: true } } }
             } else {
-                return res.status(400).json({ message: "Il ruolo deve essere 'recensore' oppure 'recensito" })
+                return res.status(400).json({ error: "Il ruolo deve essere 'recensore' oppure 'recensito" })
             }
         } else {
             where = {
@@ -193,7 +193,7 @@ export const getAllValutazioni = async (req, res) => {
 
 
     } catch (err) {
-        logger.error('Errore getAllValutazioni -> : Errore generico')
+        logger.error('['+ req.ip +'] Errore getAllValutazioni -> : Errore generico ',err)
         console.error('Errore "getAllValutazioni":', err)
         return res.status(500).json({ error: `Errore server - Impossibile visualizzare le mie valutazioni (${ruolo ? ruolo : 'Tutte'}` })
     }

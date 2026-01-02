@@ -45,7 +45,7 @@ esempio per admin
 */
 export const getAllUtenti = async (req, res) => {
     //estrae la proprietà q dall'oggetto req.query. Se non esiste sarà "undefined"
-    const { q } = req.query
+    const { q, richiesta_eliminazione, bannato } = req.query
     const mioId = req.userID
     // utilizzo la paginazione, il risultato potrebbe contenere parecchi elementi
     // vedo se nella req esiste una query con pagina e limit
@@ -68,6 +68,18 @@ export const getAllUtenti = async (req, res) => {
             // escludo utente loggato
             id: { not: mioId }
         }
+
+        // Solo gli admin possono filtrare per questi stati
+        if (req.isAdmin) {
+            if (richiesta_eliminazione !== undefined) {
+                // Converte "true" -> true, "false" -> false
+                where.richiesta_eliminazione = richiesta_eliminazione === 'true';
+            }
+            if (bannato !== undefined) {
+                where.bannato = bannato === 'true';
+            }
+        }
+
         if (q) {
             // elimino spazi bianchi
             const queryString = q.trim()
@@ -87,7 +99,7 @@ export const getAllUtenti = async (req, res) => {
                         { cognome: { contains: queryString, mode: 'insensitive' } },
                         { nome: { contains: queryString, mode: 'insensitive' } },
                         { email: { contains: queryString, mode: 'insensitive' } },
-                        { ruolo: { contains: queryString, mode: 'insensitive' } }
+                        { ruolo: { contains: queryString, mode: 'insensitive' } },                        
                     ]
                 }
             } else {
@@ -111,6 +123,7 @@ export const getAllUtenti = async (req, res) => {
                     avatar_thumb: true,
                     visualizzazioni: true,
                     biografia: true,
+                    valutazioni_ricevute: true, //{select : {voto: true}},
                     // L'espressione req.isAdmin && { ... } restituisce l'oggetto {...} che contiene tutti i campi sensibili.
                     //(...) prende le proprietà di questo oggetto e le aggiunge nell'oggetto select principale.
                     ...(req.isAdmin && {
@@ -122,6 +135,7 @@ export const getAllUtenti = async (req, res) => {
                         data_ultima_modifica: true,
                         richiesta_eliminazione: true,
                         data_richiesta_eliminazione: true,
+
                     })
                 },
                 orderBy: { username: 'asc' },
@@ -142,7 +156,7 @@ export const getAllUtenti = async (req, res) => {
         })
 
     } catch (err) {
-        logger.error('Errore getAllUtenti -> : Errore generico')
+        logger.error('['+ req.ip +'] Errore getAllUtenti -> : Errore generico ',err)
         console.error('Errore "getAllUtenti":', err)
         return res.status(500).json({ error: "Errore server" })
     }
@@ -203,7 +217,7 @@ export const getProfilo = async (req, res) => {
         return res.status(200).json({message: 'Profilo recuperato con successo', utente: utente});
 
     } catch (err) {
-        logger.error('Errore getProfilo -> : Errore generico')
+        logger.error('['+ req.ip +'] Errore getProfilo -> : Errore generico ',err)
         console.error('Errore "getProfilo":', err)
         return res.status(500).json({ error: "Errore server" })
 
@@ -220,6 +234,7 @@ export const updateUtente = async (req, res) => {
     const targetId = req.targetId // auth stabilisce se esiste un parametro oppure se usare utente loggato
     const mioId = req.userId
     const isAdmin = req.isAdmin
+    console.log("IS ADMIN", isAdmin)
 
     //uso i dati già validati da Joi
     let data = { ...req.dati_validati }
@@ -231,7 +246,7 @@ export const updateUtente = async (req, res) => {
 
     if (!isAutorizzato) {
         // Se non è autorizzato, restituisci immediatamente l'errore 403.
-        logger.warn(`L'utente id:${mioId} ha tentato di aggiornare il profilo id:${targetId} senza autorizzazione. Richiesta bloccata`)
+        logger.warn(`[${req.ip}] L'utente id:${mioId} ha tentato di aggiornare il profilo id:${targetId} senza autorizzazione. Richiesta bloccata`)
         return res.status(403).json({ error: `Non hai le autorizzazioni per modificare un altro profilo` })
     }
 
@@ -257,7 +272,7 @@ export const updateUtente = async (req, res) => {
         } catch (err) {
             // non bloccante, in caso di mancata eliminazione immagine
             console.warn(`Errore nel recupero vecchi path utente ${targetId}:`, err)
-            logger.warn("Non è stato possibile rimuovere vecchie immagini")
+            logger.warn("["+ req.ip +"] Non è stato possibile rimuovere vecchie immagini", err)
 
         }
         data.avatar = req.fileRidimensionato.main
@@ -307,17 +322,17 @@ export const updateUtente = async (req, res) => {
                     if (err && err.code !== 'ENOENT') {
                         // Logghiamo l'errore non bloccante
                         console.error("ATTENZIONE: Non è stato possibile rimuovere vecchie immagini:", err);
-                        logger.warn("Non è stato possibile rimuovere vecchie immagini");
+                        logger.warn("["+ req.ip +"] Non è stato possibile rimuovere vecchie immagini");
                     }
                 });
             });
         }
 
-        logger.info("L'utente id:" + mioId + " ha aggiornato il profilo id:" + targetId)
+        logger.info("["+ req.ip +"] L'utente id:" + mioId + " ha aggiornato il profilo id:" + targetId)
         return res.status(200).json({ message: `Profilo ${targetId} aggiornato`, data: utenteAggiornato })
 
     } catch (err) {
-        logger.error('Errore updateProfilo -> : Errore generico')
+        logger.error('['+ req.ip +'] Errore updateProfilo -> : Errore generico ', err)
         console.error('Errore "updateProfilo":', err)
         return res.status(500).json({ error: "Errore server" })
 
@@ -347,7 +362,7 @@ export const softDeleteUtente = async (req, res) => {
         })
         return res.status(200).json({ message: "Richiesta di eliminazione inviata con successo", utente })
     } catch (err) {
-        logger.error('Errore softDelete -> : Errore generico')
+        logger.error('['+ req.ip +'] Errore softDelete -> : Errore generico ',err)
         console.error('Errore "softDelete":', err)
         return res.status(500).json({ error: "Errore server" })
     }
@@ -379,7 +394,7 @@ export const deleteUtente = async (req, res) => {
                 return res.status(400).json({ error: "Richiesta di eliminazione non presente per l'utente id:" + targetId })
             }
 
-            logger.warn("L'utente con id:" + mioId + " sta per eliminare l'account id:" + targetId)
+            logger.warn("["+ req.ip +"] L'utente con id:" + mioId + " sta per eliminare l'account id:" + targetId)
 
             //cancellazione dal database
             // se transazione fallisce, esegue ROLLBACK e solleva eccezione e salta al blocco catch
@@ -409,7 +424,7 @@ export const deleteUtente = async (req, res) => {
                         fs.unlink(file_path, err => {
                             if (err && err.code !== 'ENOENT') {
                                 console.error("Non è stato possibile rimuovere vecchie immagini")
-                                logger.warn("Non è stato possibile rimuovere vecchie immagini")
+                                logger.warn("["+ req.ip +"] Non è stato possibile rimuovere vecchie immagini")
                             }
                         })
                     }
@@ -417,16 +432,16 @@ export const deleteUtente = async (req, res) => {
             }
             /////////// fine aggiornamento: implementare ELIMINAZIONE AVATAR dal disco fisso/////////////
 
-            logger.warn("L'utente con id:" + mioId + " HA ELIMINATO l'account id:" + targetId)
+            logger.warn("["+ req.ip +"] L'utente con id:" + mioId + " HA ELIMINATO l'account id:" + targetId)
             return res.status(200).json({ message: "Utente eliminato definitivamente con successo" })
 
         } catch (err) {
-            logger.error('Errore deleteUtente -> : Errore generico')
+            logger.error('['+ req.ip +'] Errore deleteUtente -> : Errore generico ',err)
             console.error('Errore "deleteUtente":', err)
             return res.status(500).json({ error: "Errore server - Cancellazione utente" })
         }
     } else {
-        logger.warn("L'utente con id:" + mioId + " ha tentato di eliminare l'account id:" + targetId + "senza averne autorizzazione. Richiesta bloccata")
+        logger.warn("["+ req.ip +"] L'utente con id:" + mioId + " ha tentato di eliminare l'account id:" + targetId + "senza averne autorizzazione. Richiesta bloccata")
         return res.status(401).json({ error: "Attensione solo gli utenti Admin possono procedere con l'eliminazione" })
     }
 }

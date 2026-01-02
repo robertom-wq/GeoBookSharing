@@ -46,7 +46,7 @@ export const addLibroMasterFromISBN = async (req, res) => {
             where: { isbn: isbn_pulito }
         })
         if (master_esistente) {
-            return  res.status(200).json(`Libro master con isbn ${isbn_pulito} già presente nel database`)
+            return res.status(200).json({ message: `Libro master con isbn ${isbn_pulito} già presente nel database` })
         }
         // eseguo la fetch verso google Book API (es https://www.googleapis.com/books/v1/volumes?q=isbn:9791280623508 per vedere la response e i dati che restituisce)
         // oppure vedi esempio_response_googleapi.json 
@@ -97,7 +97,7 @@ export const addLibroMasterFromISBN = async (req, res) => {
         return res.status(200).json({message: 'LIbro Master aggiunto al catalogo globale', data: nuovo_libro_master})
 
     } catch (err) {
-        logger.error('Errore addLibroMasterFromISBN -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore addLibroMasterFromISBN -> : Errore generico", err)
         console.error('Errore "addLibroMasterFromISBN":', err)
         return res.status(500).json({ error: "Errore server - Impossibile aggiungere libro Master da ISBN"})               
     }
@@ -114,7 +114,7 @@ export const getAllLibriMaster = async (req, res) => {
     const queryLimit = req.query.limit
     // se pagina e/o limit sono  undefined imposto la prima di default 
     let pagina = parseInt(queryPagina) || 1
-    const limit = parseInt(queryLimit) || 10
+    const limit = parseInt(queryLimit) || 200
     // intercetto valori inferiori a 1
     if (pagina < 1) {
         pagina = 1;
@@ -168,7 +168,7 @@ export const getAllLibriMaster = async (req, res) => {
             data: libri
         })
     } catch(err) {
-        logger.error('Errore getAllLibriMaster -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore getAllLibriMaster -> : Errore generico",err)
         console.error('Errore "getAllLibriMaster":', err)
         return res.status(500).json({ error: "Errore server - getAllLibriMaster"})         
     }
@@ -197,7 +197,7 @@ export const getLibroMasterById = async (req, res) => {
         return res.status(200).json({message: `Libro Master id:${targetId} trovato`, data: libro})
 
     } catch(err) {
-        logger.error('Errore getLibroMasterById -> : Errore generico')
+        logger.error('['+ req.ip +'] Errore getLibroMasterById -> : Errore generico',err)
         console.error('Errore "getLibroMasterById":', err)
         return res.status(500).json({ error: `Errore server - Impossibile recuperare libro Master con id ${targetId}`})        
     }
@@ -230,7 +230,7 @@ export const createLibroMaster = async (req, res) => {
                 where: { isbn: isbn_pulito}
             })
             if(libro_esistente) {
-                return res.status(400).json({message: `ISBN ${isbn_pulito} già presente nel catalogo`})
+                return res.status(400).json({error: `ISBN ${isbn_pulito} già presente nel catalogo`})
             }
             // effettuo controllo se esite sun google books, se esiste blocca operazione e rimanda
             // ad eseguire aggiunta tramite ISBN
@@ -242,7 +242,7 @@ export const createLibroMaster = async (req, res) => {
                     return res.status(400).json({ error: 'Libro trovato su Google Books', suggerimento: 'Usa /fromISBN'})
                 }
             } catch (err) {
-                logger.error(`Errore createLibroMaster -> : Impossibile verificare su google books presenza di ISBN ${isbn_pulito}`)
+                logger.error(`[${req.ip}] Errore createLibroMaster -> : Impossibile verificare su google books presenza di ISBN ${isbn_pulito}`, err)
                 console.error(`Impossibile verificare su google books presenza di ISBN ${isbn_pulito}`)
                 return res.status(500).json({ error: "Errore server - createLibroMaster Riprova più tardi"})
             }
@@ -283,13 +283,13 @@ export const createLibroMaster = async (req, res) => {
             })
 
         } catch (err) {
-            logger.error('Errore createLibroMaster -> : Errore generico')
+            logger.error('['+ req.ip +'] Errore createLibroMaster -> : Errore generico', err)
             console.error('Errore "createLibroMaster":', err)
             return res.status(500).json({ error: "Errore server - Impossibile aggiungere libro da Master"})               
             
         }
     } else {
-        logger.warn(`L'utente id:${mioId} ha tentato di creare un Libro Master. Richiesta bloccata`)
+        logger.warn(`[${req.ip}] L'utente id:${mioId} ha tentato di creare un Libro Master. Richiesta bloccata`)
         return res.status(403).json({ error: `Non autorizzato alla creazione di libri Master`})
     }
 }
@@ -331,13 +331,13 @@ export const deleteLibroMaster = async (req, res) => {
             });
         return res.status(200).json({message: `Libro Master con id:${targetId} eliminato con successo`})
         } catch (err) {
-            logger.error('Errore deleteLibroMaster -> : Errore generico')
+            logger.error('['+ req.ip +'] Errore deleteLibroMaster -> : Errore generico',err)
             console.error('Errore "deleteLibroMaster":', err)
             return res.status(500).json({ error: "Errore server - Impossibile rimuovere libro Master"})        
             }
 
     }else {
-        logger.warn(`L'utente id:${mioId} ha tentato di eliminare un Libro Master. Richiesta bloccata`)
+        logger.warn(`[${req.ip}] L'utente id:${mioId} ha tentato di eliminare un Libro Master. Richiesta bloccata`)
         return res.status(403).json({ error: `Non autorizzato alla rimozione di libri Master`})
     }
 }
@@ -350,8 +350,9 @@ export const updateLibroMaster = async (req, res) => {
     const mioId = req.userId
     const targetId = parseInt(req.targetId)
     // dati validati da validate(updateLibriSchema)
-    let data = {...req.body}
-    console.log(data)
+    let data = {...req.dati_validati}
+    console.log("DATA",data)
+    console.log("DATA ANNO LIBRO MASTER",typeof(data.anno))
 
     if (isAdmin) {
         //rimuovo il campo type dall'oggetto.. è utile solo per l'upload dell'immagine ma non fa parte dei campi db
@@ -367,7 +368,6 @@ export const updateLibroMaster = async (req, res) => {
             data.copertina_thumb = req.fileRidimensionato.thumb
         }
         
-        console.log("DATA",data)
         //verifico che siano stati inviati dati aggiornare in data
         if(Object.keys(data).length === 0) {
             return res.status(304).json({message: "Niente da aggiornare"})
@@ -406,24 +406,24 @@ export const updateLibroMaster = async (req, res) => {
                         fs.unlink(file_path, err => {
                             if (err && err.code !=='ENOENT') {
                                 console.error("Non è stato possibile rimuovere vecchie immagini")
-                                logger.warn("Non è stato possibile rimuovere vecchie immagini")
+                                logger.warn("["+ req.ip +"] Non è stato possibile rimuovere vecchie immagini")
                             }
                         })
                     }
                 })   
             }
-            logger.info(`L'utente id:${mioId} ha aggiornato il Libro Master id:${targetId}`)
+            logger.info(`[${req.ip}] L'utente id:${mioId} ha aggiornato il Libro Master id:${targetId}`)
             return res.status(200).json({message:`Libro Master id:${targetId} aggiornato: `, data: libroMasterAggiornato})
 
             
         } catch (err) {
-            logger.error('Errore updateLibroMaster -> : Errore generico')
+            logger.error(`[${req.ip}] Errore updateLibroMaster -> : Errore generico`, err)
             console.error('Errore "updateLibroMaster":', err)
             return res.status(500).json({ error: "Errore server - Impossibile modificare libro  Master"})               
         }
 
     }else {
-        logger.warn(`L'utente id:${mioId} ha tentato di aggiornare un Libro Master. Richiesta bloccata`)
+        logger.warn(`[${req.ip}] L'utente id:${mioId} ha tentato di aggiornare un Libro Master. Richiesta bloccata`)
         return res.status(403).json({ error: `Non autorizzato alla modifica di libri Master`})        
     }
 } 

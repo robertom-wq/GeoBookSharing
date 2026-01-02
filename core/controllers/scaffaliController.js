@@ -47,7 +47,7 @@ export const createScaffale = async (req, res) => {
 
         return res.status(201).json({ message: "Scaffale creato con successo", scaffale })
     } catch (err) {
-        logger.error('Errore createScaffale -> : Errore generico')
+        logger.error('['+ req.ip +'] Errore createScaffale -> : Errore generico ',err)
         console.error('Errore "createScaffale":', err)
         res.status(500).json({ error: "Errore server - Impossibile creare lo scaffale" })
     }
@@ -109,7 +109,7 @@ export const updateScaffale = async (req, res) => {
                 posizione =  ST_GeomFromText(${punto_geografico}, 4326)
             WHERE id = ${id_scaffale}
             `
-            logger.info(`Posizione scaffale ${id_scaffale} aggiornata separatamente.`);
+            logger.info(`[${req.ip}] Posizione scaffale ${id_scaffale} aggiornata separatamente.`);
         }
 
         //ritorna lo scaffale con posizione
@@ -131,7 +131,7 @@ export const updateScaffale = async (req, res) => {
 
 
     } catch (err) {
-        logger.error('Errore updateScaffale -> : Errore generico')
+        logger.error('['+ req.ip +'] Errore updateScaffale -> : Errore generico ',err)
         console.error('Errore "updateScaffale":', err)
         res.status(500).json({ error: "Errore server - Impossibile aggiornare lo scaffale" })
     }
@@ -188,7 +188,7 @@ export const getMieiScaffali = async (req, res) => {
         res.status(200).json({scaffali: scaffali_da_restituire})
 
     } catch (err) {
-        logger.error('Errore getMieiScaffali -> : Errore generico')
+        logger.error('['+ req.ip +'] Errore getMieiScaffali -> : Errore generico ', err)
         console.error('Errore "getMieiScaffali":', err)
         res.status(500).json({ error: "Errore server - Impossibile visualizzare scaffali personali" })
     }
@@ -224,7 +224,7 @@ export const deleteScaffale = async (req, res) => {
         }
         //verifico la proprietà dello scaffale
         if (scaffale.proprietario_id != mioId) {
-            logger.warn(`L'utente con id:${mioId} ha tentato di eliminare lo scaffale id:${id_scaffale} senza autorizzazione. Richiesta bloccata`)
+            logger.warn(`[${req.ip}] L'utente con id:${mioId} ha tentato di eliminare lo scaffale id:${id_scaffale} senza autorizzazione. Richiesta bloccata`)
             return res.status(403).json({ error: `Non sei autorizzato all'eliminazione dello scaffale ${id_scaffale}` })
         }
         //verifico la presenza di libri
@@ -253,7 +253,7 @@ export const deleteScaffale = async (req, res) => {
         res.status(200).json({ message: `Lo scaffale ${id_scaffale} è stato eliminato con successo` })
 
     } catch (err) {
-        logger.error('Errore deleteScaffale -> : Errore generico')
+        logger.error('['+ req.ip +'] Errore deleteScaffale -> : Errore generico ', err)
         console.error('Errore "deleteScaffale":', err)
         res.status(500).json({ error: "Errore server - Impossibile eliminare lo scaffale" })
     }
@@ -352,7 +352,7 @@ export const getScaffaliVicini = async (req, res) => {
         })
 
     } catch (err) {
-        logger.error('Errore getScaffaliVicini -> : Errore generico')
+        logger.error('['+ req.ip +'] Errore getScaffaliVicini -> : Errore generico ', err)
         console.error('Errore "getScaffaliVicini":', err)
         res.status(500).json({ error: "Errore server - Impossibile completare la ricerca di scaffali vicini" })
     }
@@ -473,7 +473,7 @@ export const getAllScaffaliConLibri = async (req, res) => {
         });
 
     } catch (err) {
-        logger.error('Errore getAllScaffaliConLibri -> : Errore generico', err)
+        logger.error('['+ req.ip +'] Errore getAllScaffaliConLibri -> : Errore generico ', err)
         console.error('Errore "getAllScaffaliConLibri":', err)
         res.status(500).json({ error: "Errore server - Impossibile completare la ricerca." })
     }
@@ -563,6 +563,7 @@ export const getScaffaleById = async (req, res) => {
 
         return res.status(200).json({message: 'Scaffale recuperato con successo', scaffale: scaffale_da_restiturie})
     } catch (err) {
+        logger.error('['+ req.ip +'] Errore getScaffaleById -> : Errore generico ',err)
         console.error('Errore getScaffaleById', err)
         return res.status(500).json({ error: 'Errore server - Impossibile completare la richiesta', err })
     }

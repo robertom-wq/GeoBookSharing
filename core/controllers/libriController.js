@@ -46,7 +46,7 @@ export const createLibro = async (req, res) => {
             return res.status(404).json({error: 'Scaffale non trovato'})
         }
         if (scaffale.proprietario_id !== mioId) {
-            logger.warn(`L'utente id:${mioId} ha tentato di associare un libro ad uno scaffale non suo (id:${scaffale_id}). Operazione bloccata.`)
+            logger.warn(`[${req.ip}] L'utente id:${mioId} ha tentato di associare un libro ad uno scaffale non suo (id:${scaffale_id}). Operazione bloccata.`)
             return res.status(403).json({error: "Non autorizzato"})
         } 
 
@@ -63,7 +63,7 @@ export const createLibro = async (req, res) => {
         return res.status(201).json({message: `Libro ${libro.titolo}, creato con successo`, libro: libro})
         
     } catch (err) {
-        logger.error('Errore createLibro -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore createLibro -> : Errore generico", err)
         console.error('Errore "createLibro":', err)
         return res.status(500).json({ error: "Errore server - Impossibile creare il libro"})
     }
@@ -119,7 +119,7 @@ export const getMieiLibri = async (req, res) => {
             libri: libri})
 
     } catch (err) {
-        logger.error('Errore getMieiLibri -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore getMieiLibri -> : Errore generico",err)
         console.error('Errore "getMieiLibri":', err)
         return res.status(500).json({ error: "Errore server - Impossibile recuperare i miei libri"})
         
@@ -157,7 +157,7 @@ export const getLibroById = async (req, res) => {
         }
         return res.status(200).json({message: `Libro id:${targetId} trovato`, libro: libro})
     } catch (err) {
-        logger.error('Errore getLibroById -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore getLibroById -> : Errore generico", err)
         console.error('Errore "getLibroById":', err)
         return res.status(500).json({ error: `Errore server - Impossibile recuperare libro con id ${targetId}`})        
     }
@@ -229,7 +229,7 @@ export const getAllLibri = async (req, res) => {
         })
 
     } catch (err) {
-        logger.error('Errore getAllLibri -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore getAllLibri -> : Errore generico", err)
         console.error('Errore "getAllLibri":', err)
         return res.status(500).json({ error: "Errore server"})        
     }
@@ -286,7 +286,7 @@ export const getAllDisponibili = async (req, res) => {
         libri: libri})
 
     } catch (err) {
-        logger.error('Errore getAllDisponibili -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore getAllDisponibili -> : Errore generico",err)
         console.error('Errore "getAllDisponibili":', err)
         return res.status(500).json({ error: `Errore server - Impossibile recuperare libri disponibili`})            
     }
@@ -305,7 +305,7 @@ export const getAllTipiCondivisione = async (req, res) => {
             tipiCondivisione: tipiCondivisione
         })
     } catch(err) {
-        logger.error('Errore getAllTipiCondivisione -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore getAllTipiCondivisione -> : Errore generico",err)
         console.error('Errore "getAllTipiCondivisione":', err)
         return res.status(500).json({ error: "Errore server"})   
     }
@@ -324,7 +324,7 @@ export const getAllGeneriLetterari = async (req, res) => {
             generiLetterari: generiLetterari
         })
     } catch(err) {
-        logger.error('Errore getAllLibri -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore getAllLibri -> : Errore generico", err)
         console.error('Errore "getAllLibri":', err)
         return res.status(500).json({ error: "Errore server"})   
     }
@@ -354,7 +354,7 @@ export const updateLibro = async (req, res) => {
         data.copertina = nuovaCopertina
         data.copertina_thumb = nuovaCopertina_thumb
     }
-
+    console.log("DATA ANNO LIBRO",typeof(data.anno))
     //verifico che siano stati inviati dati aggiornare in data
     if(Object.keys(data).length === 0) {
         return res.status(304).json({message: "Niente da aggiornare"})
@@ -369,7 +369,7 @@ export const updateLibro = async (req, res) => {
             return res.status(404).json({ error: `Libro id:${targetId} non trovato`})
         }
         if (libroPreUpdate.proprietario_id !== mioId) {
-            logger.warn(`L'utente id:${mioId} ha tentato di modificare il libro id:${targetId} senza autorizzazione. Richiesta bloccata`)
+            logger.warn(`[${req.ip}] L'utente id:${mioId} ha tentato di modificare il libro id:${targetId} senza autorizzazione. Richiesta bloccata`)
             return res.status(403).json({ error: `Non autorizzato ala modifica de Libro id:${targetId}`})
         }
         
@@ -400,17 +400,17 @@ export const updateLibro = async (req, res) => {
                     fs.unlink(file_path, err => {
                         if (err && err.code !=='ENOENT') {
                             console.error("Non è stato possibile rimuovere vecchie immagini")
-                            logger.warn("Non è stato possibile rimuovere vecchie immagini")
+                            logger.warn("["+ req.ip +"] Non è stato possibile rimuovere vecchie immagini")
                         }
                     })
                 }
             })   
         }
-        logger.info("L'utente id:" + mioId + " ha aggiornato il profilo id:" + targetId)
+        logger.info("["+ req.ip +"] L'utente id:" + mioId + " ha aggiornato il profilo id:" + targetId)
         return res.status(200).json({message:`Libro id:${targetId} aggiornato: `, libro: libroAggiornato})
 
     } catch (err) {
-        logger.error('Errore updateLibro -> : Errore generico')
+        logger.error(`[${req.ip}] Errore updateLibro -> : Errore generico: ${err}`)
         console.error('Errore "updateLibro":', err)
         return res.status(500).json({ error: "Errore server - updateLibro"})           
     }
@@ -466,7 +466,7 @@ export const deleteLibro = async (req, res) => {
                         fs.unlink(file_path, err => {
                             if (err && err.code !=='ENOENT') {
                                 console.error("Non è stato possibile rimuovere vecchie immagini")
-                                logger.warn("Non è stato possibile rimuovere vecchie immagini")
+                                logger.warn("["+ req.ip +"] Non è stato possibile rimuovere vecchie immagini")
                             }
                         })
                     }
@@ -476,14 +476,14 @@ export const deleteLibro = async (req, res) => {
  
             /////////// fine aggiornamento: implementare ELIMINAZIONE COPERTINA dal disco fisso/////////////
 
-            logger.info("L'utente id:" + mioId + " ha eliminato il libro id:" + targetId)
+            logger.info("["+ req.ip +"] L'utente id:" + mioId + " ha eliminato il libro id:" + targetId)
             return res.status(200).json({message: `Il libro id:${targetId} è stato rimosso con successo`})
         } else {
-            logger.warn(`L'utente id:${mioId} ha tentato di eliminare il libro id:${targetId} senza autorizzazione. Richiesta bloccata`)
+            logger.warn(`[${req.ip}] L'utente id:${mioId} ha tentato di eliminare il libro id:${targetId} senza autorizzazione. Richiesta bloccata`)
             return res.status(403).json({ error: `Non hai le autorizzazioni per eliminare questo libro` })
         }
     } catch (err) {
-        logger.error('Errore deleteLibro -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore deleteLibro -> : Errore generico", err)
         console.error('Errore "deleteLibro":', err)
         return res.status(500).json({ error: "Errore server - deleteLibro"})   
     }
@@ -508,7 +508,7 @@ export const createLibroFromMaster = async (req, res) => {
         }
         // verifico se l'utente che effettua la richiesta è il proprietario dello scaffale
         if (scaffale.proprietario_id !== mioId) {
-            logger.warn(`L'utente id:${mioId} ha tentato di associare un libro ad uno scaffale non suo (id:${scaffale_id}). Operazione bloccata.`)
+            logger.warn(`[${req.ip}] L'utente id:${mioId} ha tentato di associare un libro ad uno scaffale non suo (id:${scaffale_id}). Operazione bloccata.`)
             return res.status(403).json({ error: `Scaffale id:${scaffale_id} non tuo.`})
         }
 
@@ -539,7 +539,7 @@ export const createLibroFromMaster = async (req, res) => {
         })
         return res.status(201).json({ message: 'Libro aggiunto alla tua libreria', libro: nuovo_libro})
     } catch (err) {
-        logger.error('Errore createLibroFromMaster -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore createLibroFromMaster -> : Errore generico",err)
         console.error('Errore "createLibroFromMaster":', err)
         return res.status(500).json({ error: "Errore server - createLibroFromMaster"})   
 
@@ -551,15 +551,16 @@ Restituisce la top 10 dei libri piu ricercati e di cui è stata visualizzata ant
 */
 export const getLibriPiuVisitati = async (req, res) => {
     const mioId = req.userId
-    const limit = 10
+    const limit = 5
      try {
         const libriPiuVisitati = await prisma.libri.findMany({
             take: limit,
-            orderBy: {visualizzazioni: 'desc'}
+            orderBy: {visualizzazioni: 'desc'},
+            include : { genere : { select : {dettagli : true}}}
         })
         return res.status(201).json({message:'Top 10 dei libri piu ricercati e di cui è stata visualizzata anteprima', data: libriPiuVisitati})
      } catch (err) {
-        logger.error('Errore getLibriPiuVisitati -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore getLibriPiuVisitati -> : Errore generico",err)
         console.error('Errore "getLibriPiuVisitati":', err)
         return res.status(500).json({ error: "Errore server - getLibriPiuVisitati"})          
      }
@@ -674,7 +675,7 @@ export const getLibriVicini = async (req, res) => {
             libri: libri_vicini
         })
         } catch (err) {
-            logger.error('Errore getLibriVicini -> : Errore generico')
+            logger.error("["+ req.ip +"] Errore getLibriVicini -> : Errore generico", err)
             console.error('Errore "getLibriVicini":', err)
             res.status(500).json({ error: "Errore server - Impossibile completare la ricerca dei libri vicini"})           
     }

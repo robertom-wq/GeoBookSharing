@@ -85,7 +85,7 @@ export const creaRichiestaCondivisione = async (req, res) => {
         if (error.message === "CONFLITTO_DATE") {
             return res.status(409).json({ error: "L'intervallo richiesto si sovrappone o è incluso in una condivisione esistente." })
         }
-        logger.error('Errore creaRichiestaCondivisione -> : Errore generico')
+        logger.error('['+ req.ip +'] Errore creaRichiestaCondivisione -> : Errore generico',err)
         console.error('Errore "creaRichiestaCondivisione":', err)
         return res.status(500).json({ error: "Errore server - Impossibile processare la richiesta di condivisione" })
     }
@@ -125,7 +125,7 @@ export const aggiornaStatoCondivisione = async (req, res) => {
     }
 
     if (condivisione.proprietario_id !== mioId) {
-        logger.warn(`L'utente id:${mioId} ha tentato di aggiornare lo stato di una condivisione di un libro senza autorizzazione. Richiesta bloccata`)
+        logger.warn(`[${req.ip}] L'utente id:${mioId} ha tentato di aggiornare lo stato di una condivisione di un libro senza autorizzazione. Richiesta bloccata`)
         return res.status(403).json({ error: 'Non sei il proprietario del libro' })
     }
 
@@ -152,7 +152,7 @@ export const aggiornaStatoCondivisione = async (req, res) => {
         return res.status(200).json({ message: is_accettata ? 'Richiesta Accetta' : 'Richiesta rifiutata', aggiornata })
 
     } catch (err) {
-        logger.error('Errore aggiornaStatoCondivisione -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore aggiornaStatoCondivisione -> : Errore generico", err)
         console.error('Errore "aggiornaStatoCondivisione":', err)
         return res.status(500).json({ error: "Errore server - Impossibile processare lo stato della condivisione" })
     }
@@ -176,7 +176,7 @@ export const concludiPrestito = async (req, res) => {
         }
         // solo il proprietario può concludere
         if (condivisione.libro.proprietario_id !== mioId) {
-            logger.warn(`L'utente id:${mioId} ha tentato di concludere una condivisione di un libro senza autorizzazione. Richiesta bloccata`)
+            logger.warn(`[${req.ip}] L'utente id:${mioId} ha tentato di concludere una condivisione di un libro senza autorizzazione. Richiesta bloccata`)
             return res.status(400).json({ error: 'Non sei il proprietario del libro. Non puoi concludere la condivisione' })
         }
 
@@ -194,10 +194,10 @@ export const concludiPrestito = async (req, res) => {
             where: { id: targetId },
             data: { is_completato: true, data_completato: new Date() }
         })
-        return res.status(200).json({ message: "Condivisione completata con successo" })
+        return res.status(200).json({ message: "Condivisione completata con successo", data: condivione_conclusa })
 
     } catch (err) {
-        logger.error('Errore concludiPrestito -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore concludiPrestito -> : Errore generico", err)
         console.error('Errore "concludiPrestito":', err)
         return res.status(500).json({ error: "Errore server - Impossibile concludere la condivisione" })
     }
@@ -263,7 +263,7 @@ export const deleteCondivisione = async (req, res) => {
         return res.status(200).json({message: `La condivisione con id:${targetId} è stata eliminata`, motivo: motivo || null})
 
     } catch (err) {
-        logger.error('Errore deleteCondivisione -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore deleteCondivisione -> : Errore generico", err)
         console.error('Errore "deleteCondivisione":', err)
         return res.status(500).json({ error: `Errore server - Impossibile eliminare le mie condivisioni` })
     }
@@ -303,7 +303,7 @@ export const getMieCondivisioni = async (req, res) => {
             } else if (ruolo === 'richiedente') {
                 where = { richiedente_id: mioId }
             } else {
-                return res.status(400).json({ message: "Il ruolo deve essere 'proprietario' oppure 'richiedente" })
+                return res.status(400).json({ error: "Il ruolo deve essere 'proprietario' oppure 'richiedente" })
             }
         } else {
             where = {
@@ -345,7 +345,7 @@ export const getMieCondivisioni = async (req, res) => {
             data: richieste
         })
     } catch (err) {
-        logger.error('Errore getMieCondivisioniRichiedente -> : Errore generico')
+        logger.error("["+ req.ip +"] Errore getMieCondivisioniRichiedente -> : Errore generico", err)
         console.error('Errore "getMieCondivisioniRichiedente":', err)
         return res.status(500).json({ error: `Errore server - Impossibile visualizzare le mie condivisioni (${ruolo ? ruolo : 'Tutte'}` })
     }
