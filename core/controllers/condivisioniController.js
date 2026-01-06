@@ -32,6 +32,7 @@ export const creaRichiestaCondivisione = async (req, res) => {
             const condivisioneSovrapposta = await tx.condivisioni.findFirst({
                 where: {
                     libro_id: libro_ricercato.id,
+                    is_completato: false, // Ignora prestiti conclusi
                     AND: [
                         // Condizione 1: data_al (esistente) deve essere >= data_dal (richiesto) (B >= C)
                         {
@@ -149,7 +150,7 @@ export const aggiornaStatoCondivisione = async (req, res) => {
             data,
         })
 
-        return res.status(200).json({ message: is_accettata ? 'Richiesta Accetta' : 'Richiesta rifiutata', aggiornata })
+        return res.status(200).json({ message: is_accettata ? 'Richiesta Accetta' : 'Richiesta rifiutata', data: aggiornata })
 
     } catch (err) {
         logger.error("["+ req.ip +"] Errore aggiornaStatoCondivisione -> : Errore generico", err)

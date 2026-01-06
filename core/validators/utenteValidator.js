@@ -53,5 +53,9 @@ export const updateUtenteSchema = (context = {}) => {
 export const richiestaEliminazioneSchema = Joi.object({
     richiesta_eliminazione: Joi.boolean().required().messages({
        "boolean.base": "Il campo 'richiesta_eliminazione' deve essere un valore booleano (true o false)."
-    }).options({ stripUnknown: true})
-})
+    }),
+    data_richiesta_eliminazione: Joi.date().iso().allow(null).messages({
+        "date.base": "Il campo 'data_richiesta_eliminazione' deve essere una data valida.",
+        "date.format": "La data deve essere nel formato ISO 8601 (es. .toISOString())."
+    })
+}).options({ stripUnknown: true})

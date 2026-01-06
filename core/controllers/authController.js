@@ -115,7 +115,7 @@ export const registrazione = async (req, res) => {
     } catch (err) {
         logger.error("["+ req.ip +"] Errore Registrazione -> : Errore generico", err)
         console.error("Errore di registrazione:", err)
-        res.status(500).json({error: "Errore server"})
+        return res.status(500).json({error: "Errore server"})
     }
 
 
@@ -129,13 +129,6 @@ export const login = async (req, res) => {
     try {
         const utente = await prisma.utenti.findUnique({
             where: { username: username.toLowerCase()},
-/*             select: {
-                id: true,
-                username: true,
-                hashed_password: true,
-                bannato: true,
-                ruolo: true
-            }  */
         });
         // verifico se l'account è presente nel db o se l'utente non è stato bannato
         if (!utente || utente.bannato) {
@@ -165,7 +158,7 @@ export const login = async (req, res) => {
 
         logger.info(" ["+ req.ip +"] Tentativo di accesso ->" + username + ": Effettuato con successo")
         // Risponsta positiva alla richiesta
-        res.json({
+        return res.status(200).json({
             message: "Login Effettuato",
             utente:
              {
@@ -183,7 +176,7 @@ export const login = async (req, res) => {
 
     } catch (err) {
         logger.error("["+ req.ip +"] Errore Login -> : Errore generico", err)
-        res.status(500).json({error: "Errore server"})
+        return res.status(500).json({error: "Errore server"})
     }
 }
 
@@ -195,9 +188,6 @@ export const logout = (req, res) => {
     res.cookie('jwt', '', { ...COOKIE_OPTIONS, maxAge: 0})
     res.cookie('csrf_token', '', { ...COOKIE_OPTIONS, maxAge: 0})
 
-    res.json({message: 'Logout effettuato'})
+    return res.json({message: 'Logout effettuato'})
 }
 
-export const demoget = (req,res) => {
-    res.json({message: "Ok...demo get"})
-}

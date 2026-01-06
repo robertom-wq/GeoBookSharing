@@ -45,7 +45,7 @@ esempio per admin
 */
 export const getAllUtenti = async (req, res) => {
     //estrae la proprietà q dall'oggetto req.query. Se non esiste sarà "undefined"
-    const { q, richiesta_eliminazione, bannato } = req.query
+    const { q, richiesta_eliminazione, bannato, data_richiesta_eliminazione } = req.query
     const mioId = req.userID
     // utilizzo la paginazione, il risultato potrebbe contenere parecchi elementi
     // vedo se nella req esiste una query con pagina e limit
@@ -204,6 +204,7 @@ export const getProfilo = async (req, res) => {
             res.status(404).json({ error: 'Utente non trovato' })
         }
 
+        console.log(utente)
         //incremento visualizzazioni utente (se profilo visitato è diverso dal suo)
         if (targetId !== mioId) {
             const utenteVisualizzazioneUpdated = await prisma.utenti.update({
@@ -348,11 +349,17 @@ Solo l'utente stesso può richiedere la cancellazione o revocarla.
 export const softDeleteUtente = async (req, res) => {
     const mioId = req.userId
     let data = { ...req.dati_validati }
+    console.log("DATA",data)
+
 
     try {
+    
         const utente = await prisma.utenti.update({
             where: { id: mioId },
-            data: { richiesta_eliminazione: data.richiesta_eliminazione },
+            data: { 
+                richiesta_eliminazione: data.richiesta_eliminazione,
+                data_richiesta_eliminazione:data.data_richiesta_eliminazione
+            },
             select: {
                 id: true,
                 username: true,

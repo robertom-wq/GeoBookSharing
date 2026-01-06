@@ -7,7 +7,7 @@ export const createCondivisioniSchema = Joi.object({
     }),
     tipo_condivisione_id:  Joi.number().integer().positive().required().messages({
         'any.required' : 'Il campo tipo_condivisione_id è obbligatorio',
-        'number.base' : 'Libro id deve essere un numero'
+        'number.base' : 'Libro id deve essere un numero, scegli un elemento dall\'elenco'
     }),
     data_dal: Joi.date().iso().optional().messages({
         'data.format' : 'Formato data non valido YYYY-MM-DD'
