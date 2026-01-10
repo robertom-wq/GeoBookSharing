@@ -9,25 +9,26 @@ import prisma from '../config/prisma.js'
 
 const JWT_SECRET = process.env.JWT_SECRET
 
+// controllo se è stata definita JWT_SECRET in .env
 if (!JWT_SECRET) {
     console.error("JWT_SECRET non definito. Imposta una chiave sicura in .env")
-    process.exit(1)
+    process.exit(1) //In caso di assenza, il processo viene terminato con codice 1 per impedire al server di girare in uno stato nn sicuro.
 }
 
+// middleware
 const auth = async (req, res, next) => {
     let token
-    // cerco nei cookies
+    // cerco  token nei cookies
     if (req.cookies?.jwt) {
         token = req.cookies.jwt
-        console.log("Token da cookie: ", token)
+        console.log("Token jwt da cookie: ", token)
     }
     
-
-    // cerco nell'header Authorization
+    // cerco token nell'header Authorization
     const authHeader = req.header('Authorization')
     if (authHeader?.startsWith('Bearer ')) {
         token = authHeader.replace('Bearer ', '').trim()
-        console.log("Token da header: ", token)
+        console.log("Token jwt da header: ", token)
     }
     
     // se non trovo il token resrtituisco 401 Unauthorized
@@ -40,7 +41,7 @@ const auth = async (req, res, next) => {
         const decodificato = jwt.verify(token, JWT_SECRET)
         req.userId = decodificato.userId
         req.isAdmin = decodificato.userRuolo === 'admin' // true se l'utente è admin
-        // verifico che l'utente esista ancora o non sia bannato ( SELECT id, bannato FROM utenti WHERE id = decodificato.id)
+        // verifico che l'utente esista ancora o non sia bannato
         const utente = await prisma.utenti.findUnique({
             where: {id: decodificato.userId},
             select: {id:true, bannato: true, username: true}
@@ -51,9 +52,8 @@ const auth = async (req, res, next) => {
             return res.status(400).json({ error: "Utente non valido o bannato"})
         }
 
-        /*
-         Gesrione dei parametri id nelle richieste (es in utenti/{id} etc.)
-         */
+        
+        //Gesrione dei parametri id nelle richieste (es in utenti/{id} etc.)
         if (!req.params.id || req.params.id === '' || req.params.id === '{id}') {
             // pulizia, controlla se il parametro id è mancante (ad esempio, se l'utente ha chiamato
             // un URL come /utenti/ invece di /utenti/123) oppure se ha un valore falsy in JavaScript, come null o undefined.
@@ -76,9 +76,6 @@ const auth = async (req, res, next) => {
             }
             // passaggio al middleware successivo
             next()
-        
-        
-
 
     } catch (err) {
         // caso 1, Token scaduto
@@ -89,7 +86,7 @@ const auth = async (req, res, next) => {
         if (err.name === 'JsonWebTokenError') {
             return res.status(401).json({error: "Token non valido"})
         }
-        console.error('Errore JWT', err);
+        console.error('Errore JWT', err)
         // Se non è nessuno dei due precendenti restituisco errore generico
         return res.status(401).json({error: "Errore di autenticazione JWT"})
 

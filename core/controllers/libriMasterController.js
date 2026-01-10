@@ -1,3 +1,7 @@
+//Controller dedicato alle operazioni CRUD relative ai libri master
+// sequenza, utente deve aggiungere un libro alla sua libreria, o lo crea da 0, oppure cerca un modello sui master disponibili.
+// se non presente tra i master disponibili, prova la ricerca tramite isbn, che a sua volta creerà il master da utilizzare
+
 import prisma from "../config/prisma.js"
 import { TipiAzione } from "@prisma/client"
 import axios from 'axios'
@@ -8,8 +12,7 @@ import fs from 'fs'
 import logger from '../config/logging.js'
 
 
-// sequenza, utente deve aggiungere un libro alla sua libreria, o lo crea da 0, oppure cerca un modello sui master disponibili.
-// se non presente tra i master disponibili, prova la ricerca tramite isbn, che a sua volta creerà il master da utilizzare
+
 
 // helper per la scelta della migliore immagine delle copertine da goole Books
 const getMiglioreImmagine = (url_immagine) => {
@@ -17,25 +20,28 @@ const getMiglioreImmagine = (url_immagine) => {
         return null
     }
     return (
+        // restituisce la prima che trova partendo dalla qualità pi alta a scendere
         url_immagine.large || url_immagine.medium || url_immagine.small || url_immagine.thumbnail || url_immagine.smallThumbnail || null
     )
 }
 
+// Aggiunta di un libroMaster al catalogo tramite codice ISBN 
 export const addLibroMasterFromISBN = async (req, res) => {
     // estrapolo isbn dal body
     const { isbn } = req.body
 
-    // validazione veloce del codice
+    // validazione veloce del codice ISBN
     if(!isbn || typeof isbn !== 'string') {
         return res.status(400).json({ error: 'Errore nel caricamento del codice ISBN'})
     }
 
-    let isbn_pulito = isbn.trim()
-    // verifico che il codice ISBN sia valido tramite funzion dedicata in utils/toolkit
+    let isbn_pulito = isbn.trim() // elimino eventuali spazi bianchi
+    // verifico che il codice ISBN sia valido tramite funzion checkISBN creata  e disponibile in utils/toolkit implementata tramite libreria esterna isbn3
     const check_isbn = checkISBN(isbn_pulito)
 
-    if (check_isbn.valid && check_isbn.fixed !== null) {
-        isbn_pulito = check_isbn.fixed
+    //se ISBN e stato etichettao come valido ed è stato normalizzato
+    if (check_isbn.is_valido && check_isbn.isbn_normalizzato !== null) {
+        isbn_pulito = check_isbn.isbn_normalizzato
         console.log("ISBN pulito in controller:", isbn_pulito)
     } else {
         return res.status(400).json({ error: check_isbn.error, isbn: isbn_pulito})
@@ -48,19 +54,19 @@ export const addLibroMasterFromISBN = async (req, res) => {
         if (master_esistente) {
             return res.status(200).json({ message: `Libro master con isbn ${isbn_pulito} già presente nel database` })
         }
-        // eseguo la fetch verso google Book API (es https://www.googleapis.com/books/v1/volumes?q=isbn:9791280623508 per vedere la response e i dati che restituisce)
-        // oppure vedi esempio_response_googleapi.json 
+        // eseguo la fetch verso google Book API (es https://www.googleapis.com/books/v1/volumes?q=isbn:9791280623508)
         const url = `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn_pulito.replaceAll('-','')}`
-        const response = await axios.get(url, {timeout: 10000})
+        const libro_google = await axios.get(url, {timeout: 10000})
 
-        if(!response.data.items || response.data.items.length ===0){
+        if(!libro_google.data.items || libro_google.data.items.length ===0){
             return res.status(404).json({ error: 'Libro non trovato su Google Books', isbn_pulito})
         }
-        const libro_trovato = response.data.items[0].volumeInfo
+        const libro_trovato = libro_google.data.items[0].volumeInfo
 
         //estrapolazione dati necessari
         const titolo = (libro_trovato.title || 'Sconosciuto').substring(0,500)
         const autore = (libro_trovato.authors?.join(', ') || 'Sconosciuto').substring(0,300)
+        //estrapolo solo l'anno di pubblicazione
         const anno = libro_trovato.publishedDate ? parseInt(libro_trovato.publishedDate.split('-')[0], 10) : null 
         const descrizione = libro_trovato.description?.substring(0,2000) || null
         // mi appoggio ad un oggetto json costruito con le traduzioni dei generi letterali piu usati su google Books
@@ -68,7 +74,7 @@ export const addLibroMasterFromISBN = async (req, res) => {
         const genere_nome = tabella_conversioni_generi[libro_trovato.categories?.[0].toUpperCase()] || 'Non definito' 
         console.log("GENERE", libro_trovato.categories?.[0].toUpperCase(), genere_nome)
         //verifico esistenza genere nel db, se non esiste lo crea upsert(). Questo fa si che chi sceglierà di creare un libro da 0
-        // utilizzera generi prestabiliti, in modo da essere uniformi e ottenere statistiche sui generi piu veritiere
+        // utilizzera generi prestabiliti, in modo da essere uniformi e ottenere statistiche sui generi uniformi
         const genere = await prisma.generi.upsert({
             where: {dettagli : genere_nome},
             update : {},
@@ -103,9 +109,8 @@ export const addLibroMasterFromISBN = async (req, res) => {
     }
 }
 
-/*
-Mostra il catalogo dei libri master o ricerca tramite q=... per genere/titolo/autore
-*/
+
+//Mostra il catalogo dei libri master o ricerca tramite q=... per genere/titolo/autore
 export const getAllLibriMaster = async (req, res) => {
     const { q } = req.query
      // utilizzo la paginazione, il risultato potrebbe contenere parecchi elementi
@@ -117,12 +122,12 @@ export const getAllLibriMaster = async (req, res) => {
     const limit = parseInt(queryLimit) || 200
     // intercetto valori inferiori a 1
     if (pagina < 1) {
-        pagina = 1;
+        pagina = 1
     }
     if (limit < 1) {
-        limit = 10;
+        limit = 10
     }
-    const skipElementi = (pagina - 1) * limit;
+    const skipElementi = (pagina - 1) * limit
 
     let where = {}
 
@@ -130,13 +135,14 @@ export const getAllLibriMaster = async (req, res) => {
         // elimino spazi bianchi
         const queryString = q.trim()
         where.OR = [
-                // username like %queryString%
+                // titolo like %queryString%
                 {titolo: { contains: queryString, mode: 'insensitive'}},
                 {autore: { contains: queryString, mode: 'insensitive'}},
                 {genere: { dettagli: { contains: queryString, mode: 'insensitive'}}},
             ]
     }
     try {
+    //recupero tutti i libri master in base ai criteri di ricerca e il conteggio totale
     const [libri, conteggioTotale] = await prisma.$transaction([
             prisma.libri_master.findMany({
                 where,
@@ -176,13 +182,13 @@ export const getAllLibriMaster = async (req, res) => {
 
 }
 
-/*
-Restituisce il libro master con id in params
-*/
+
+//Visualizzazione dei dettagli di un libro master con id in params
 export const getLibroMasterById = async (req, res) => {
     const targetId = parseInt(req.params.id)
 
      try {
+        // ricerco il libro
         const libro = await prisma.libri_master.findUnique({
             where: {id: targetId},
             include: {
@@ -205,21 +211,20 @@ export const getLibroMasterById = async (req, res) => {
 
 }
 
-/*
-Creazione libro master manuale. SOLO ADMINS per evitare confusione e abusi
-*/
+
+//Creazione libro master manuale. SOLO ADMINS per evitare confusione e abusi
 export const createLibroMaster = async (req, res) => {
     const isAdmin = req.isAdmin
     const mioId = req.userId
-    console.log(req.dati_validati)
+    //controllo di sicurezza sui permessi dell'utente loggato
     if(isAdmin) {
         const {isbn, titolo, autore, anno, descrizione, genere, type} = req.dati_validati
         let isbn_pulito = isbn.trim()
         // verifico che il codice ISBN sia valido tramite funzion dedicata in utils/toolkit
         const check_isbn = checkISBN(isbn_pulito)
 
-        if (check_isbn.valid && check_isbn.fixed !== null) {
-            isbn_pulito = check_isbn.fixed
+        if (check_isbn.is_valido && check_isbn.isbn_normalizzato !== null) {
+            isbn_pulito = check_isbn.isbn_normalizzato
             console.log("ISBN pulito in controller:", isbn_pulito)
         } else {
             return res.status(400).json({ error: check_isbn.error, isbn: isbn_pulito})
@@ -239,7 +244,7 @@ export const createLibroMaster = async (req, res) => {
                 const response = await axios.get(url, {timeout: 10000})
 
                 if(response.data.items?.length > 0){
-                    return res.status(400).json({ error: 'Libro trovato su Google Books', suggerimento: 'Usa /fromISBN'})
+                    return res.status(400).json({ error: 'Libro trovato su Google Books, aggiungilo al catalogo globale tramite ISBN', suggerimento: 'Usa /fromISBN'})
                 }
             } catch (err) {
                 logger.error(`[${req.ip}] Errore createLibroMaster -> : Impossibile verificare su google books presenza di ISBN ${isbn_pulito}`, err)
@@ -295,9 +300,8 @@ export const createLibroMaster = async (req, res) => {
 }
 
 
-/*
-Delete libro master  SOLO ADMINS
-*/
+
+//Delete libro master  SOLO ADMINS
 export const deleteLibroMaster = async (req, res) => {
     const isAdmin = req.isAdmin
     const mioId = req.userId
@@ -318,7 +322,7 @@ export const deleteLibroMaster = async (req, res) => {
                 // Elimina il record dal database. Se questo fallisce, l'intera transazione fallisce .
                 await tx.libri_master.delete({
                     where: { id: targetId }
-                });
+                })
                 await tx.storico_eliminazioni.create({
                     data: {
                         esecutore_id: mioId,
@@ -328,7 +332,7 @@ export const deleteLibroMaster = async (req, res) => {
                         azione: TipiAzione.DELETE_LIBRO_MASTER
                     }
                 })
-            });
+            })
         return res.status(200).json({message: `Libro Master con id:${targetId} eliminato con successo`})
         } catch (err) {
             logger.error('['+ req.ip +'] Errore deleteLibroMaster -> : Errore generico',err)
@@ -342,9 +346,8 @@ export const deleteLibroMaster = async (req, res) => {
     }
 }
 
-/*
-Aggiornamento libro master  SOLO ADMINS
-*/
+
+//Aggiornamento libro master  SOLO ADMINS
 export const updateLibroMaster = async (req, res) => {
     const isAdmin = req.isAdmin
     const mioId = req.userId
@@ -381,22 +384,18 @@ export const updateLibroMaster = async (req, res) => {
             if (!libromMasterPreUpdate) {
                 return res.status(404).json({ error: `Libro Master id:${targetId} non trovato`})
             }
-            let libroMasterAggiornato;
+            let libroMasterAggiornato
         
-            // aggiornamento
-            // Se fallisce, esegue ROLLBACK e salta direttamente al catch.
-            libroMasterAggiornato = await prisma.$transaction(async (tx) => {
-                return await tx.libri_master.update({
+            libroMasterAggiornato = await prisma.libri_master.update({
                     where: { id: targetId },
                     data,
                     include: {
                         genere: { select: {dettagli: true}},
                     }
                 })
-            })
 
             if(req.fileRidimensionato) {
-                const vecchiFiles = [libromMasterPreUpdate.copertina, libromMasterPreUpdate.copertina_thumb].filter(Boolean);
+                const vecchiFiles = [libromMasterPreUpdate.copertina, libromMasterPreUpdate.copertina_thumb].filter(Boolean)
                     //procedo all'eliminazione
                 vecchiFiles.forEach( url => {
                     // solitamente i libri caricati da google.books non hanno entrambe le immagini

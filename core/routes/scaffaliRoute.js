@@ -7,6 +7,7 @@ import { createScaffaleSchema, updateScaffaleSchema } from "../validators/scaffa
 
 const scaffaliRouter = express.Router()
 
+
 scaffaliRouter.post('/nuovo', auth, csrf_protection, valida_dati(createScaffaleSchema), createScaffale)
 
 scaffaliRouter.patch('/:id', auth, csrf_protection, valida_dati(updateScaffaleSchema), updateScaffale)

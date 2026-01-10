@@ -1,13 +1,14 @@
+//Controller dedicato alle operazioni CRUD sui libri
+
 import prisma from "../config/prisma.js"
 
 import path from 'path'
 import fs from 'fs'
 import logger from "../config/logging.js"
-import { Prisma, TipiAzione } from '@prisma/client'; // Importa l'oggetto Prisma
+import { Prisma, TipiAzione } from '@prisma/client' // Importa l'oggetto Prisma
 
-/*
-Creazione manuale di un libro
-*/
+
+//Creazione manuale di un libro
 export const createLibro = async (req, res) => {
     
     const mioId = req.userId
@@ -69,9 +70,8 @@ export const createLibro = async (req, res) => {
     }
 }
 
-/*
-Restituisce tutti i libri in possesso dell'utente loggato 
-*/
+
+//Restituisce tutti i libri in possesso dell'utente loggato 
 export const getMieiLibri = async (req, res) => {
     const mioId = req.userId
     
@@ -84,14 +84,15 @@ export const getMieiLibri = async (req, res) => {
     const limit = parseInt(queryLimit) || 10
     // intercetto valori inferiori a 1
     if (pagina < 1) {
-        pagina = 1;
+        pagina = 1
     }
     if (limit < 1) {
-        limit = 10;
+        limit = 10
     }
-    const skipElementi = (pagina - 1) * limit;
+    const skipElementi = (pagina - 1) * limit
 
     try {
+        // eseguo transazione per atomicità
         const [libri, conteggioTotale] = await prisma.$transaction([
             prisma.libri.findMany({
                 where: { proprietario_id : mioId},
@@ -126,9 +127,8 @@ export const getMieiLibri = async (req, res) => {
     }
 }
 
-/*
-Ricerca libri tramite id come parametro
-*/
+
+//Ricerca libri tramite id come parametro
 export const getLibroById = async (req, res) => {
     const targetId = parseInt(req.params.id)
     const mioId = req.userId
@@ -153,7 +153,7 @@ export const getLibroById = async (req, res) => {
                 data: {visualizzazioni: {increment: 1 }},
                 where: {id: targetId}
         })
-        libro.visualizzazioni = libroVisualizzazioneUpdated.visualizzazioni;
+        libro.visualizzazioni = libroVisualizzazioneUpdated.visualizzazioni
         }
         return res.status(200).json({message: `Libro id:${targetId} trovato`, libro: libro})
     } catch (err) {
@@ -164,9 +164,8 @@ export const getLibroById = async (req, res) => {
 }
 
 
-/*
-Ricerca libri con query di ricerca autore, titolo o genere
-*/
+
+//Ricerca libri con query di ricerca autore, titolo o genere
 export const getAllLibri = async (req, res) => {
     const mioId = req.userID
      // utilizzo la paginazione, il risultato potrebbe contenere parecchi elementi
@@ -178,12 +177,12 @@ export const getAllLibri = async (req, res) => {
     const limit = parseInt(queryLimit) || 10
     // intercetto valori inferiori a 1
     if (pagina < 1) {
-        pagina = 1;
+        pagina = 1
     }
     if (limit < 1) {
-        limit = 10;
+        limit = 10
     }
-    const skipElementi = (pagina - 1) * limit;
+    const skipElementi = (pagina - 1) * limit
 
     const { q } = req.query
     try {
@@ -215,7 +214,7 @@ export const getAllLibri = async (req, res) => {
                 skip: skipElementi
             }),
             prisma.libri.count({ // Query per il conteggio
-                where
+                where // calusola where dinamicamente popolata
             })
         ])
 
@@ -236,9 +235,8 @@ export const getAllLibri = async (req, res) => {
     
 }
 
-/*
-Ricerca tutti libri disponibili (da eliminare)
-*/
+
+//Ricerca tutti libri disponibili (da eliminare)
 export const getAllDisponibili = async (req, res) => {
     // utilizzo la paginazione, il risultato potrebbe contenere parecchi elementi
     // vedo se nella req esiste una query con pagina e limit
@@ -249,13 +247,13 @@ export const getAllDisponibili = async (req, res) => {
     const limit = parseInt(queryLimit) || 10
     // intercetto valori inferiori a 1
     if (pagina < 1) {
-        pagina = 1;
+        pagina = 1
     }
     if (limit < 1) {
-        limit = 10;
+        limit = 10
     }
 
-    const skipElementi = (pagina - 1) * limit;
+    const skipElementi = (pagina - 1) * limit
 
     try {
         // utilizzo transaction che permette di eseguire più operazioni sul database in un unico blocco
@@ -292,9 +290,8 @@ export const getAllDisponibili = async (req, res) => {
     }
 }
 
-/*
-Restituisce tutti i tipi di condivisione censiti nel DB
-*/
+
+//Restituisce tutti i tipi di condivisione censiti nel DB
 export const getAllTipiCondivisione = async (req, res) => {
         try {
         const tipiCondivisione = await prisma.tipi_condivisione.findMany({
@@ -311,9 +308,8 @@ export const getAllTipiCondivisione = async (req, res) => {
     }
 }
 
-/*
-Restituisce tutti i generi letterari censiti nel DB
-*/
+
+//Restituisce tutti i generi letterari censiti nel DB
 export const getAllGeneriLetterari = async (req, res) => {
     try {
         const generiLetterari = await prisma.generi.findMany({
@@ -330,10 +326,10 @@ export const getAllGeneriLetterari = async (req, res) => {
     }
 }
 
-/*
-Aggiornamento dettagli libro presenti nella libreria
-*/
+
+//Aggiornamento dettagli libro presenti nella libreria
 export const updateLibro = async (req, res) => {
+
     const targetId = parseInt(req.params.id)
     const mioId = req.userId
     let nuovaCopertina = null
@@ -373,12 +369,9 @@ export const updateLibro = async (req, res) => {
             return res.status(403).json({ error: `Non autorizzato ala modifica de Libro id:${targetId}`})
         }
         
-        let libroAggiornato;
-        
-        // aggiornamento
-        // Se fallisce, esegue ROLLBACK e salta direttamente al catch.
-        libroAggiornato = await prisma.$transaction(async (tx) => {
-             return await tx.libri.update({
+        let libroAggiornato
+               
+        libroAggiornato = await prisma.libri.update({
                 where: { id: targetId },
                 data,
                 include: {
@@ -387,10 +380,10 @@ export const updateLibro = async (req, res) => {
                     tipo_condivisione: { select: {dettagli: true}}
                 }
             })
-        })
 
+        //cancellazione delle vecchie immagini per evitare di avere file orfani
         if(nuovaCopertina) {
-            const vecchiFiles = [libroPreUpdate.copertina, libroPreUpdate.copertina_thumb].filter(Boolean);
+            const vecchiFiles = [libroPreUpdate.copertina, libroPreUpdate.copertina_thumb].filter(Boolean)
                 //procedo all'eliminazione
             vecchiFiles.forEach( url => {
                 // solitamente i libri caricati da google.books non hanno entrambe le immagini
@@ -417,9 +410,8 @@ export const updateLibro = async (req, res) => {
 }
 
 
-/*
-Eliminazione definitiva libro dal DB (admin o proprietario)
-*/
+
+//Eliminazione definitiva libro dal DB (admin o proprietario)
 export const deleteLibro = async (req, res) => {
     const targetId = parseInt(req.params.id)
     const isAdmin = req.isAdmin
@@ -429,9 +421,10 @@ export const deleteLibro = async (req, res) => {
     try {
         // ricerco il libro da eliminare, verificando se utente non ha prestiti in atto
         const libro = await prisma.libri.findUnique({
-        where: {id: targetId, is_disponibile: true},
-        select: {proprietario_id: true, titolo: true, copertina: true, copertina_thumb:true},
+            where: {id: targetId, is_disponibile: true},
+            select: {proprietario_id: true, titolo: true, copertina: true, copertina_thumb:true},
         })
+
         if(!libro) {
             return res.status(404).json({error: `Libro ${targetId} non trovato oppure in prestito`})
         }
@@ -442,7 +435,8 @@ export const deleteLibro = async (req, res) => {
                 // Elimina il record dal database. Se questo fallisce, l'intera transazione fallisce .
                 await tx.libri.delete({
                     where: { id: targetId }
-                });
+                })
+                //Aggiungo record anche alla tabella di audit
                 await tx.storico_eliminazioni.create({
                     data: {
                         esecutore_id: mioId,
@@ -452,11 +446,11 @@ export const deleteLibro = async (req, res) => {
                         azione: TipiAzione.DELETE_LIBRO
                     }
                 })
-            });
+            })
 
-            /////////// aggiornamento: implementare ELIMINAZIONE COPERTINA dal disco fisso/////////////
+            //ELIMINAZIONE COPERTINA
             if (libro.copertina || libro.copertina_thumb) {
-                const filesToDelete = [libro.copertina, libro.copertina_thumb].filter(Boolean);
+                const filesToDelete = [libro.copertina, libro.copertina_thumb].filter(Boolean)
                 //procedo all'eliminazione
                 filesToDelete.forEach( url => {
                     // solitamente i libri caricati da google.books non hanno entrambe le immagini
@@ -474,8 +468,6 @@ export const deleteLibro = async (req, res) => {
 
             } 
  
-            /////////// fine aggiornamento: implementare ELIMINAZIONE COPERTINA dal disco fisso/////////////
-
             logger.info("["+ req.ip +"] L'utente id:" + mioId + " ha eliminato il libro id:" + targetId)
             return res.status(200).json({message: `Il libro id:${targetId} è stato rimosso con successo`})
         } else {
@@ -546,11 +538,9 @@ export const createLibroFromMaster = async (req, res) => {
     }
 }
 
-/*
-Restituisce la top 10 dei libri piu ricercati e di cui è stata visualizzata anteprima
-*/
+
+//Restituisce la top 5 dei libri piu ricercati e di cui è stata visualizzata anteprima
 export const getLibriPiuVisitati = async (req, res) => {
-    const mioId = req.userId
     const limit = 5
      try {
         const libriPiuVisitati = await prisma.libri.findMany({
@@ -567,9 +557,8 @@ export const getLibriPiuVisitati = async (req, res) => {
 }
 
 
-/*
-Ricerca libri per titolo/autore, genere e posizione
-*/
+
+//Ricerca libri per titolo/autore, genere e posizione
 export const getLibriVicini = async (req, res) => {
     const {lat, lng, dist=5000, q='', limit } = req.query
 
@@ -616,11 +605,11 @@ export const getLibriVicini = async (req, res) => {
             u.avatar_thumb AS proprietario_avatar_thumb,
             s.id AS scaffale_id,
             s.nome AS scaffale_nome,
-            COALESCE(ST_AsText(s.posizione), 'Nessuna Posizione') AS posizione,
-            ST_Distance(
+            COALESCE(ST_AsText(s.posizione), 'Nessuna Posizione') AS posizione, --trasforma le coordinate binarie del database in una stringa leggibile
+            ST_Distance( --Calcola la distanza tra la posizione del libro (s.posizione in quanto è legata allo scaffale) e il punto inviato dall'utente (lng_num, lat_num).
                     s.posizione::geography,
                     --crea il punto di riferimento (la posizione dell'utente che esegue la ricerca) e gli assegna il sistema di coordinate
-                    ST_SetSRID(ST_MakePoint(${lng_num}, ${lat_num}), 4326)::geography
+                    ST_SetSRID(ST_MakePoint(${lng_num}, ${lat_num}), 4326)::geography --::geography serve a calcolare la distanza in metri reali (tenendo conto della curvatura terrestre)
                 ) AS distanza_metri
             FROM libri l
             JOIN scaffali s ON l.scaffale_id = s.id
@@ -631,16 +620,16 @@ export const getLibriVicini = async (req, res) => {
                 l.is_disponibile = true --Valutare se utile oppure se è utile vederli tutti
                 AND s.posizione IS NOT NULL
                 AND u.id != ${mioId} -- escludo i propri scaffali dalla ricerca
-                AND ST_DWithin(
+                AND ST_DWithin( --Controlla se la posizione dello scaffale è all'interno di un raggio di {dist_num} metri rispetto alle coordinate dell'utente.
                         s.posizione::geography,
-                        ST_SetSRID(ST_MakePoint(${lng_num}, ${lat_num}), 4326)::geography,
+                        ST_SetSRID(ST_MakePoint(${lng_num}, ${lat_num}), 4326)::geography, --Assegna il sistema di riferimento WGS84
                         ${dist_num}
                     )
                 ${sql_where_filtro} -- altri filtri provenienti dalla query della req
                 ORDER BY distanza_metri ASC
                 LIMIT ${limit_num}
         `
-        //esegu la query appena creata
+        //esegu la query appena creata, tramite $queryRaw in quanto prisma non gestisce nativamente query con dati geospaziali
         const libri = await prisma.$queryRaw(sql_query)
 
         //mappo il risultato
@@ -666,8 +655,9 @@ export const getLibriVicini = async (req, res) => {
             },
             posizione: libro.posizione,
             distanza_metri: Number(libro.distanza_metri),
-            distanza_km: (libro.distanza_metri / 1000).toFixed(2)
+            distanza_km: (libro.distanza_metri / 1000).toFixed(2) //arrotondamento per eccesso alla seconda cifra
         }))
+
         return res.status(200).json({
             limite_ricerca: limit_num,
             trovati: libri_vicini.length,

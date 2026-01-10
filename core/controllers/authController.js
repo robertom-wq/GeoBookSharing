@@ -1,10 +1,7 @@
 /*
-GESTISCE LA LOGICA DI BUSINNESS DI:
-- LOGIN
-- REGISTRAZIONE
-- LOGOUT
-FUNZIONALITA PRINCIPALI:
+Controller che permette gestisce il sistema di autenticazione dell'utente.
 
+note
 Password criptata con bcryptjs con Work Factor 12. Essendo bcrypt legacy, possibile miglioria Argon2 raccomandato OSWAP 
 
 L'Access Token è impostato per durare 7 giorni a scopo dimostrativo. In un ambiente di produzione, la durata dovrebbe essere 
@@ -12,26 +9,20 @@ ridotta a pochi minuti (e.g., 15m), implementando un meccanismo di Refresh Token
 per mitigare il rischio di furto del token (XSS).
 */
 
-//import { PrismaClient } from "@prisma/client";
+//import { PrismaClient } from "@prisma/client"
 import bcrypt from 'bcryptjs'
 import jwt  from 'jsonwebtoken'
-import { generateCsrfToken } from "../middleware/csrf.js";
+import { generateCsrfToken, CSRF_COOKIE_OPTIONS } from "../middleware/csrf.js"
 
-//const prisma = new PrismaClient()
 import prisma from '../config/prisma.js'
-import logger from '../config/logging.js';
+import logger from '../config/logging.js'
 
-/*
-SETUP INIZIALE JWT E COOKIES
- */
+
+//SETUP INIZIALE JWT E COOKIES
 const JWT_SECRET = process.env.JWT_SECRET
-const JWT_EXPIRATION = '7d';
+const JWT_EXPIRATION = '7d'
 
-// controllo se la chiave JVW_SECRET è stata definita in .env
-if (!JWT_SECRET) {
-    console.error("JWT_SECRET non definito. Imposta una chiave sicura in .env")
-    process.exit(1)
-}
+
 
 // Settagio parametri dei cookies
 const COOKIE_OPTIONS = {
@@ -41,26 +32,12 @@ const COOKIE_OPTIONS = {
     maxAge:  7*24*60*60 *1000// 7 giorni
 }
 
-const CSFR_COOKIE_OPTIONS = {
-    httpOnly: false, // il frontend deve poterlo leggere per inviarlo in X-CSFR-Token
-    secure: false, // false in ambiente di sviluppo in quanto non si dispone di https
-    sameSite: 'lax',
-    maxAge: 7*24*60*60*1000 // 7 giorni
-}
 
-function exclude(user, keys) {
-  return Object.fromEntries(
-    Object.entries(user).filter(([key]) => !keys.includes(key))
-  );
-}
-
-/*
-REGISTRAZIONE
-*/
+//REGISTRAZIONE UTENTE
 export const registrazione = async (req, res) => {
     const { email, cognome, nome, password, username} = req.body    
     try {
-        // controllo se utente esiste nel db
+        // controllo se utente esiste nel db tramite username o email
         const esiste = await prisma.utenti.findFirst({
             where: {
                 // o username o email già presenti
@@ -69,7 +46,7 @@ export const registrazione = async (req, res) => {
                     {username: username.toLowerCase()}
                 ]
             }
-        });
+        })
         if (esiste) {
             return res.status(400).json({
                 error: esiste.email === email.toLowerCase() ? "Email già in uso" : "Username già in uso"
@@ -88,26 +65,34 @@ export const registrazione = async (req, res) => {
                 username: username.toLowerCase(),
                 hashed_password: password_cifrata,
             },
-            // dati da inviare assieme alla res
+            // dati da inviare assieme alla response
             select: {
                 id: true,
                 username: true,
+                ruolo: true,
                 data_creazione: true,
             }
 
-        });
-        const csrf_token_value = generateCsrfToken(req, res);
+        })
+
+        const csrf_token_value = generateCsrfToken(req, res) // creo token CSRF tramite 
 
         // creo un token firmato da inviare il browser
         const token = jwt.sign( {
             userId: utente.id,
             userUsername: utente.username,
-            csrf_token: csrf_token_value,
-            }, JWT_SECRET, {expiresIn: JWT_EXPIRATION})
-        res.cookie('jwt', token, COOKIE_OPTIONS)
+            userRuolo: utente.ruolo,
+            csrf_token: csrf_token_value
+        }, JWT_SECRET, {expiresIn: JWT_EXPIRATION})
+            
+        
+        // invio i due cookies
+        res.cookie('jwt', token, COOKIE_OPTIONS) //JWT - il JS non lo vede
+        res.cookie('csrf_token', csrf_token_value, CSRF_COOKIE_OPTIONS) //CSRF - leggibile dal JS del frontend
+
         logger.info("["+ req.ip +"] Tentativo di registrazione -> " + utente.username + ": Effettuato con successo")
         res.status(201).json({ 
-            mesage: "Registrazione completata con successo",
+            message: "Registrazione completata con successo",
             utente,
             csrf_token: csrf_token_value
         })
@@ -121,23 +106,21 @@ export const registrazione = async (req, res) => {
 
 }
 
-/*
-LOGIN
-*/
+//LOGIN UTENTE
 export const login = async (req, res) => {
-    const { username, password } = req.body
+    const { username, password } = req.body //destructuring, etraggo username e password dal body della richiesta
     try {
         const utente = await prisma.utenti.findUnique({
             where: { username: username.toLowerCase()},
-        });
-        // verifico se l'account è presente nel db o se l'utente non è stato bannato
+        })
+        // verifico se l'account è presente nel db e se l'utente non è stato bannato
         if (!utente || utente.bannato) {
             logger.error("["+ req.ip +"] Tentativo di accesso -> " + username + ": credenziali non valide, utente non esistente o bannato")
             return res.status(401).json({ error: "Credenziali non valide"})
         }
 
         // verifico se la password è corretta
-        const password_valida = await bcrypt.compare(password, utente.hashed_password);
+        const password_valida = await bcrypt.compare(password, utente.hashed_password)
         if (!password_valida) {
             logger.error("["+ req.ip +"] Tentativo di accesso -> " + username + ": credenziali non valide, password errata")
             return res.status(401).json({error: "Credenziali non valide"})
@@ -151,10 +134,11 @@ export const login = async (req, res) => {
             userId: utente.id,
             userUsername: utente.username,
             userRuolo: utente.ruolo,
-            csrfToken: csrf_token_value
+            csrf_token: csrf_token_value
         }, JWT_SECRET, {expiresIn: JWT_EXPIRATION})
 
-        res.cookie('jwt', token, COOKIE_OPTIONS)
+        res.cookie('jwt', token, COOKIE_OPTIONS) //JWT - il JS non lo vede
+        res.cookie('csrf_token', csrf_token_value, CSRF_COOKIE_OPTIONS) //CSRF - leggibile dal JS del frontend
 
         logger.info(" ["+ req.ip +"] Tentativo di accesso ->" + username + ": Effettuato con successo")
         // Risponsta positiva alla richiesta
@@ -171,7 +155,7 @@ export const login = async (req, res) => {
                 visualizzazioni: utente.visualizzazioni,
                 email: utente.email
             }, 
-            csrf_token: csrf_token_value
+            csrf_token: csrf_token_value // aggungo nel body anche il csrf_token
         })
 
     } catch (err) {
@@ -180,9 +164,7 @@ export const login = async (req, res) => {
     }
 }
 
-/*
-LOGOUT
-*/
+//LOGOUT
 export const logout = (req, res) => {
     // invalida entrambi i cookies
     res.cookie('jwt', '', { ...COOKIE_OPTIONS, maxAge: 0})

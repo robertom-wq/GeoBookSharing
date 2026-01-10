@@ -10,6 +10,7 @@ import { createLibroSchema, updateLibroSchema, createLibroFromMasterSchema } fro
 
 const libriRouter = express.Router()
 
+
 libriRouter.post('/nuovo', auth, csrf_protection, uploadImgERidimensiona, valida_dati(createLibroSchema), createLibro)
 
 libriRouter.post('/daMaster', auth, csrf_protection, uploadImgERidimensiona, valida_dati(createLibroFromMasterSchema), createLibroFromMaster)

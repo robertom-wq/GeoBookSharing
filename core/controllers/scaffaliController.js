@@ -1,14 +1,6 @@
 import prisma from "../config/prisma.js"
 import logger from "../config/logging.js"
-import { Prisma, TipiAzione } from '@prisma/client'; // Importa l'oggetto Prisma
-/*
-NOTE - RIMUOVERE E AGGIUNGERE IN TEMPLATE
-Ho optato per l'uso di prisma.$queryRaw perchè Prisma non supporta nativamente i tipi di dati spaziali come geometry o geography
-del PostGIS con i suoi metodi standard (.create(), .update(), ecc.)
-Non ci sono alternative dirette con i metodi tipizzati di Prisma che consentano l'uso della funzione ST_GeomFromText()
- * /
-
-import prisma from "../config/prisma.js"
+import { Prisma, TipiAzione } from '@prisma/client' // Importa l'oggetto Prisma
 
 /*
 Creazione di uno scaffale, basato su posizione geografica, che andreà popolato con i vari libri
@@ -97,8 +89,8 @@ export const updateScaffale = async (req, res) => {
                 await tx.scaffali.update({
                     where: { id: id_scaffale },
                     data: dati_in_aggiornamento,
-                });
-            });
+                })
+            })
         }
         //seconda fase
         if (lat !== undefined && lng !== undefined) {
@@ -109,7 +101,7 @@ export const updateScaffale = async (req, res) => {
                 posizione =  ST_GeomFromText(${punto_geografico}, 4326)
             WHERE id = ${id_scaffale}
             `
-            logger.info(`[${req.ip}] Posizione scaffale ${id_scaffale} aggiornata separatamente.`);
+            logger.info(`[${req.ip}] Posizione scaffale ${id_scaffale} aggiornata separatamente.`)
         }
 
         //ritorna lo scaffale con posizione
@@ -259,9 +251,8 @@ export const deleteScaffale = async (req, res) => {
     }
 }
 
-/*
-Ricerca di scaffali vicini ad una posizione in base ad una distanza
-*/
+
+//Ricerca di scaffali vicini ad una posizione in base ad una distanza
 export const getScaffaliVicini = async (req, res) => {
     const { lat, lng, dist = 5000, q = '' } = req.query
 
@@ -296,15 +287,15 @@ export const getScaffaliVicini = async (req, res) => {
                 ST_SetSRID(ST_MakePoint(${lng_num}, ${lat_num}), 4326)::geography
             ) AS distanza_metri,
             COALESCE (
-                json_agg(
+                json_agg( --prende tutti gli oggetti JSON creati e li unisce in un unico array
                     CASE
                         WHEN l.is_disponibile = true THEN 
-                            json_build_object(
+                            json_build_object( --Creo un oggetto JSON per ogni libro con chiavi specifiche id, titolo, ecc.
                                 'id', l.id,
                                 'titolo', l.titolo,
                                 'anno', l.anno,
                                 'genere', json_build_object(
-                                    'dettagli', g.dettagli
+                                'dettagli', g.dettagli
                                 )
                             )
                         ELSE NULL 
@@ -359,23 +350,20 @@ export const getScaffaliVicini = async (req, res) => {
 
 }
 
-/*
-ricerca di scaffali (non del proprietario) tramite parametri (username proprietario, nome scaffale, libro)
-*/
+
+//ricerca di scaffali (non del proprietario) tramite parametri (username proprietario, nome scaffale, libro)
 export const getAllScaffaliConLibri = async (req, res) => {
     // estrae solo il parametro di ricerca 'q'
-    const { q = '' } = req.query;
+    const { q = '' } = req.query
 
-    const mioId = req.userId;
+    const mioId = req.userId
 
-    const is_q_popolato = q.trim().length > 0;
+    const is_q_popolato = q.trim().length > 0
 
-
-
-    const termine_ricercato = `%${q.toLowerCase()}%`;
+    const termine_ricercato = `%${q.toLowerCase()}%`
 
     // costruisco la clausola WHERE in modo dinamico
-    let condizioni = [];
+    let condizioni = []
     // escludo utente loggato
     condizioni.push(Prisma.sql`s.proprietario_id != ${mioId}`)
 
@@ -399,12 +387,12 @@ export const getAllScaffaliConLibri = async (req, res) => {
 
     if (condizioni.length > 0) {
         // Unisco le condizioni con una stringa ' AND ' 
-        const joinedConditions = Prisma.join(condizioni, ' AND ');
+        const joinedConditions = Prisma.join(condizioni, ' AND ')
 
         // Racchiudo il tutto nel template literal WHERE per l'interpolazione finale
-        whereCondizione = Prisma.sql`WHERE ${joinedConditions}`;
+        whereCondizione = Prisma.sql`WHERE ${joinedConditions}`
     } else {
-        whereCondizione = Prisma.sql``; // Se non ci sono condizioni
+        whereCondizione = Prisma.sql`` // Se non ci sono condizioni
     }
 
     try {
@@ -449,7 +437,7 @@ export const getAllScaffaliConLibri = async (req, res) => {
             ORDER BY s.data_creazione DESC
             
             LIMIT 20
-        `;
+        `
 
         // costruisco la response
         const result = scaffali.map(s => ({
@@ -462,15 +450,15 @@ export const getAllScaffaliConLibri = async (req, res) => {
                 avatar: s.proprietario_avatar
             },
             libri: s.libri.filter(book => book !== null)
-        }));
+        }))
 
-        const messaggio = is_q_popolato ? `corrispondenti a "${q}"` : 'trovati nel database';
+        const messaggio = is_q_popolato ? `corrispondenti a "${q}"` : 'trovati nel database'
 
         res.status(200).json({
             message: `Scaffali ${messaggio}`,
             trovati: result.length,
             scaffali: result
-        });
+        })
 
     } catch (err) {
         logger.error('['+ req.ip +'] Errore getAllScaffaliConLibri -> : Errore generico ', err)
@@ -479,9 +467,8 @@ export const getAllScaffaliConLibri = async (req, res) => {
     }
 }
 
-/*
-restituisce scaffale tramite id
-*/
+
+//restituisce scaffale tramite id
 export const getScaffaleById = async (req, res) => {
     const id_scaffale = parseInt(req.params.id)
     const mioId = req.userId

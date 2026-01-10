@@ -15,7 +15,7 @@ condivisioniRouter.patch('/:id/stato', auth, csrf_protection, valida_dati(update
 
 condivisioniRouter.patch('/:id/concludi', auth, csrf_protection, concludiPrestito)
 
-condivisioniRouter.delete('/:id/delete', auth, csrf_protection,valida_dati(deleteCondivisioneSchema), deleteCondivisione)
+condivisioniRouter.delete('/:id/delete', auth, csrf_protection, valida_dati(deleteCondivisioneSchema), deleteCondivisione)
 
 
 

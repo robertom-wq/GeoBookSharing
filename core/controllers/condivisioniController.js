@@ -2,12 +2,11 @@ import prisma from "../config/prisma.js"
 import { TipiAzione } from "@prisma/client"
 import logger from "../config/logging.js"
 
-/*
-Creazione di una richiesta di prestito/condivisione
-*/
+
+//Creazione di una richiesta di prestito/condivisione
 export const creaRichiestaCondivisione = async (req, res) => {
     const richiedenteId = req.userId
-    const dati_validati = { ...req.dati_validati };
+    const dati_validati = { ...req.dati_validati }
     const today = new Date()
 
     // verifico che il libro esista e sia disponibile
@@ -15,35 +14,35 @@ export const creaRichiestaCondivisione = async (req, res) => {
         where: { id: dati_validati.libro_id },
     })
     if (!libro_ricercato) {
-        return res.stauts(404).json({ error: `Libro id:${dati_validati.libro_id} non trovato` })
+        return res.status(404).json({ error: `Libro id:${dati_validati.libro_id} non trovato` })
     }
 
-    // altri controlli
+    // altri controlli 
     if (richiedenteId === libro_ricercato.proprietario_id) {
         return res.status(400).json({ error: 'Non puoi richiedere un tuo stesso libro' })
     }
-    let nuovaCondivisione;
+    let nuovaCondivisione
     try {
         //uso una transazione per prevenire la Race Condition.
         //Se la condizione di findFirst è falsa al momento della creazione 
         //(perché nel frattempo un'altra transazione ha concluso), l'intera transazione fallisce, prevenendo il doppio booking
-        const nuovaCondivisione = await prisma.$transaction(async (tx) => {
+        nuovaCondivisione = await prisma.$transaction(async (tx) => {
             // verifico sovrapposizioni di date richieste con quelle confermate
             const condivisioneSovrapposta = await tx.condivisioni.findFirst({
                 where: {
                     libro_id: libro_ricercato.id,
                     is_completato: false, // Ignora prestiti conclusi
                     AND: [
-                        // Condizione 1: data_al (esistente) deve essere >= data_dal (richiesto) (B >= C)
+                        // Condizione 1: data_al (esistente) deve essere > data_dal (richiesto) (B > C)
                         {
                             data_al: {
-                                gt: dati_validati.data_dal, // gte = Greater Than or Equal
+                                gt: new Date(dati_validati.data_dal), // gt = Greater Than
                             }
                         },
-                        // Condizione 2: data_dal (esistente) deve essere <= data_al (richiesto) (A <= D)
+                        // Condizione 2: data_dal (esistente) deve essere < data_al (richiesto) (A < D)
                         {
                             data_dal: {
-                                lt: dati_validati.data_al, // lte = Less Than or Equal
+                                lt: new Date(dati_validati.data_al), // lt = Less Than
                             }
                         },
                     ]
@@ -55,7 +54,7 @@ export const creaRichiestaCondivisione = async (req, res) => {
 
             }
             // creazione della condivisione
-            return await prisma.condivisioni.create({
+            return await tx.condivisioni.create({
                 data: {
                     libro: {
                         connect: { id: dati_validati.libro_id }
@@ -82,8 +81,8 @@ export const creaRichiestaCondivisione = async (req, res) => {
             })
 
         })
-    } catch (error) {
-        if (error.message === "CONFLITTO_DATE") {
+    } catch (err) {
+        if (err.message === "CONFLITTO_DATE") {
             return res.status(409).json({ error: "L'intervallo richiesto si sovrappone o è incluso in una condivisione esistente." })
         }
         logger.error('['+ req.ip +'] Errore creaRichiestaCondivisione -> : Errore generico',err)
@@ -91,18 +90,11 @@ export const creaRichiestaCondivisione = async (req, res) => {
         return res.status(500).json({ error: "Errore server - Impossibile processare la richiesta di condivisione" })
     }
 
-
-
-
-
-
-
     return res.status(200).json({ message: `Richiesta inviata con successo`, condivisione: nuovaCondivisione })
 }
 
-/*
-Conferma/rifiuta richiesta di prestito/condivisione
-*/
+
+//Conferma/rifiuta richiesta di prestito/condivisione
 export const aggiornaStatoCondivisione = async (req, res) => {
     const targetId = parseInt(req.targetId)
     const mioId = req.userId
@@ -159,9 +151,8 @@ export const aggiornaStatoCondivisione = async (req, res) => {
     }
 }
 
-/*
-Concludi prestisto/condivisione una volta restituito il libro
-*/
+
+//Concludi prestisto/condivisione una volta restituito il libro
 export const concludiPrestito = async (req, res) => {
     const targetId = req.targetId
     const mioId = req.userId
@@ -175,7 +166,7 @@ export const concludiPrestito = async (req, res) => {
         if (!condivisione) {
             return res.status(404).json({ error: `Condivisione con id:${targetId} non travata` })
         }
-        // solo il proprietario può concludere
+        // solo il proprietario può concludere la condivisione dopo la restituzione del libro
         if (condivisione.libro.proprietario_id !== mioId) {
             logger.warn(`[${req.ip}] L'utente id:${mioId} ha tentato di concludere una condivisione di un libro senza autorizzazione. Richiesta bloccata`)
             return res.status(400).json({ error: 'Non sei il proprietario del libro. Non puoi concludere la condivisione' })
@@ -204,9 +195,8 @@ export const concludiPrestito = async (req, res) => {
     }
 }
 
-/*
-Elimina un prestito/condivisione
-*/
+
+//Elimina un prestito/condivisione
 export const deleteCondivisione = async (req, res) => {
     const targetId = req.targetId
     const mioId = req.userId
@@ -232,6 +222,7 @@ export const deleteCondivisione = async (req, res) => {
         }
 
         // creo le regole di eliminazione
+        // verifico che ruolo ha avuto l'utente loggato nella condivisione
         const isRichiedente = condivisione.richiedente_id === mioId
         const isProprietario = condivisione.proprietario_id === mioId
         if (!isRichiedente && !isProprietario) {
@@ -249,7 +240,7 @@ export const deleteCondivisione = async (req, res) => {
             // Elimina il record dal database. Se questo fallisce, l'intera transazione fallisce .
             await tx.condivisioni.delete({
                 where: { id: targetId }
-            });
+            })
             await tx.storico_eliminazioni.create({
                 data: {
                     esecutore_id: mioId,
@@ -259,7 +250,7 @@ export const deleteCondivisione = async (req, res) => {
                     azione: TipiAzione.DELETE_CONDIVISIONE
                 }
             })
-        });
+        })
 
         return res.status(200).json({message: `La condivisione con id:${targetId} è stata eliminata`, motivo: motivo || null})
 
@@ -271,9 +262,8 @@ export const deleteCondivisione = async (req, res) => {
 
 }
 
-/*
-Restituisce i miei prestiti in qualità di richiedente/proprietario in base al param ruolo=richiedente/proprietario
-*/
+
+//Restituisce i miei prestiti in qualità di richiedente/proprietario in base al param ruolo=richiedente/proprietario
 export const getMieCondivisioni = async (req, res) => {
     const mioId = req.userId
     const ruolo = req.query.ruolo
@@ -288,12 +278,12 @@ export const getMieCondivisioni = async (req, res) => {
     const limit = parseInt(queryLimit) || 10
     // intercetto valori inferiori a 1
     if (pagina < 1) {
-        pagina = 1;
+        pagina = 1
     }
     if (limit < 1) {
-        limit = 10;
+        limit = 10
     }
-    const skipElementi = (pagina - 1) * limit;
+    const skipElementi = (pagina - 1) * limit
 
     try {
         let where
@@ -314,7 +304,6 @@ export const getMieCondivisioni = async (req, res) => {
                 ]
             }
         }
-
 
         const [richieste, conteggioTotale] = await prisma.$transaction([
             prisma.condivisioni.findMany({

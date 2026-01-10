@@ -5,7 +5,6 @@ import { csrf_protection } from "../middleware/csrf.js";
 
 const routerAdmin = Router();
 
-// Proteggi questa rotta con i tuoi middleware di sicurezza!
-routerAdmin.get('/system-logs', auth, csrf_protection, getLogs);
+routerAdmin.get('/system-logs', auth, getLogs);
 
 export default routerAdmin;

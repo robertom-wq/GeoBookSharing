@@ -1,24 +1,26 @@
-import winston from 'winston';
-import 'winston-daily-rotate-file';
+// sistema di logging tramite libreria Winston
+
+import winston from 'winston'
+import 'winston-daily-rotate-file'
 
 const transport = new winston.transports.DailyRotateFile({
-  dirname: 'logs',                // cartella dei log
+  dirname: 'logs',                      // cartella dei log
   filename: 'app-%DATE%.log',           // nome con data
   datePattern: 'YYYY-MM-DD',            // rotazione giornaliera
-  zippedArchive: false,
+  zippedArchive: false,                 // Se true, comprime i vecchi log in .gz
   maxSize: '20m',
   maxFiles: '14d'                       // conserva 14 giorni
-});
+})
 
 const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
+  level: 'info', // identifica la la soglia di sensibilità, al di sotto del quale i messaggi verranno ignorati
+  format: winston.format.combine( // composizione del log
     winston.format.timestamp(),
     winston.format.json()
   ),
   transports: [
     transport
   ]
-});
+})
 
-export default logger;
+export default logger

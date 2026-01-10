@@ -6,18 +6,19 @@ singleton, viene creta una sola istanza per collegarsi al database.
 import { PrismaClient } from '@prisma/client'
 
 // Variabile per l'istanza globale
-let prisma;
+let prisma
 
 if (process.env.NODE_ENV === 'production') {
-  // In produzione, creiamo una singola istanza permanente
-  prisma = new PrismaClient();
+  // In produzione, creo una singola istanza permanente. il server parte una volta sola e non si riavvia a ogni modifica
+  prisma = new PrismaClient()
 } else {
-  // In sviluppo, usiamo una cache globale per prevenire la creazione di nuove istanze
-  // ad ogni ricaricamento a caldo (hot reload) del server.
+  //in fase di sviluppo, controllo se esiste già un'istanza nell'oggetto globale.
   if (!global.prisma) {
-    global.prisma = new PrismaClient();
+    //se non esiste, presumibilmente prima esecuzione, la creo e la metto in attesa
+    global.prisma = new PrismaClient()
   }
-  prisma = global.prisma;
+  prisma = global.prisma
 }
 
-export default prisma;
+//Rend0 l'unica istanza disponibile a tutto il resto dell'app.
+export default prisma

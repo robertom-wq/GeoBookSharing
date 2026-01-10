@@ -1,10 +1,12 @@
+////Controller dedicato alle operazioni CRUD sulle valutazioni degli utenti
+
+
 import prisma from '../config/prisma.js'
 import logger from '../config/logging.js'
 
 
-/*
-crea uan nuova valutazione (bidirezionale per una condivisione due valutazioni, una del proprietario e una del richiedente)
-*/
+
+//crea uan nuova valutazione (bidirezionale per una condivisione due valutazioni, una del proprietario e una del richiedente)
 export const creaValutazione = async (req, res) => {
     const mioId = req.userId
     const mioUsername = req.userUsername
@@ -31,7 +33,6 @@ export const creaValutazione = async (req, res) => {
 
     try {
         let recensito
-        console.log(condivisione.proprietario_id, condivisione.richiedente_id, mioId)
         // se sono proprietario recensisco il richiedente
         if (condivisione.proprietario_id === mioId) {
             recensito = condivisione.richiedente_id
@@ -40,6 +41,7 @@ export const creaValutazione = async (req, res) => {
             recensito = condivisione.proprietario_id
         }
         
+        //creo il nuovo recod nel database
         const nuovaValutazione = await prisma.utente_valutazioni.create({
             data: {
                 recensore_id: mioId,
@@ -59,9 +61,8 @@ export const creaValutazione = async (req, res) => {
 
 }
 
-/*
-Restituisce votazione media piu ultime 5 recensioni
-*/
+
+//Restituisce votazione media piu ultime 5 recensioni
 export const getVotazioneMediaUtente = async (req, res) => {
     console.log("Dentro getVotazioneMediaUtente")
     const targetId = req.targetId
@@ -116,10 +117,9 @@ export const getVotazioneMediaUtente = async (req, res) => {
     }
 }
 
-/*
-Tutte le valutazioni date e ricevute con filtro ruolo=recensore/recensito,
-con pagination pagina=1
-*/
+
+//Tutte le valutazioni date e ricevute con filtro ruolo=recensore/recensito,
+//con pagination pagina=1
 export const getAllValutazioni = async (req, res) => {
     const mioId = req.userId
     const ruolo = req.query.ruolo?.trim().toLowerCase() || null
@@ -133,12 +133,12 @@ export const getAllValutazioni = async (req, res) => {
     const limit = parseInt(queryLimit) || 10
     // intercetto valori inferiori a 1
     if (pagina < 1) {
-        pagina = 1;
+        pagina = 1
     }
     if (limit < 1) {
-        limit = 10;
+        limit = 10
     }
-    const skipElementi = (pagina - 1) * limit;
+    const skipElementi = (pagina - 1) * limit
 
     try {
         // Imposto la where in base al ruolo che imposto sulla query
@@ -164,7 +164,8 @@ export const getAllValutazioni = async (req, res) => {
             includeDinamico = { recensito: { select: { username: true, avatar: true, avatar_thumb: true }},
                                 recensore: { select: { username: true, avatar: true, avatar_thumb: true }}}
         }
-        console.log("WHERE finale:", where);
+        console.log("WHERE finale:", where)
+        
         const [valutazioni_all, conteggioTotale] = await prisma.$transaction([
             prisma.utente_valutazioni.findMany({
                 where,

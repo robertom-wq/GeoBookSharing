@@ -1,5 +1,5 @@
 /* MIDDLEWARE GENERICO PER LA VALIDAZIONE DEGLI SCHEMI JOI
-Scritto per evitare la ripetizione del codice sottostante
+Scritto per evitare la ripetizione del codice sottostante 
 */
 
 const valida_dati = (schema) => {

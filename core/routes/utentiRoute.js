@@ -8,10 +8,10 @@ import uploadImgERidimensiona from "../middleware/uploadImgERidimensiona.js";
 
 const utentiRouter = express.Router()
 
+
 utentiRouter.get("/all", auth, getAllUtenti)
 
 utentiRouter.patch("/richiestaCancellazione", auth, csrf_protection, valida_dati(richiestaEliminazioneSchema), softDeleteUtente)
-
 
 utentiRouter.get("/profilo{/:id}", auth, getProfilo)
 
