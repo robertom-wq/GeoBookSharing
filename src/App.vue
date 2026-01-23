@@ -6,7 +6,7 @@
       <n-dialog-provider>
         <n-layout class="layout_principale">
           <header>
-            <!--INSERIRE NAVBAR-->
+            <Navbar />
           </header>
           <!-- Layout del contenuto differenziato da quello della navbar e footer-->
           <n-layout-content class="contentuto_principale">
@@ -14,7 +14,7 @@
               <router-view />
           </n-layout-content>
           <footer>
-            <!--INSERIRE FOOTER-->
+            <Footbar />
           </footer>
         </n-layout>
       </n-dialog-provider>
@@ -28,6 +28,34 @@
 
 <script setup>
 import { NConfigProvider, NLayoutContent, NMessageProvider, NDialogProvider, NLayout, itIT } from 'naive-ui'
+import Navbar from './components/Navbar.vue'
+import Footbar from './components/Footbar.vue'
+import { useUtentiStore } from './stores/utentiStore';
+import { onMounted } from 'vue'
+
+// uso lo store degli utenti per gestire l'accesso
+const utenti_store = useUtentiStore()
+
+// Appena l'app si carica, controllo se l'utente era già loggato (ripristino la sessione)
+onMounted(async() => {
+  // controllo se è presente csrf_token nel localStorage come indizio di utente autenticato
+  const token_esistente = localStorage.getItem('csrf_token')
+  console.log("token_esistente:", !!token_esistente )
+    // Solo se il token esiste provo a recuperare il profilo
+    if (token_esistente) {
+      try {
+        await utenti_store.getUtente()
+        console.log("Utente loggato", utenti_store.utente.username)
+      } catch (err) {
+        // Se il token era nel localStorage ma è scaduto sul server
+        console.warn('Sessione scaduta, pulizia in corso...')
+        localStorage.removeItem('csrf_token')
+      }
+    } else {
+      // Se non c'è il token, non chiamo nemmeno apiFetch
+      console.log('Navigazione come ospite (nessun token trovato)')
+    }
+})
 
 // sovrascrivo lo stile base di Naive UI
 const themeOverrides = {
@@ -81,7 +109,6 @@ const themeOverrides = {
 
 .contenuto_principale {
   flex: 1; /* Questo dice al contenuto di espandersi e spingere il footer in basso */
-  padding: 10px;
   flex-grow: 1 !important;
 
 }
