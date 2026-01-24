@@ -17,7 +17,7 @@
                 </div>
                 <!-- creare condizione se utente loggato, mostra questo-->
                 <div class="pulsanti_azione" v-else>
-                    <NButton type="info">Vai al profilo</NButton>
+                    <NButton @click="router.push('/profilo')" type="info">Vai al profilo</NButton>
                 </div>
             </div>
         </section>

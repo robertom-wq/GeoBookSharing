@@ -54,8 +54,4 @@ body {
 /* Ottimizzazione per mobile (tablet e smartphone) */
 @media (max-width: 748px) {
 
-.page {
-  padding: 5vw; 
-}
-
 }

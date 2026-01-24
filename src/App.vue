@@ -33,7 +33,7 @@ import Footbar from './components/Footbar.vue'
 import { useUtentiStore } from './stores/utentiStore';
 import { onMounted } from 'vue'
 
-// uso lo store degli utenti per gestire l'accesso
+/* // uso lo store degli utenti per gestire l'accesso
 const utenti_store = useUtentiStore()
 
 // Appena l'app si carica, controllo se l'utente era già loggato (ripristino la sessione)
@@ -55,7 +55,7 @@ onMounted(async() => {
       // Se non c'è il token, non chiamo nemmeno apiFetch
       console.log('Navigazione come ospite (nessun token trovato)')
     }
-})
+}) */
 
 // sovrascrivo lo stile base di Naive UI
 const themeOverrides = {

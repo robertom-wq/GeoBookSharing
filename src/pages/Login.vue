@@ -13,22 +13,22 @@
                     libri</p>
             </div>
             <!-- Contenitore della card del login -->
-            <div class="contenuto_pagina">
+            <div class="contenuto_modulo">
 
                 <!-- card naive che racchiude il form di login -->
                 <n-card title="Accedi" class="scheda_login">
 
-                    <!-- form naive collegato al modello form_value -->
-                    <n-form :model="form_value" @submit.prevent="gestisci_login" :rules="rules">
+                    <!-- form naive collegato al modello form_data -->
+                    <n-form :model="form_data" @submit.prevent="gestisciLogin" :rules="rules">
 
                         <!-- Campo Username -->
                         <n-form-item label="Username" path="username">
-                            <n-input round v-model:value="form_value.username" placeholder="Username" />
+                            <n-input round v-model:value="form_data.username" placeholder="Username" />
                         </n-form-item>
 
                         <!-- Campo password -->
                         <n-form-item label="Password" path="password">
-                            <n-input round v-model:value="form_value.password" type="password" placeholder="Password" />
+                            <n-input round v-model:value="form_data.password" type="password" placeholder="Password" />
                         </n-form-item>
                         <n-form-item>
                             <div class="pulsanti_azione">
@@ -56,7 +56,7 @@ const router = useRouter()
 const message = useMessage()
 
 // Modello
-const form_value = ref({
+const form_data = ref({
     username: '',
     password: ''
 })
@@ -71,14 +71,14 @@ const rules = {
     ]
 }
 
-async function gestisci_login() {
+async function gestisciLogin() {
     // se i campi sono vuoti non effettuo neanche la chiamata API
-    if (!form_value.value.username || !form_value.value.password) return;
+    if (!form_data.value.username || !form_data.value.password) return;
 
     try {
+        //Non uso Promise.all() in quanto le due chiamate sono dipendenti e quindi ho bisogno di sequenzialita
         // Passo le credenziali allo store che gestisce la fetch e i cookie/token
-        await utenti_store.login(form_value.value.username, form_value.value.password)
-
+        await utenti_store.login(form_data.value.username, form_data.value.password)
         // Dopo il login, popolo lo store con i dati dell'utente 
         await utenti_store.getUtente()
         message.success('Login effettuato con successo!')
@@ -92,6 +92,7 @@ async function gestisci_login() {
 </script>
 
 <style scoped>
+
 .scheda_login {
     max-width: clamp(18.75rem, 90vw, 31.25rem);/* Larghezza fluida: min 300px, ideale 90%, max 500px */    
     margin: 3rem auto; /* Centratura con margini in rem */
@@ -103,23 +104,22 @@ async function gestisci_login() {
     background-color: var(--pearl-white-bg);
 }
 
-.contenuto_pagina {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 60vh;
-    /* Centra verticalmente il form nella viewport */
-    padding: 0 1rem;
+.contenuto_modulo {
+    display: flex;/* attiva il layout flex */
+    flex-direction: column; /* dispone gli elementi in colonna */
+    align-items: center; /* centra verticalmente */
+    justify-content: center;/* centra orizzontalmente */
+    min-height: 60vh; /* occupa almeno il 60% dell'altezza dello schermo */
 }
 
 .n-button {
-    min-width: 7rem;
+    min-width: 7rem; /* assicura che il bottone non sia troppo stretto */
 }
 
 .pulsanti_azione {
-    width: 100%;
-    display: flex;
+    width: 100%; /* occupa tutta la larghezza disponibile */
+    display: flex;/* attivo flexbox per gestire i bottoni interni */
+    justify-content: end; /*Pulsanti sulla destra*/
 }
 
 
@@ -130,14 +130,14 @@ async function gestisci_login() {
 /* Ottimizzazione per mobile (tablet e smartphone) */
 @media (max-width: 768px) {
     .scheda_login {
-        margin: 1.5rem auto;
-        padding: 1rem;
+        margin: 1.5rem auto;/* riduce i margini verticali su mobile */
+        padding: 1rem;/* riduce lo spazio interno della card */
     }
 
     /* input più grandi per il touch */
     :deep(.n-input) {
-        height: 2.5rem; 
-        font-size: small;
+        height: 2.5rem;/* rende la casella di testo piu alta per il touch */
+        font-size: small;/* riduce leggermente la dimensione del font */
     }
 
     :deep(.n-card__content) {
@@ -145,7 +145,7 @@ async function gestisci_login() {
     }
 
     .pulsanti_azione {
-        flex-direction: column;
+        flex-direction: column;/* bottoni uno sopra l'altro su mobile */
     }
 
     .n-button {
@@ -153,8 +153,8 @@ async function gestisci_login() {
         height: 2.3rem;
     }
     
-    .contenuto_pagina  {
-        padding: 0 0rem;
+    .contenuto_modulo  {
+        padding: 0 0rem;/* rimuovo il padding laterale per aumentare spazio disponibile*/
     }
 
 }

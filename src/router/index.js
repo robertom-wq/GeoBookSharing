@@ -1,8 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUtentiStore } from '@/stores/utentiStore'
 
 // Importo pagine (lazy loading) in quanto rende piu veloce il caricamento dell'applicazione. Solo su richiesta
 const Welcome = () => import('@/pages/Welcome.vue')
 const Login = () => import('@/pages/Login.vue')
+const Registrazione = () => import('@/pages/Registrazione.vue')
+const Profilo = () => import('@/pages/Profilo.vue')
 
 const routes = [
     //Home, la prima pagina
@@ -15,13 +18,79 @@ const routes = [
     {
         path: '/login',
         component: Login,
-        meta: { requiresGuest: true }
+        meta: { solo_ospiti: true }
+    },
+    //pagina di registrazione
+    {
+        path: '/registrati',
+        component: Registrazione,
+        meta: { solo_ospiti: true }
+    },
+    //pagina profilo utente
+    {
+        path: '/profilo',
+        component: Profilo,
+        name: 'Profilo',
+        meta: { requiresAuth: true },
+    },
+    //pagina dedicata agli admin per modifica di un profilo 
+    {
+        path: '/supervisione/ModificaProfilo/:id',
+        component: Profilo,
+        name: 'AdminProfilo',
+        meta: { requiresAuth: true,
+                requiresAdmin: true
+            }
     },
 ]
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes,
+})
+
+//Protezione Router
+// importante per avere sempre i dati utente senza richiamarli da altre parti del codice anche dopo refresh
+router.beforeEach(async (to, from, next) => {
+  const utenti_store = useUtentiStore()
+
+
+  // Chiamo il server SOLO se c'è il token nel localStorage 
+  // e non ho ancora i dati in Pinia
+  const token_esistente = !!localStorage.getItem('csrf_token')
+
+  // Se lo user non è stato ancora recuperato (es. dopo refresh), lo recupera
+ if (utenti_store.utente === null && token_esistente) {
+    try {
+      // Se fallisce (es. 401), l'errore viene catturato qui e non blocca il router
+      await utenti_store.getUtente()
+    } catch (err) {
+      console.warn("Sessione non valida o scaduta")
+      // Non facciamo nulla: utenti_store.utente rimarrà null
+    }
+  }
+
+  const is_autenticato = !!utenti_store.utente
+
+  if (to.meta.solo_autenticati && !is_autenticato) {
+    // Utente non autenticato viene reindirizzato a login
+    return next('/login')
+  }
+
+  if (to.meta.solo_ospiti && is_autenticato) {
+    // Utente già loggato niente accesso a login/registrazione, mando alla home
+    return next('/')
+  }
+
+  if (to.meta.solo_admin) {
+    const is_admin = utenti_store.utente?.ruolo === 'admin'
+    if (is_admin) {
+      return next() // Utente autorizzato, esce qui
+    } else {
+      return next({ name: 'Home' }) // Non autorizzato, esce qui
+    }
+  }
+  next() // procede normalmente
 })
 
 

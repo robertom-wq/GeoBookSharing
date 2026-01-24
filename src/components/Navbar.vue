@@ -89,7 +89,7 @@ const links = computed(() => {
     //menu base per tutti gli utenti loggati ()
     const menu_loggato = [
             { label: 'Home', to: '/' },
-            { label: 'Profilo', to: '/' },
+            { label: 'Profilo', to: '/profilo' },
             { label: 'Libreria', to: '/' },
             { label: 'Cerca Libri', to: '/' },
             { label: 'Catalogo', to: '/' },
