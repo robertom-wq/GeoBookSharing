@@ -6,6 +6,9 @@ const Welcome = () => import('@/pages/Welcome.vue')
 const Login = () => import('@/pages/Login.vue')
 const Registrazione = () => import('@/pages/Registrazione.vue')
 const Profilo = () => import('@/pages/Profilo.vue')
+const Libreria = () => import('@/pages/Libreria.vue')
+const DettaglioScaffale = () => import('@/pages/Scaffale.vue')
+const AggiungiModificaScaffale = () => import('@/pages/AggiungiModificaScaffale.vue')
 
 const routes = [
     //Home, la prima pagina
@@ -31,15 +34,43 @@ const routes = [
         path: '/profilo',
         component: Profilo,
         name: 'Profilo',
-        meta: { requiresAuth: true },
+        meta: { solo_autenticati: true },
+    },
+    //pagina relativa alla libreria dell'utente. E' un raccoglitore di scaffali (geolocalizzati) che l'utente può possedere.
+    {
+        path: '/libreria',
+        component: Libreria,
+        name: 'Libreria',
+        meta: { solo_autenticati: true },
+    },
+    //Pagina per la creazione di un nuovo scaffale
+    {
+        path: '/libreria/scaffale/nuovo',
+        component: AggiungiModificaScaffale,
+        name: 'AggiungiScaffale',
+        meta: { solo_autenticati: true },
+    },
+    //Pagina per la modifica di uno scaffale esistente
+    {
+        path: '/libreria/scaffale/modifica/:id',
+        component: AggiungiModificaScaffale,
+        name: 'ModificaScaffale',
+        meta: { solo_autenticati: true },
+    },
+    //Pagina per i dettagli di uno scaffale esistente
+    {
+        path: '/libreria/scaffale/dettaglio/:id',
+        component: DettaglioScaffale,
+        name: 'DettaglioScaffale',
+        meta: { solo_autenticati: true },
     },
     //pagina dedicata agli admin per modifica di un profilo 
     {
         path: '/supervisione/ModificaProfilo/:id',
         component: Profilo,
         name: 'AdminProfilo',
-        meta: { requiresAuth: true,
-                requiresAdmin: true
+        meta: { solo_autenticati: true,
+                solo_admin: true
             }
     },
 ]

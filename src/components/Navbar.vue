@@ -90,7 +90,7 @@ const links = computed(() => {
     const menu_loggato = [
             { label: 'Home', to: '/' },
             { label: 'Profilo', to: '/profilo' },
-            { label: 'Libreria', to: '/' },
+            { label: 'Libreria', to: '/libreria' },
             { label: 'Cerca Libri', to: '/' },
             { label: 'Catalogo', to: '/' },
             { label: 'Condivisioni', to: '/' }            

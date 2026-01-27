@@ -119,7 +119,7 @@ async function gestisciLogin() {
 .pulsanti_azione {
     width: 100%; /* occupa tutta la larghezza disponibile */
     display: flex;/* attivo flexbox per gestire i bottoni interni */
-    justify-content: end; /*Pulsanti sulla destra*/
+    justify-content: center; /*Pulsanti al centro*/
 }
 
 

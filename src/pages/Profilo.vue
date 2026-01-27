@@ -403,7 +403,7 @@ onMounted(() => {
 .pulsanti_azione {
     width: 100%; /* occupa tutta la larghezza disponibile */
     display: flex; /* attivo flexbox per gestire i bottoni interni */
-    justify-content: end; /*Pulsanti sulla destra*/
+    justify-content: center; /*Pulsanti al centro*/
     gap: 0.85rem; /* spazio tra un bottone e l'altro (potrebbero essercene 2 in caso eliminazione utente) */
 }
 
@@ -425,8 +425,7 @@ onMounted(() => {
         flex-direction: column;/* bottoni uno sopra l'altro su mobile */
         align-items: stretch; /* allarga i bottoni a tutta la larghezza */
         gap: 1rem; /* aumenta lo spazio tra i bottoni */
-        padding-bottom: 2rem; /* spazio in fondo alla pagina */       
-
+        padding-bottom: 2rem; /* spazio in fondo alla pagina */ 
     }
 
     :deep(.n-card__content) {
