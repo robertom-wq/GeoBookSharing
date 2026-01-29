@@ -23,9 +23,8 @@
             </div>
             <div class="contenuto_libreria">
                 <div id="contenitore_mappa">
-
-                    <!-- contenitore della mappa Leaflet - da implementare -->
-
+                    <Mappa :is_home_scaffali="true" ref="mappa_ref" :centra_mappa="coordinate_centrate"
+                    :dati_scaffali="scaffali_store.scaffali_utente" />
                 </div>
                 <!-- carousel degli scaffali (visibile solo se esistono scaffali) -->
                 <div class="carousel_scaffali"
@@ -78,9 +77,10 @@
 <script setup>
 import { useUtentiStore } from '@/stores/utentiStore'
 import { useScaffaliStore } from '@/stores/scaffaliStore';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onBeforeMount, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { troncaStringa } from '@/utils/toolkit'
+import Mappa from '@/components/Mappa.vue';
 
 const utenti_store = useUtentiStore()
 const scaffali_store = useScaffaliStore()
@@ -89,6 +89,7 @@ const router = useRouter()
 //STATI
 // questo sarà utile per aggiornare la posizione nella mappa in base all'elemento attivo del carousel
 const indice_carousel_corrente = ref(0)
+const mappa_ref = ref(null)
 
 //AZIONI
 //porta l'utente alla creazione
@@ -112,10 +113,30 @@ function gestisciCambioCarousel(index) {
 
 }
 
+// stato calcolato per centrare la mappa sullo scaffale selezionato
+const coordinate_centrate = computed(() => {
+    //verifico la presenza di scaffali
+    const scaffali = scaffali_store.scaffali_utente
+    if (scaffali && scaffali.length > 0) {
+        //prendo lo scaffale selezionato con il carousel grazie a 'indice_carousel_corrente'
+        // fallback all'indice 0 se l'indice corrente non è valido
+        const index_fallback = indice_carousel_corrente.value < scaffali.length ? indice_carousel_corrente.value : 0;
+        const scaffale_corrente = scaffali[index_fallback];
+        if (scaffale_corrente) {
+            const coordinate_scaffale = { lat: scaffale_corrente.lat, lng: scaffale_corrente.lng, zoom: 15 }
+            console.log("Coordinate Scaffale: ", coordinate_scaffale)
+            return coordinate_scaffale
+        }
+    }
+    // se non ci sono scaffali, la mappa si centrerà a treviso
+    return { lat: 45.6667, lng: 12.2416, zoom: 15 }
+})
+
+
 onMounted(async () => {
     //appena la pagina è pronta, chiedo al server gli scaffali dell'utente
     await scaffali_store.getMieiScaffali()
-    
+
 })
 
 
@@ -123,12 +144,7 @@ onMounted(async () => {
 
 
 <style scoped>
-/* Contenitore principale */
-.contenuto_libreria {
-    padding: 2vw; /* spaziatura responsive rispetto alla larghezza viewport */
-    max-width: var(--container-max-width); /* limita estensione su schermi grandi */
-    margin: 0 auto; /* centra orizzontalmente il contenuto */
-}
+
 
 /* evidenzia il numero totale degli scaffali */
 .evidenza_numero {
@@ -139,14 +155,17 @@ onMounted(async () => {
 
 /* Area Mappa */
 #contenitore_mappa {
-    border-radius: var(--border-radius);
-    overflow: hidden; /* evita che la mappa esca dai bordi */
-    margin-bottom: 1.875rem; /* 30px */
-    border: 0.0625rem solid #eee;
+    margin-bottom: 2rem; /* spazio sotto il contenitore della mappa */
     box-shadow: var(--box-shadow);
-    height: clamp(20rem, 50vh, 35rem);/* Altezza dinamica del contenitore della mappa */  
-    position: relative; /* Aiuta Leaflet a posizionarsi correttamente */
-    
+    border-radius: var(--border-radius);
+    height: clamp(18.75rem, 40vh, 31.25rem);/* definisce l'altezza della card dinamicamente tra 300px e 500px in base all'altezza dello schermo */
+    overflow: hidden;/* nasconde le parti di mappa che escono dagli angoli arrotondati */
+}
+
+/* rimuovo il padding interno della card Naive per far toccare la mappa ai bordi */
+.contenitore_mappa :deep(.n-card__content) {
+    padding: 0 !important; /* forza zero padding per full width */
+    height: 100%; /* assicura che il contenuto occupi tutta l'altezza disponibile */
 }
 
 /* Assicuriamoci che il componente Mappa occupi tutto lo spazio */
@@ -171,7 +190,7 @@ onMounted(async () => {
     width: 60% !important; 
 }
 
-/* Scheda Scaffale */
+/* scheda Scaffale */
 .scheda_scaffale {
     background-color: var(--pearl-white-bg);
     border-radius: var(--border-radius);
@@ -183,7 +202,7 @@ onMounted(async () => {
     padding: 0.5rem 0;
 }
 
-/* Testo descrizione scaffale con altezza minima per allineamento visivo */
+/* testo descrizione scaffale con altezza minima per allineamento visivo */
 .testo_descrizione {
     font-style: italic;
     display: block;
@@ -191,7 +210,7 @@ onMounted(async () => {
     min-height: 2.5rem; /* 40px */
 }
 
-/* Pulsante Creazione */
+/* pulsante creazione */
 #contenitore_pulsante_creazione {
     display: flex;
     justify-content: center; /* Centra il pulsante orizzontalmente */
@@ -222,7 +241,8 @@ onMounted(async () => {
         height: 2.5rem;
     }
     #contenitore_mappa {
-        height: 20rem; /* Altezza leggermente ridotta su mobile */
+        height: 15.625rem; /* altezza fissa su mobile circa 250px */
+        margin-bottom: 1.25rem; /* riduce margine inferiore */
     }
 }
 </style>

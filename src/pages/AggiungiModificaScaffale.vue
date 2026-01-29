@@ -37,8 +37,10 @@
                                 <n-form-item label="Posizione (seleziona sulla mappa)">
 
                                     <!-- contenitore della mappa Leaflet -->
-                                    <div class="contenitore_mappa">
-                                        <!-- mappa Leaflet - da implementare -->
+                                    <div class="contenitore_mappa" v-if="!is_salvataggio_in_corso">
+                                        <Mappa @update:coords="gestisciAggiornamentoCoordinate" ref="mappa_ref"
+                                            :centra_mappa="scaffale ? { lat: form.lat, lng: form.lng } : { lat: 45.4642, lng: 12.1900 }"
+                                            :dati_scaffali="scaffale ? [scaffale] : []" />
                                     </div>
                                     <!-- coordinate geografiche, campi di sola lettura -->
                                     <n-grid x-gap="12" :cols="2" class="griglia_coordinate_nascosta">
@@ -62,13 +64,14 @@
                                 </n-form-item>
                                 <n-divider />
                                 <!-- pulsante di invio -->
+                                <div class="pulsanti_azione">
+                                    <n-button type="primary" attr-type="submit" :loading="scaffali_store.loading">
+                                        {{ is_modifica ? 'Salva Modifiche' : 'Aggiungi Scaffale' }}
+                                    </n-button>
+                                </div>
                             </n-form>
                         </n-card>
-                        <div class="pulsanti_azione">
-                            <n-button type="primary" attr-type="submit" :loading="scaffali_store.loading">
-                                {{ is_modifica ? 'Salva Modifiche' : 'Aggiungi Scaffale' }}
-                            </n-button>
-                        </div>
+
                     </div>
                 </div>
             </n-spin>
@@ -80,9 +83,11 @@
 <script setup>
 import { useUtentiStore } from '@/stores/utentiStore'
 import { useScaffaliStore } from '@/stores/scaffaliStore'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
+import Mappa from '@/components/Mappa.vue'
+
 
 const router = useRouter()
 const route = useRoute()
@@ -96,6 +101,8 @@ const is_modifica = computed(() => !!route.params.id)
 // stati
 const scaffale = ref(null)
 const form_ref = ref(null)
+const mappa_ref = ref(null)
+const is_salvataggio_in_corso = ref(false)
 
 // modello
 const form = ref({
@@ -149,6 +156,12 @@ onMounted(async () => {
                 lng: scaffale_recuperato.lng
             }
 
+            //forzo aggiornamento mappa tramite funzione esposta su Mappa.vue
+            if (mappa_ref && typeof mappa_ref.value.aggiornaMappaEMarkers === 'function') {
+                console.log('funzione trovata')
+                mappa_ref.value.aggiornaMappaEMarkers(form.value.lat, form.value.lng, 15)
+            }
+
 
         } catch (err) {
             console.error("Errore nel caricamento dello scaffale", err)
@@ -175,7 +188,7 @@ const is_utente_proprietario = computed(() => {
 // funzione unica che gestisce il salvataggio delle impostazioni,
 // in base a is_modifica scelgo se creare nuovo elemento o modificare uno esistente
 async function gestisciSalvataggioScaffale() {
-    //console.log('SALVATAGGIo')
+    console.log('SALVATAGGIo')
     await form_ref.value?.validate()
 
     try {
@@ -184,6 +197,8 @@ async function gestisciSalvataggioScaffale() {
             message.error('Seleziona una posizione sulla mappa prima di salvare');
             return;
         }
+        is_salvataggio_in_corso.value = true
+        await nextTick()
         //invio dati allo store
         if (is_modifica.value) {
             console.log("Inviando aggiornamento per ID:", route.params.id)
@@ -196,10 +211,16 @@ async function gestisciSalvataggioScaffale() {
         }
         //redirect alla libreira
         router.push({ name: 'Libreria' })
+
     } catch (err) {
         console.error("Impossibile completare il salvataggio:", err)
         message.error(err.message || 'Errore durante il salvataggio')
     }
+}
+
+function gestisciAggiornamentoCoordinate(coordinate) {
+    form.value.lat = coordinate.lat
+    form.value.lng = coordinate.lng
 }
 
 </script>
@@ -277,8 +298,5 @@ async function gestisciSalvataggioScaffale() {
 
     }
     
-    .contenitore_mappa {
-        height: 15.625rem;
-    }
 }
 </style>

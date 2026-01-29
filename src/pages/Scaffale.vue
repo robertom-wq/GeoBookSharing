@@ -20,8 +20,9 @@
                         <template v-if="scaffale">
 
                             <!-- contenitore della mappa (Leaflet) -->
-                            <div class="contenitore_mappa">
-                                <!-- contenitore della mappa Leaflet - da implementare -->
+                            <div class="contenitore_mappa" v-if="!is_cancellazione_in_corso">
+                                <Mappa :centra_mappa="{ lat: scaffale.lat, lng: scaffale.lng }"
+                                        :dati_scaffali="[scaffale]" :is_home_scaffali="true" />
                             </div>
                             <n-divider />
                             <!-- titolo sezione libri -->
@@ -86,10 +87,11 @@
     import { useUtentiStore } from '@/stores/utentiStore'
     import { useScaffaliStore } from '@/stores/scaffaliStore'
     import { useRoute, useRouter } from 'vue-router'
-    import { computed, onMounted, ref } from 'vue'
+    import { computed, onMounted, ref, nextTick} from 'vue'
     import ModaleConferma from '@/components/ModaleConferma.vue'
     import { useMessage } from 'naive-ui'
     import LibriCard from '@/components/LibriCard.vue'
+    import Mappa from '@/components/Mappa.vue'
 
     const message = useMessage()
     const utenti_store = useUtentiStore()
@@ -100,7 +102,7 @@
     //STATI
     const scaffale = ref(null) // oggetto reattivo per i dati dello scaffale
     const mostra_modale_conferma = ref(false) // flag per visibilita modale cancellazione
-
+    const is_cancellazione_in_corso = ref(false)
     //verifico proprietà dello scaffale
     const is_utente_proprietario = computed(() => {
         //mi assicuro che i dati siano caricati
@@ -138,23 +140,29 @@
     // cancellazione scaffale
     async function eseguiCancellazione() {
         try {
+            is_cancellazione_in_corso.value = true
+            await nextTick()
             // chiamo lo store per eliminare definitivamente
             await scaffali_store.deleteScaffale(scaffale.value.scaffale.id)
-            router.push({ name: 'Libreria' }) // redirect alla breria
+            mostra_modale_conferma.value = false
             message.success("Scaffale eliminato correttamente")
 
+            router.replace({ name: 'Libreria' }) //'replace' è meglio dopo una cancellazione perché impedisce di tornare indietro con il tasto "Back" su un elemento morto
+
         } catch (err) {
+            mostra_modale_conferma.value = false // chiude la modale
+            is_cancellazione_in_corso.value = false 
             message.error(err.message || 'Errore durante l\'eliminazione')
             console.error('Errore durante l\'eliminazione', err)
-        } finally {
-            mostra_modale_conferma.value = false // chiude la modale in ogni caso
-        }
+        } 
     }
 
     onMounted(async () => {
         //ottengo l'id dal parametro nell'URL
         const scaffale_id = route.params.id
         console.log(scaffale_id)
+
+        
 
         // controllo validita id
         if (!scaffale_id || isNaN(scaffale_id)) {
