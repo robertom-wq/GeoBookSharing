@@ -42,11 +42,14 @@ const ridimensiona = async (req, res, next) => {
     try {
         //immagine principale ridimensionata a 300x400
         const path_immagine_principale =  `${cartella}/${base_nome_file}-main${estensione}`
-        await sharp(buffer).resize(300, 400, {fit: 'cover', position: 'center'}).toFile(path_immagine_principale)
-
         //immagine anteprima, thumbnail a 128x192
         const path_immagine_anteprima =  `${cartella}/${base_nome_file}-thumb${estensione}`
-        await sharp(buffer).resize(128, 192, {fit: 'cover', position: 'center'}).toFile(path_immagine_anteprima)
+
+        await Promise.all([
+            sharp(buffer).resize(300, 400, {fit: 'cover', position: 'center'}).toFile(path_immagine_principale), 
+            sharp(buffer).resize(128, 192, {fit: 'cover', position: 'center'}).toFile(path_immagine_anteprima)
+        ])
+
 
         //passo gli url dei files al controller
         req.fileRidimensionato = {
