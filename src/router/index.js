@@ -9,6 +9,8 @@ const Profilo = () => import('@/pages/Profilo.vue')
 const Libreria = () => import('@/pages/Libreria.vue')
 const DettaglioScaffale = () => import('@/pages/Scaffale.vue')
 const AggiungiModificaScaffale = () => import('@/pages/AggiungiModificaScaffale.vue')
+const AggiungiModificaLibro = () => import('@/pages/AggiungiModificaLibro.vue')
+const RicercaLibriVicini = () => import('@/pages/RicercaLibriVicini.vue')
 
 const routes = [
     //Home, la prima pagina
@@ -63,6 +65,27 @@ const routes = [
         component: DettaglioScaffale,
         name: 'DettaglioScaffale',
         meta: { solo_autenticati: true },
+    },
+    //Pagina dedicata alla creazione di un libro
+    {
+      path: '/libro/nuovo',
+      component: AggiungiModificaLibro,
+      name: 'AggiungiLibro',
+      meta: { requiresAuth: true },
+    },
+    //Pagina dedicata alla modifica di un libro esistente
+    {
+      path: '/libro/modifica/:id',
+      component: AggiungiModificaLibro,
+      name: 'ModificaLibro',
+      meta: { requiresAuth: true },
+    },
+    //Pagina dedicata alla ricerca geoloc. di un libro
+    {
+      path: '/libro/ricerca',
+      component: RicercaLibriVicini,
+      name: 'RicercaLibriVicini',
+      meta: { requiresAuth: true },
     },
     //pagina dedicata agli admin per modifica di un profilo 
     {

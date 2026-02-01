@@ -239,7 +239,7 @@ function gestisciAggiornamentoCoordinate(coordinate) {
 /* gestione mappa nel form (stessi parametri di scaffale.vue) */
 .contenitore_mappa {
     width: 100%; /* occupa tutta la larghezza disponibile */
-    height: clamp(13.75rem, 35vh, 31.25rem); /* altezza fluida con minimo e massimo */
+    height: clamp(25.75rem, 35vh, 31.25rem); /* altezza fluida con minimo e massimo */
     border-radius: var(--border-radius);/* angoli arrotondati */
     overflow: hidden;/* nasconde parti di mappa che escono dai bordi */
     border: 0.0625rem solid #eee;/* bordo sottile grigio chiaro */
@@ -273,6 +273,7 @@ function gestisciAggiornamentoCoordinate(coordinate) {
     gap: 0.85rem; /* spazio tra un bottone e l'altro (potrebbero essercene 2 in caso eliminazione utente) */
     padding-bottom: 2rem; /* spazio in fondo alla pagina */
     padding-top: 2rem; /* spazio in fondo alla pagina */ 
+    
 }
 
 /* Ottimizzazione per mobile (tablet e smartphone) */
@@ -285,6 +286,8 @@ function gestisciAggiornamentoCoordinate(coordinate) {
     :deep(.n-button) {
         width: 100%; /* bottone full width */
         height: 2.5rem; /* dimensione bottone aumentata per migliorare esperienza con touch */
+        height: 2.3rem;
+        font-size: 1.2rem;
     }
 
     :deep(.n-card__content) {
@@ -295,6 +298,9 @@ function gestisciAggiornamentoCoordinate(coordinate) {
         flex-direction: column;/* bottoni uno sopra l'altro su mobile */
         align-items: stretch; /* allarga i bottoni a tutta la larghezza */
         gap: 1rem; /* aumenta lo spazio tra i bottoni */
+        padding-top: 0rem; /* spazio in tra botton e mappa */
+         
+
 
     }
     

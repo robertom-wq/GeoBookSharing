@@ -37,7 +37,7 @@
 
                                     <!-- Sezione Avatar -->
                                     <n-form-item class="avatar" label="Avatar">
-                                        <div class="avatar-container">
+                                        <div class="avatar_container">
                                             <n-avatar :src="avatar_src" round size="large" class="avatar_img" />
                                             <!-- Upload immagine avatar -->
                                             <n-upload @before-upload="controlloPreUpload" :default-upload="false"
@@ -130,7 +130,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import { useUtentiStore } from '@/stores/utentiStore'
@@ -190,7 +190,6 @@ const avatar_src = computed(() => {
 async function inizializzaPagina() {
     pulisciStatoFile() //resetta variabili upload
     await caricaDatiUtente()//carica info utente
-
 }
 
 //caricamento dati dell'utente
@@ -303,17 +302,17 @@ async function inviaDati() {
         const id_target = is_admin_modifica.value ? utente_da_modificare_id.value : null
 
         // chiamata api aggiornamento profilo tramite store
-        const rispostaUpdate = await utenti_store.updateUtente(id_target, fd, is_admin_modifica.value)
+        const risposta_update = await utenti_store.updateUtente(id_target, fd, is_admin_modifica.value)
 
         // gestione separata richiesta eliminazione, soft delete
         if (!is_admin_modifica.value && form_data.value.richiesta_eliminazione !== undefined) {
             await utenti_store.softDeleteUtente(form_data.value.richiesta_eliminazione)
         }
 
-        //console.log("rispostaUpdate?.utente.avatar", rispostaUpdate.data)
+        //console.log("risposta_update?.utente.avatar", risposta_update.data)
         // aggiorna dati locali con risposta dal backend
-        if (rispostaUpdate?.data) {
-            form_data.value = { ...form_data.value, ...rispostaUpdate.data }
+        if (risposta_update?.data) {
+            form_data.value = { ...form_data.value, ...risposta_update.data }
         }
 
         message.success('Profilo aggiornato!')
@@ -350,6 +349,12 @@ watch(() => route.fullPath, () => {
 onMounted(() => {
     inizializzaPagina()
 })
+
+onBeforeUnmount(() => {
+    if (anteprima.value) {
+        URL.revokeObjectURL(anteprima.value)
+    }
+})
 </script>
 
 <style scoped>    
@@ -373,7 +378,7 @@ onMounted(() => {
     text-align: center; 
 }
 
-.avatar-container {
+.avatar_container {
     text-align: center; /* centra gli elementi interni (img e bottone) */
     width: 100%; /* occupa tutta la larghezza disponibile */
 }

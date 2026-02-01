@@ -116,7 +116,8 @@
     //AZIONI
     //permette di aggiungere libri manualmente
     function aggiungiLibro() {
-        console.log("aggiungiLibro") // da implementare
+        console.log("aggiungiLibro")
+        router.push({ name: 'AggiungiLibro' })
     }
 
     //permette di aggiungere libri tramite codice ISBN
@@ -129,7 +130,8 @@
 
     //permette di visualizzare i dettagli del libro selezionato 
     function vaiAlLibroId(id) {
-        console.log("vaiAlLibroId") // da implementare
+        console.log("vaiAlLibroId")
+        router.push({ name: 'ModificaLibro', params:{id}})
     }
 
     // naviga alla pagina di modifica passando l'id
@@ -160,9 +162,7 @@
     onMounted(async () => {
         //ottengo l'id dal parametro nell'URL
         const scaffale_id = route.params.id
-        console.log(scaffale_id)
-
-        
+        console.log(scaffale_id)        
 
         // controllo validita id
         if (!scaffale_id || isNaN(scaffale_id)) {
@@ -192,7 +192,6 @@
                 return
             }
 
-
         } catch (err) {
             console.error("Errore nel caricamento dello scaffale", err)
             message.error(err.message || "Errore nel caricamento dello scaffale")
@@ -204,8 +203,6 @@
 
 
 <style scoped>
-/* Contenitore principale */
-
 /* Area Mappa */
 .contenitore_mappa {
     margin-bottom: 2rem; /* spazio sotto il contenitore della mappa */
@@ -249,7 +246,7 @@
     padding-bottom: 2rem; /* spazio in fondo alla pagina */
 }
 
-/* Forziamo la responsività dei bottoni Naive UI nel contenitore azioni */
+/* Forzo la responsività dei bottoni Naive UI nel contenitore azioni */
 .azioni_utente :deep(.n-space) {
     gap: 1rem !important; /* imposta spazio forzato i bottoni */
     justify-content: center !important; /*Bottoni su lato destro */
@@ -269,7 +266,7 @@
         gap: 1rem; /* riduce lo spazio tra i libri su mobile */
     }
 
-    /* Rendiamo i pulsanti d'azione a tutta larghezza su mobile per il touch */
+    /* Rendo i pulsanti d'azione a tutta larghezza su mobile per il touch */
     .azioni_utente :deep(.n-space) {
         flex-direction: column !important; /* dispone i bottoni uno sopra l'altro */
     }

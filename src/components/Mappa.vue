@@ -266,14 +266,15 @@ async function cercaIndirizzo() {
         risultati_ricerca.value = []
         return
     }
-    const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(
-        query_ricerca.value
-    )}&countrycodes=it&limit=${limite_risultati}`
+    // uso proxy di vite
+    const url = `/nominatim-api/search?format=json&addressdetails=1&q=${encodeURIComponent(
+    query_ricerca.value
+        )}&countrycodes=it&limit=${limite_risultati}`
 
     try {
-        const response = await fetch(url, {
-            headers: { 'User-Agent': 'GeoBooksharing/1.0' }
-        })
+        const response = await fetch(url) // Non servono più gli headers qui, li mette Vite
+        console.log(response.ok)
+        if (!response.ok) throw new Error('Errore risposta server')
         const trovati = await response.json()
         risultati_ricerca.value = trovati.slice(0, 5)
     } catch (err) {

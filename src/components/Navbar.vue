@@ -91,7 +91,7 @@ const links = computed(() => {
             { label: 'Home', to: '/' },
             { label: 'Profilo', to: '/profilo' },
             { label: 'Libreria', to: '/libreria' },
-            { label: 'Cerca Libri', to: '/' },
+            { label: 'Cerca Libri', to: '/libro/ricerca' },
             { label: 'Catalogo', to: '/' },
             { label: 'Condivisioni', to: '/' }            
         ]
