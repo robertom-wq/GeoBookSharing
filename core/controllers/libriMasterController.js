@@ -11,8 +11,7 @@ import path from 'path'
 import fs from 'fs'
 import logger from '../config/logging.js'
 
-
-
+const GOOGLE_BOOKS_KEY=process.env.GOOGLE_BOOKS_KEY
 
 // helper per la scelta della migliore immagine delle copertine da goole Books
 const getMiglioreImmagine = (url_immagine) => {
@@ -55,7 +54,12 @@ export const addLibroMasterFromISBN = async (req, res) => {
             return res.status(200).json({ message: `Libro master con isbn ${isbn_pulito} già presente nel database` })
         }
         // eseguo la fetch verso google Book API (es https://www.googleapis.com/books/v1/volumes?q=isbn:9791280623508)
-        const url = `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn_pulito.replaceAll('-','')}`
+        /*
+        Durante la fase di sviluppo, è stata riscontrata una criticità relativa ai limiti di quota delle API di Google (HTTP 429).
+        Il problema è stato risolto tramite l'implementazione di una API Key dedicata e l'astrazione delle credenziali
+        tramite variabili d'ambiente, garantendo così la stabilità del servizio di importazione automatica dei volumi
+        */
+        const url = `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn_pulito.replaceAll('-','')}&key=${GOOGLE_BOOKS_KEY}`
         const libro_google = await axios.get(url, {timeout: 10000})
 
         if(!libro_google.data.items || libro_google.data.items.length ===0){
