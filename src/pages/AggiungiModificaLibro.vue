@@ -204,8 +204,9 @@ const lista_tipi_condivisione = computed(() => {
 
 //lista che permette di scegliere dove inserire il nuovo libro o dove spostare quello esistente
 const lista_scaffali_disponibili = computed(() => {
-    //recupero la lista dei generi letterari dallo store
+    //recupero la lista degli scaffali dallo store
     const miei_scaffali = scaffali_store.scaffali_utente || []
+    
     //trasformo l'array appena resrituito nel formato {label, value}
     return miei_scaffali.map(s => ({
         label: s.nome,

@@ -11,6 +11,10 @@ const DettaglioScaffale = () => import('@/pages/Scaffale.vue')
 const AggiungiModificaScaffale = () => import('@/pages/AggiungiModificaScaffale.vue')
 const AggiungiModificaLibro = () => import('@/pages/AggiungiModificaLibro.vue')
 const RicercaLibriVicini = () => import('@/pages/RicercaLibriVicini.vue')
+const CatalogoLibriMaster = () => import('@/pages/CatalogoLibriMaster.vue')
+const LibroMaster = () => import('@/pages/AggiungiModificaLibroMaster.vue')
+
+
 
 const routes = [
     //Home, la prima pagina
@@ -87,6 +91,26 @@ const routes = [
       name: 'RicercaLibriVicini',
       meta: { requiresAuth: true },
     },
+    {
+    path: '/catalogo',
+    component: CatalogoLibriMaster,
+    name: 'CatalogoLibriMaster',
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/catalogo/LibroMaster/nuovo',
+    component: LibroMaster,
+    name: 'CreaLibroMaster',
+    meta: { requiresAuth: true },
+
+  },
+  {
+    path: '/catalogo/libroMaster/:id',
+    component: LibroMaster,
+    name: 'ModificaLibroMaster',
+    meta: { requiresAuth: true },
+  },
+
     //pagina dedicata agli admin per modifica di un profilo 
     {
         path: '/supervisione/ModificaProfilo/:id',
