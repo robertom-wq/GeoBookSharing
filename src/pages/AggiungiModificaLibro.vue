@@ -397,8 +397,8 @@ async function inviaDati() {
 
 }
 
-function richiediCondivisione(id) {
-    console.log("richiediCondivisione") //da implementare
+function richiediCondivisione(id){
+    router.push({ name: 'RichiestaCondivisione', params: { id }})
 }
 
 async function deleteLibro() {

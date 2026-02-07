@@ -93,7 +93,7 @@ const links = computed(() => {
             { label: 'Libreria', to: '/libreria' },
             { label: 'Cerca Libri', to: '/libro/ricerca' },
             { label: 'Catalogo', to: '/catalogo' },
-            { label: 'Condivisioni', to: '/' }            
+            { label: 'Condivisioni', to: '/condivisioni' }            
         ]
         
     //aggiunge link solo se admin

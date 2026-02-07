@@ -10,11 +10,11 @@
 
                 <!-- Sottotitolo personalizzato in base al ruolo di chi accede al profilo-->
                 <p v-if="is_admin_modifica" class="sottotitolo">
-                    Ciao <strong>{{ nome_loggato.toUpperCase() }}</strong>, stai modificando il profilo di
+                    Ciao <strong>{{ utenti_store.utente.nome.toUpperCase() }}</strong>, stai modificando il profilo di
                     <span class="testo_evidenziato">{{ username_target }}</span>
                 </p>
                 <p v-else>
-                    Ciao {{ nome_loggato.toUpperCase() }}, modifica il tuo profilo o accedi alle tue statistiche
+                    Ciao {{utenti_store.utente.nome.toUpperCase() }}, modifica il tuo profilo o accedi alle tue statistiche
                 </p>
             </div>
             <!-- Contenitore del contenuto del profilo -->
@@ -158,8 +158,7 @@ const anteprima = ref(null) // url temporaneo per visualizzazione immediata
 
 //Logica di navigazione
 const utente_da_modificare_id = computed(() => route.params.id ? parseInt(route.params.id) : null) // recupera id da url se presente
-const is_admin_modifica = computed(() => !!utente_da_modificare_id.value) // true se admin sta modificando altri
-const nome_loggato = computed(() => form_data.value?.nome || 'Ospite') // nome per messaggio benvenuto, reattivo al cambiamento sul form
+const is_admin_modifica = computed(() => !!utente_da_modificare_id.value && utenti_store.utente.ruolo === 'admin') // true se admin sta modificando altri
 const username_target = computed(() => form_data.value?.username || '...') // username utente target
 const titoloPagina = computed(() => is_admin_modifica.value ? 'Gestione Utente' : 'Il Mio Profilo') // titolo dinamico
 

@@ -13,6 +13,8 @@ const AggiungiModificaLibro = () => import('@/pages/AggiungiModificaLibro.vue')
 const RicercaLibriVicini = () => import('@/pages/RicercaLibriVicini.vue')
 const CatalogoLibriMaster = () => import('@/pages/CatalogoLibriMaster.vue')
 const LibroMaster = () => import('@/pages/AggiungiModificaLibroMaster.vue')
+const Condivisioni = () => import('@/pages/Condivisioni.vue')
+const RichiestaCondivisione = () => import('@/pages/RichiestaCondivisione.vue')
 
 
 
@@ -42,6 +44,7 @@ const routes = [
         name: 'Profilo',
         meta: { solo_autenticati: true },
     },
+
     //pagina relativa alla libreria dell'utente. E' un raccoglitore di scaffali (geolocalizzati) che l'utente può possedere.
     {
         path: '/libreria',
@@ -110,7 +113,18 @@ const routes = [
     name: 'ModificaLibroMaster',
     meta: { requiresAuth: true },
   },
-
+  {
+    path: '/condivisioni',
+    component: Condivisioni,
+    name: 'Condivisioni',
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/richiestaCondivisione/:id',
+    component: RichiestaCondivisione,
+    name: 'RichiestaCondivisione',
+    meta: { requiresAuth: true }
+  },
     //pagina dedicata agli admin per modifica di un profilo 
     {
         path: '/supervisione/ModificaProfilo/:id',

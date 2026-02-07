@@ -5,7 +5,8 @@
   --box-shadow: 0 7px 7px rgba(81, 86, 150, 0.623); /* Ombra più morbida e professionale */
   --border-radius: 12px;
   --pearl-white-bg: rgb(241, 238, 238); 
-  --color-text-dark: #333333;
+  /*--color-text-dark: #333333;*/
+  --color-text-dark: #434343;
   --navbar-text-hover: #82c4f7;
   --btn-primary-color : #3194E7;
   --btn-primary-color-text: #ffffff;
