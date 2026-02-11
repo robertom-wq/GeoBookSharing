@@ -16,6 +16,7 @@ import { generateCsrfToken, CSRF_COOKIE_OPTIONS } from "../middleware/csrf.js"
 
 import prisma from '../config/prisma.js'
 import logger from '../config/logging.js'
+import { error } from 'console'
 
 
 //SETUP INIZIALE JWT E COOKIES
@@ -35,7 +36,7 @@ const COOKIE_OPTIONS = {
 
 //REGISTRAZIONE UTENTE
 export const registrazione = async (req, res) => {
-    const { email, cognome, nome, password, username} = req.body    
+    const { email, cognome, nome, password, username, privacy_policy_accettata} = req.body    
     try {
         // controllo se utente esiste nel db tramite username o email
         const esiste = await prisma.utenti.findFirst({
@@ -53,6 +54,10 @@ export const registrazione = async (req, res) => {
             })
         }
 
+        if(!privacy_policy_accettata) {
+            return res.status(422).json({error: 'Accettare le Privacy Policy per completare la registrazione'})
+        }
+
         //  cifratura della password tramite bcryptjs con wf 12
         const password_cifrata = await bcrypt.hash(password, 12)
 
@@ -64,6 +69,7 @@ export const registrazione = async (req, res) => {
                 email: email.toLowerCase(),
                 username: username.toLowerCase(),
                 hashed_password: password_cifrata,
+                privacy_policy_accettata
             },
             // dati da inviare assieme alla response
             select: {
@@ -71,6 +77,7 @@ export const registrazione = async (req, res) => {
                 username: true,
                 ruolo: true,
                 data_creazione: true,
+                privacy_policy_accettata: true
             }
 
         })
@@ -113,8 +120,8 @@ export const login = async (req, res) => {
         const utente = await prisma.utenti.findUnique({
             where: { username: username.toLowerCase()},
         })
-        // verifico se l'account è presente nel db e se l'utente non è stato bannato
-        if (!utente || utente.bannato) {
+        // verifico se l'account è presente nel db, se l'utente non è stato bannato, o se non ha accettato le privacy policy
+        if (!utente || utente.bannato || !utente.privacy_policy_accettata) {
             logger.error("["+ req.ip +"] Tentativo di accesso -> " + username + ": credenziali non valide, utente non esistente o bannato")
             return res.status(401).json({ error: "Credenziali non valide"})
         }

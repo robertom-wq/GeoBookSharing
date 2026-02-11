@@ -47,7 +47,9 @@ model utenti {
   biografia                       String?    @db.VarChar(1000)
   avatar                          String?   @db.VarChar(1000)
   avatar_thumb                    String?   @db.VarChar(1000)
-  bannato                         Boolean   @default(false)                                     // Di default banalmente gli utenti sono tutti Non bannati
+  bannato                         Boolean   @default(false)
+  privacy_policy_accettata        Boolean   @default(false)
+  data_accettazione_privacy       DateTime? @db.Timestamp(6)                                     // Di default banalmente gli utenti sono tutti Non bannati
   data_creazione                  DateTime  @db.Timestamp(6) @default(now())                    // Imposta come data di creazione, il momento in cui viene creato il record
   ruolo                           String    @db.VarChar(50) @default("user")
   richiesta_eliminazione          Boolean?  @default(false)
