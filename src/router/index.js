@@ -15,6 +15,7 @@ const CatalogoLibriMaster = () => import('@/pages/CatalogoLibriMaster.vue')
 const LibroMaster = () => import('@/pages/AggiungiModificaLibroMaster.vue')
 const Condivisioni = () => import('@/pages/Condivisioni.vue')
 const RichiestaCondivisione = () => import('@/pages/RichiestaCondivisione.vue')
+const AdminPage = () => import('@/pages/Supervisione.vue')
 
 
 
@@ -94,12 +95,14 @@ const routes = [
       name: 'RicercaLibriVicini',
       meta: { requiresAuth: true },
     },
+    //pagina dedicata al catalogo di tutti i libri master già censiti
     {
     path: '/catalogo',
     component: CatalogoLibriMaster,
     name: 'CatalogoLibriMaster',
     meta: { requiresAuth: true }
   },
+  //pagina dedicata alla creazione manuale di un libro master
   {
     path: '/catalogo/LibroMaster/nuovo',
     component: LibroMaster,
@@ -107,23 +110,35 @@ const routes = [
     meta: { requiresAuth: true },
 
   },
+  //pagina dedicata alla vsualizzazioe dettaglio di un libro master (admin può modificare)
   {
     path: '/catalogo/libroMaster/:id',
     component: LibroMaster,
     name: 'ModificaLibroMaster',
     meta: { requiresAuth: true },
   },
+  //pagina dedicata alla gestione delle varie richieste effettuate o ricevute
   {
     path: '/condivisioni',
     component: Condivisioni,
     name: 'Condivisioni',
     meta: { requiresAuth: true }
   },
+  //pagina dedicata alle richieste di condivisione
   {
     path: '/richiestaCondivisione/:id',
     component: RichiestaCondivisione,
     name: 'RichiestaCondivisione',
     meta: { requiresAuth: true }
+  },
+  //pagina dedicata agli admin
+  {
+    path: '/supervisione',
+    component: AdminPage,
+    name: 'AdminPage',
+    meta: { requiresAuth: true,
+            requiresAdmin: true
+          }
   },
     //pagina dedicata agli admin per modifica di un profilo 
     {

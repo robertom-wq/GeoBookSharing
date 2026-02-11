@@ -246,12 +246,6 @@
     padding-bottom: 2rem; /* spazio in fondo alla pagina */
 }
 
-/* Forzo la responsività dei bottoni Naive UI nel contenitore azioni */
-.azioni_utente :deep(.n-space) {
-    gap: 1rem !important; /* imposta spazio forzato i bottoni */
-    justify-content: center !important; /*Bottoni su lato destro */
-}
-
 .n-card {
     box-shadow: var(--box-shadow);
 }
@@ -264,16 +258,6 @@
 
     .griglia_libri {
         gap: 1rem; /* riduce lo spazio tra i libri su mobile */
-    }
-
-    /* Rendo i pulsanti d'azione a tutta larghezza su mobile per il touch */
-    .azioni_utente :deep(.n-space) {
-        flex-direction: column !important; /* dispone i bottoni uno sopra l'altro */
-    }
-
-    .azioni_utente :deep(.n-button) {
-        width: 100%;/* occupa tutta la larghezza */
-        height: 2.5rem; /* bottone piu largo, per agevolare touch */
     }
 
     .contenitore_mappa {

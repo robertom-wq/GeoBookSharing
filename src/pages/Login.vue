@@ -93,17 +93,6 @@ async function gestisciLogin() {
 
 <style scoped>
 
-.scheda_login {
-    max-width: clamp(18.75rem, 90vw, 31.25rem);/* Larghezza fluida: min 300px, ideale 90%, max 500px */    
-    margin: 3rem auto; /* Centratura con margini in rem */
-    padding: clamp(1rem, 5vw, 2rem); /* Spaziatura interna fluida */
-
-    /* Utilizzo variabili globali */
-    box-shadow: var(--box-shadow);
-    border-radius: var(--border-radius);
-    background-color: var(--pearl-white-bg);
-}
-
 .contenuto_modulo {
     display: flex;/* attiva il layout flex */
     flex-direction: column; /* dispone gli elementi in colonna */
@@ -112,50 +101,8 @@ async function gestisciLogin() {
     min-height: 60vh; /* occupa almeno il 60% dell'altezza dello schermo */
 }
 
-.n-button {
-    min-width: 7rem; /* assicura che il bottone non sia troppo stretto */
-}
-
-.pulsanti_azione {
-    width: 100%; /* occupa tutta la larghezza disponibile */
-    display: flex;/* attivo flexbox per gestire i bottoni interni */
-    justify-content: center; /*Pulsanti al centro*/
-}
 
 
-:deep(.n-card > .n-card-header) {
-    text-align: center; 
-}
 
-/* Ottimizzazione per mobile (tablet e smartphone) */
-@media (max-width: 768px) {
-    .scheda_login {
-        margin: 1.5rem auto;/* riduce i margini verticali su mobile */
-        padding: 1rem;/* riduce lo spazio interno della card */
-    }
 
-    /* input più grandi per il touch */
-    :deep(.n-input) {
-        height: 2.5rem;/* rende la casella di testo piu alta per il touch */
-        font-size: small;/* riduce leggermente la dimensione del font */
-    }
-
-    :deep(.n-card__content) {
-        padding: 0 /* azzero il padding della card in modo da predere piu spazio laterale possibile */
-    }
-
-    .pulsanti_azione {
-        flex-direction: column;/* bottoni uno sopra l'altro su mobile */
-    }
-
-    .n-button {
-        font-size: 1.2rem; /* dimensione testo e altezza bottone aumentati per migliorare esperienza con touch */
-        height: 2.3rem;
-    }
-    
-    .contenuto_modulo  {
-        padding: 0 0rem;/* rimuovo il padding laterale per aumentare spazio disponibile*/
-    }
-
-}
 </style>

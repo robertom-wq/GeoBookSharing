@@ -263,11 +263,6 @@ onMounted(async ()=> {
     padding-bottom: 2rem;
 }
 
-/* pulsante conferma modale informazini*/
-.button_conferma_modale {
-    max-width: 15rem;
-    justify-self: center;
-}
 
 /* modale scheda informativa */
 .scheda_informativa {
@@ -285,48 +280,22 @@ onMounted(async ()=> {
 /* dimensioni finestra ricerca isbn */
 .scheda_isbn {
     width: 90vw;
-    max-width: 25rem; /* 400px */
+    max-width: 25rem; 
+    padding: 0.85rem
 }
 
-
-/*forzo spaziatura e centraggio bottoni*/
-.azioni_utente :deep(.n-space) {
-    gap: 1rem !important; /* imposta spazio forzato i bottoni */
-    justify-content: center !important; /*Bottoni al centro */
-}
 
 /* Ottimizzazione per mobile (tablet e smartphone) */
 @media (max-width: 768px) {
     .input_ricerca {
         max-width: 100%;
     }
-
-    .barra_input :deep(.n-space) {
-        flex-direction: column;
-        width: 100%;
-    }
-
     .scheda_informativa {
         margin-top: 5rem;
         max-width: 95%;
     }
-
-    .barra_input :deep(.n-button) {
-        width: 100%;
-    }
-
     .griglia_libri_master {
         gap: 1rem; 
-    }
-
-    /* bottoni a tutta larghezza e alti per touch */
-    .azioni_utente :deep(.n-space) {
-        flex-direction: column !important; /* dispone i bottoni uno sopra l'altro */
-    }
-
-    .azioni_utente :deep(.n-button) {
-        width: 100%;/* occupa tutta la larghezza */
-        height: 2.5rem; /* bottone piu largo, per agevolare touch */
     }
 }
 </style>

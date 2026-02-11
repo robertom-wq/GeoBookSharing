@@ -88,6 +88,7 @@ export const useUtentiStore = defineStore('utente', () => {
     // Eseguo registrazione (crazione nuovo accoubnt)
     async function registrati(form_data) {
         loading.value = true
+        console.log(form_data)
         try {
             // Faccio la POST con tutti i dati del nuovo utente
             const nuovo_utente = await chiamaAPI('/auth/registrazione', {

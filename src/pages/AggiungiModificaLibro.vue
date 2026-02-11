@@ -23,10 +23,10 @@
                             <n-form :model="form" :rules="rules" ref="form_ref" label-placement="top"
                                 :disabled="is_disabilitato">
                                 <!--Copertina-->
-                                <n-form-item class="sezione_copertina" label="Copertina">
-                                    <div class="copertina_container">
+                                <n-form-item class="sezione_copertina_avatar" label="Copertina">
+                                    <div class="avatar_copertina_container">
                                         <!-- anteprima copertina -->
-                                        <n-avatar :src="copertina_src" round size="large" class="copertina_img"/>
+                                        <n-avatar :src="copertina_src" round size="large" class="avatar_copertina_img"/>
                                         <!-- upload copertina -->
                                         <n-upload @before-upload="controlloPreUpload" :show-file-list="false" :default-upload="false"
                                             accept="image/*" :max-count="1" v-model:file-list="lista_files"
@@ -431,44 +431,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* Contenitore principale */
-.contenuto_modulo {
-    margin-top: 2rem;
-}
-
-/* La Scheda del Libro*/
-.libro_card {
-    max-width: clamp(18.75rem, 90vw, 38rem); 
-    margin: 3rem auto;
-    padding: clamp(0.5rem, 3vw, 2rem);
-    background-color: var(--pearl-white-bg);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-}
-
-/* centratura titolo della card */
-:deep(.n-card > .n-card-header) {
-    text-align: center;
-}
-
-/* allineamento copertina e gestione spazi interni */
-.copertina_container {
-    text-align: center;
-    width: 100%;
-}
-
-:deep(.sezione_copertina .n-form-item-blank) {
-    flex-direction: column;
-    justify-content: center;
-    gap: 1rem;
-}
-
-/* dimensioni fisse per l'immagine anteprima */
-.copertina_img {
-    width: 9.375rem !important;
-    height: 9.375rem !important;
-    margin-bottom: 0.625rem;
-}
 
 /* statistiche visualizzazioni */
 .statistiche_visualizzazioni {
@@ -486,47 +448,6 @@ onBeforeUnmount(() => {
     color: var(--color-text-dark);
 }
 
-/* centratura e spaziatura pulsanti */
-:deep(.n-space) {
-    width: 100%;
-    display: flex;
-    justify-content: center !important; 
-    gap: 0.85rem !important;
-}
 
-.n-button {
-    min-width: 7rem;
-}
 
-/* Ottimizzazione per mobile (tablet e smartphone) */
-@media (max-width: 768px) {
-    .libro_card {
-        width: 100% !important;
-        margin: 1rem auto;
-    }
-
-    /* input più grandi per il touch */
-    :deep(.n-input) {
-        min-height: 2.5rem;
-        font-size: small;
-    }
-
-    /* pila verticale dei pulsanti su mobile */
-    :deep(.n-space) {
-        flex-direction: column !important;
-        align-items: stretch;
-        gap: 1rem !important;
-        padding-bottom: 2rem;
-    }
-
-    :deep(.n-button) {
-        width: 100% !important;
-        height: 2.3rem;
-        font-size: 1.2rem;
-    }
-
-    :deep(.n-card__content) {
-        padding: 0;
-    }
-}
 </style>

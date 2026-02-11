@@ -38,8 +38,13 @@
                             <n-input v-model:value="form_value.username" placeholder="Username" />
                         </n-form-item>
                         <!-- Campo Password -->
-                        <n-form-item>
+                        <n-form-item label="Password" path="password">
                             <n-input v-model:value="form_value.password" type="password" placeholder="Password" />
+                        </n-form-item>
+                        <!-- Accettazione termini privacy -->
+                        <n-form-item label="Privacy" path="privacy_policy_accettata">
+                            <n-checkbox v-model:checked="form_value.privacy_policy_accettata"
+                                >Accetta i <a @click="showPrivacyModal = true" class="link-privacy">termini sulla privacy</a></n-checkbox>
                         </n-form-item>
                         <n-form-item>
                             <div class="pulsanti_azione">
@@ -55,6 +60,31 @@
             </div>
         </section>
     </div>
+    <n-modal
+        v-model:show="showPrivacyModal"
+        preset="card"
+        style="width: 600px; max-width: 90vw"
+        title="Informativa sulla Privacy (GDPR)"
+        class="mobile-pila"
+        >
+        <div class="testo-privacy">
+            <h3>1. Tipologia di Dati Raccolti</h3>
+            <p>I dati raccolti includono: Nome, Cognome, Email, Username e Immagine del profilo (Avatar).</p>
+            
+            <h3>2. Visibilità dei Dati</h3>
+            <p><strong>Dati Privati:</strong> Nome, Cognome ed Email sono visibili solo a te e agli amministratori.</p>
+            <p><strong>Dati Pubblici:</strong> Username e Immagine del profilo sono visibili agli altri utenti per facilitare gli scambi.</p>
+
+            <h3>3. Cookie</h3>
+            <p>Utilizziamo esclusivamente cookie tecnici di autenticazione necessari al funzionamento del portale.</p>
+
+            <h3>4. Cancellazione</h3>
+            <p>Puoi richiedere la cancellazione dal profilo. I dati verranno eliminati definitivamente dopo 10 giorni (periodo di ripensamento).</p>
+        </div>
+        <template #footer>
+            <n-button type="primary" @click="showPrivacyModal = false">Ho capito</n-button>
+        </template>
+    </n-modal>
 </template>
 
 <script setup>
@@ -75,14 +105,31 @@ const form_value = ref({
   cognome: '',
   username: '',
   email: '',
-  password: ''
+  password: '',
+  privacy_policy_accettata: false
 })
-
+const showPrivacyModal = ref(false)
 // Regole di validazione
 const rules = {
   nome: { required: true, message: 'Nome obbligatorio', trigger: 'blur' },
   cognome: { required: true, message: 'Cognome obbligatorio', trigger: 'blur' },
   username: { required: true, message: 'Username obbligatorio', trigger: 'blur' },
+  privacy_policy_accettata : [
+{
+    validator: (rule, value, callback) => {
+      // Logga il valore per debuggare in console (aprila con F12)
+      console.log("Valore privacy:", value); 
+      
+      if (value === true) {
+        callback(); // Successo
+      } else {
+        callback(new Error('Accettare le Privacy Policy per completare la registrazione')); // Errore
+      }
+    },
+    trigger: ['blur', 'change'] // Ascolta entrambi gli eventi
+  }
+  ],
+  
   email: [
     { required: true, message: 'Email obbligatoria', trigger: 'blur' },
     { type: 'email', message: 'Email non valida', trigger: 'blur' }
@@ -130,65 +177,21 @@ async function gestisciRegistrazione() {
     min-height: 60vh; /* occupa almeno il 60% dell'altezza dello schermo */
 }
 
-/* La Scheda di Registrazione */
-.scheda_registrazione {
-    max-width: clamp(18.75rem, 90vw, 31.25rem);/* Larghezza fluida: non supera i 500px ma occupa il 95% su schermi piccoli */
-    margin: 3rem auto;  /* Centratura con margini in rem */
-    padding: clamp(1rem, 5vw, 2rem); /* padding che si adatta alla larghezza dello schermo */
-    
-    /* Utilizzo variabili globali */
-    background-color: var(--pearl-white-bg);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-
+.link-privacy {
+    color: #3194E7; /* Il tuo --btn-primary-color */
+    text-decoration: underline;
+    margin-left: 4px;
+    font-weight: 500;
 }
 
-.n-button {
-    min-width: 7rem; /* assicura che il bottone non sia troppo stretto */
+.testo-privacy {
+    line-height: 1.6;
+    padding: 10px;
 }
 
-.pulsanti_azione {
-    width: 100%; /* occupa tutta la larghezza disponibile */
-    display: flex; /* attivo flexbox per gestire i bottoni interni */
+.testo-privacy h3 {
+    margin-top: 15px;
+    color: var(--color-text-dark);
 }
-
-/*centratura titolo della card */
-:deep(.n-card > .n-card-header) {
-    text-align: center; 
-}
-
-/* Ottimizzazione per mobile (tablet e smartphone) */
-@media (max-width: 768px) {
-
-    .scheda_registrazione {
-        margin: 1.5rem auto;/* riduce i margini verticali su mobile */
-        padding: 1rem;/* riduce lo spazio interno della card */
-    }
-
-    /* input più grandi per il touch */
-    :deep(.n-input) {
-        height: 2.5rem;/* rende la casella di testo piu alta per il touch */
-        font-size: small;/* riduce leggermente la dimensione del font */
-    }
-    
-    :deep(.n-card__content) {
-        padding: 0 /* azzero il padding della card in modo da predere piu spazio laterale possibile */
-    }
-
-    .pulsanti_azione {
-        flex-direction: column;/* bottoni uno sopra l'altro su mobile */
-    }
-
-    .n-button {
-        font-size: 1.2rem; /* dimensione testo e altezza bottone aumentati per migliorare esperienza con touch */
-        height: 2.3rem;
-    }
-    
-    .contenuto_modulo  {
-        padding: 0 0rem;/* rimuovo il padding laterale per aumentare spazio disponibile*/
-        
-    }
-}
-
 
 </style>

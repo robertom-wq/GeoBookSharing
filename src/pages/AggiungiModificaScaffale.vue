@@ -267,13 +267,7 @@ function gestisciAggiornamentoCoordinate(coordinate) {
 }
 
 .pulsanti_azione {
-    width: 100%; /* occupa tutta la larghezza disponibile */
-    display: flex; /* attivo flexbox per gestire i bottoni interni */
-    justify-content: center; /*Pulsanti al centro*/
-    gap: 0.85rem; /* spazio tra un bottone e l'altro (potrebbero essercene 2 in caso eliminazione utente) */
-    padding-bottom: 2rem; /* spazio in fondo alla pagina */
-    padding-top: 2rem; /* spazio in fondo alla pagina */ 
-    
+    padding-bottom: 2rem; /* spazio in fondo alla pagina */ 
 }
 
 /* Ottimizzazione per mobile (tablet e smartphone) */
@@ -281,28 +275,5 @@ function gestisciAggiornamentoCoordinate(coordinate) {
     .scheda_nuovo_scaffale {
         padding: 0.5rem; /* riduce padding interno su schermi piccoli */
     }
-
-    /* Rendiamo il pulsante di salvataggio a tutta larghezza */
-    :deep(.n-button) {
-        width: 100%; /* bottone full width */
-        height: 2.5rem; /* dimensione bottone aumentata per migliorare esperienza con touch */
-        height: 2.3rem;
-        font-size: 1.2rem;
-    }
-
-    :deep(.n-card__content) {
-        padding: 0 /* azzero il padding della card in modo da predere piu spazio laterale possibile */
-    }
-
-    .pulsanti_azione {
-        flex-direction: column;/* bottoni uno sopra l'altro su mobile */
-        align-items: stretch; /* allarga i bottoni a tutta la larghezza */
-        gap: 1rem; /* aumenta lo spazio tra i bottoni */
-        padding-top: 0rem; /* spazio in tra botton e mappa */
-         
-
-
-    }
-    
 }
 </style>

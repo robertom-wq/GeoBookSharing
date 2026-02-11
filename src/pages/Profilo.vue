@@ -36,9 +36,9 @@
                                     class="responsive-form">
 
                                     <!-- Sezione Avatar -->
-                                    <n-form-item class="avatar" label="Avatar">
-                                        <div class="avatar_container">
-                                            <n-avatar :src="avatar_src" round size="large" class="avatar_img" />
+                                    <n-form-item class="sezione_copertina_avatar" label="Avatar">
+                                        <div class="avatar_copertina_container">
+                                            <n-avatar :src="avatar_src" round size="large" class="avatar_copertina_img" />
                                             <!-- Upload immagine avatar -->
                                             <n-upload @before-upload="controlloPreUpload" :default-upload="false"
                                                 accept="image/*" :max-count="1" v-model:file-list="lista_files"
@@ -115,7 +115,8 @@
                         </n-tab-pane>
                         <!-- TAB: Dashboard utente, visibile solo all'utente -->
                         <n-tab-pane v-if="!is_admin_modifica" :tab="`Le tue Statistiche`" name="dashboard">
-                            <!--Dashboard utente, da implementare-->
+                            <DashboardUtente 
+                                :dati_report="dati_report"/>
                         </n-tab-pane>
 
                     </n-tabs>
@@ -124,16 +125,20 @@
         </section>
         <!-- Modale di conferma eliminazione utente -->
         <ModaleConferma v-model:show="mostra_modale_conferma" titolo="Elimina Utente"
-            :messaggio="'Sei sicuro di voler eliminare l\'utente \'\'' + form_data?.username + '\'\'? Questa operazione è irreversibile.'"
-            testoConferma="Elimina Definitivamente" tipo="warning" @conferma="gestisciDeleteUtente()" />
+                :messaggio="'Sei sicuro di voler eliminare l\'utente \'\'' + form_data?.username + '\'\'? Questa operazione è irreversibile.'"
+                testoConferma="Elimina Definitivamente" tipo="warning" @conferma="gestisciDeleteUtente()" />
     </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, ErrorCodes } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import { useUtentiStore } from '@/stores/utentiStore'
+import { useLibriStore } from '@/stores/libriStore'
+import { useCondivisioniStore } from '@/stores/condivisioniStore'
+import { useValutazioniStore } from '@/stores/valutazioniStore'
+import DashboardUtente from '@/components/DashboardUtente.vue'
 
 // Componenti
 import ModaleConferma from '@/components/ModaleConferma.vue'
@@ -142,6 +147,9 @@ const route = useRoute()
 const router = useRouter()
 const message = useMessage()
 const utenti_store = useUtentiStore()
+const libri_store = useLibriStore()
+const valutazioni_store = useValutazioniStore()
+const condivisioni_store = useCondivisioniStore()
 
 const image_url = import.meta.env.VITE_ROOT_URL // url base per le immagini da file .env
 
@@ -150,6 +158,13 @@ const form_ref = ref(null) // riferimento al componente form per la validazione
 const mostra_modale_conferma = ref(false) // stato visibilita modale eliminazione
 const form_data = ref(null) // Dati locali per il form
 const utente = ref(null)
+const dati_report = ref({ 
+    media_voto: 0,
+    libri_condivisi: 0,
+    libri_richiesti:0,
+    libri_ricercati: [],
+    recensioni: []
+})
 // Gestione Files
 const lista_files = ref([]) // array contente la lista di files caricati (componente upload)
 const file = ref(null) // file da inviare
@@ -189,6 +204,20 @@ const avatar_src = computed(() => {
 async function inizializzaPagina() {
     pulisciStatoFile() //resetta variabili upload
     await caricaDatiUtente()//carica info utente
+    try {
+        // Eseguo in parallelo il recupero dell'utente e i report
+        if (utente.value) {
+            await Promise.all([
+                getStatisticheLibriUtente(),
+                getStatisticheCondivisioniUtente(),
+                getStatisticheValutazioniUtente()
+            ])
+            console.log("VALORI", dati_report.value)
+        }
+    } catch (err) {
+        message.error("Errore inizializzazione Dati")
+        console.error("Errore inizializzazione:", ErrorCodes)
+    }     
 }
 
 //caricamento dati dell'utente
@@ -196,8 +225,8 @@ async function caricaDatiUtente() {
     utente.value = null
     // logica per admin che modifica altro utente
     if (is_admin_modifica.value) {
-        const res = await utenti_store.getUtenteByID(utente_da_modificare_id.value)
-        utente.value = res.utente
+        const utente_by_id = await utenti_store.getUtenteByID(utente_da_modificare_id.value)
+        utente.value = utente_by_id.utente
     } else {
         // logica per utente che modifica il profilo personale
         if (!utenti_store.utente) {
@@ -216,6 +245,42 @@ async function caricaDatiUtente() {
         }
     }
     //console.log("Immagine", form_data.value.avatar)
+
+}
+
+async function getStatisticheLibriUtente() {
+    await libri_store.getMieiLibri()
+    const libri = libri_store.miei_libri
+    if (libri && libri.length > 0) {
+      //[...] per non mutare l'array originale
+      const ordinati = [...libri].sort((a, b) => b.visualizzazioni - a.visualizzazioni)
+      const piu_visualizzato = ordinati[0]
+      const meno_visualizzato = ordinati[ordinati.length - 1]
+      dati_report.value.libri_ricercati = [piu_visualizzato, meno_visualizzato]
+    }
+}
+
+  async function getStatisticheCondivisioniUtente() {
+    await condivisioni_store.getMieCondivisioni()
+    const condivisioni_p = condivisioni_store.mie_condivisioni_proprietario
+    if (condivisioni_p && condivisioni_p.length > 0) {
+        dati_report.value.libri_condivisi = condivisioni_p.length
+    }
+    const condivisioni_r = condivisioni_store.mie_condivisioni_richiedente
+    if (condivisioni_r && condivisioni_r.length > 0) {
+        dati_report.value.libri_richiesti = condivisioni_r.length
+  }
+}
+
+  async function getStatisticheValutazioniUtente() {
+    await Promise.all([
+        valutazioni_store.getMieValutazioni(),
+        valutazioni_store.getRankingUtenteByID(utente.value.id)
+        ])
+    const voto = valutazioni_store.ranking_utente_selezionato
+    const ultime_valutazioni = [...valutazioni_store.mie_alutazioni_ricevute].sort((a, b) => new Date(b.data_creazione) - new Date(a.data_creazione)).slice(0, 5)
+    dati_report.value.media_voto = parseFloat(voto.media_voto)
+    dati_report.value.recensioni = ultime_valutazioni
 
 }
 
@@ -357,36 +422,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>    
-/* Unione degli stili di Profilo.vue e UtenteScheda.vue */
-.profilo_card {
-    max-width: clamp(18.75rem, 90vw, 38rem);/* Larghezza fluida: non supera i 500px ma occupa il 95% su schermi piccoli */
-    margin: 3rem auto;  /* Centratura orizzontalmente e distanzia verticalmente con margini in rem */
-    padding: clamp(0.5rem, 3vw, 2rem);
-    /* Utilizzo variabili globali */
-    background-color: var(--pearl-white-bg);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-}
-
-.n-button {
-    min-width: 7rem; /* assicura che il bottone non sia troppo stretto */
-}
-
-/*centratura titolo della card */
-:deep(.n-card > .n-card-header) {
-    text-align: center; 
-}
-
-.avatar_container {
-    text-align: center; /* centra gli elementi interni (img e bottone) */
-    width: 100%; /* occupa tutta la larghezza disponibile */
-}
-
-.avatar_img {
-    width: 9.375rem; /* larghezza fissa dell'immagine */
-    height: 9.375rem; /* altezza fissa dell'immagine */
-    margin-bottom: 0.625rem; /* spazio sotto l'immagine prima del bottone */
-}
 
 .testo_evidenziato {
     color: #7fb9db;
@@ -397,48 +432,11 @@ onBeforeUnmount(() => {
     margin-top: 2rem; /* spazio sopra le tab per separarle dall'intestazione */
 }
 
-/* centra il contenuto del form item avatar */
-:deep(.n-form-item.avatar .n-form-item-blank) {
-    flex-direction: column; /* immagine e bottone in colonna */
-    justify-content: center; /* centra verticalmente, asse principale è verticale */
-    gap: 1rem;
+@media (max-width: 500px) {
+  .modale_conferma_eliminazione {
+      display: flex!important;
+      justify-content: flex-end!important;
+  }
 }
 
-.pulsanti_azione {
-    width: 100%; /* occupa tutta la larghezza disponibile */
-    display: flex; /* attivo flexbox per gestire i bottoni interni */
-    justify-content: center; /*Pulsanti al centro*/
-    gap: 0.85rem; /* spazio tra un bottone e l'altro (potrebbero essercene 2 in caso eliminazione utente) */
-}
-
-
-/* Ottimizzazione per mobile (tablet e smartphone) */
-@media (max-width: 768px) {
-    .profilo_card {
-        width: 100% !important;
-        margin: 1rem auto;  /* Centratura con margini in rem */
-    }
-
-    /* input più grandi per il touch */
-    :deep(.n-input) {
-        min-height: 2.5rem;/* rende la casella di testo piu alta per il touch */
-        font-size: small;/* riduce leggermente la dimensione del font */
-    }
-
-    .pulsanti_azione {
-        flex-direction: column;/* bottoni uno sopra l'altro su mobile */
-        align-items: stretch; /* allarga i bottoni a tutta la larghezza */
-        gap: 1rem; /* aumenta lo spazio tra i bottoni */
-        padding-bottom: 2rem; /* spazio in fondo alla pagina */ 
-    }
-
-    :deep(.n-card__content) {
-        padding: 0; /* azzero il padding della card in modo da predere piu spazio laterale possibile */
-    }
-
-    .n-button {
-        font-size: 1.2rem; /* dimensione testo e altezza bottone aumentati per migliorare esperienza con touch */
-        height: 2.3rem;
-    }    
-}
 </style>

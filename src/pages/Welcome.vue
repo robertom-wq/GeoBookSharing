@@ -114,14 +114,6 @@ const utenti_store = useUtentiStore()
     font-weight: 900;    /* grasseto molto evidente */
 }
 
-/* Contenitore dei pulsanti*/
-.pulsanti_azione {
-    padding-top: 2rem; /*distanzia i bottoni dal testo */
-    display: flex; /* layout Flexbox  */
-    gap: 1.5rem !important; /* Spazio piu largo tra i bottoni per agevolare click */
-    justify-content: center; /* Centratura bottoni nel contenitore */
-}
-
 .n-button{
     min-width: 10rem;
 }
@@ -169,20 +161,9 @@ const utenti_store = useUtentiStore()
 
 /* Ottimizzazione per mobile (tablet e smartphone) */
 @media (max-width: 768px) {
-    .pulsanti_azione {
-        flex-direction: column; /* bottoni uno sopra l'altro */        
-        align-items: stretch; /* i bottoni occupano tutta la larghezza */
-    }
-
-    .n-button {
-        font-size: 1.2rem; /* dimensione testo e altezza bottone aumentati per migliorare esperienza con touch */
-        height: 2.3rem;
-    }
-
     .schermata_iniziale .contenuto_principale {
        margin: 2rem 0 0 0; 
     }
-
     .contenitore_funzionalita {
         margin: 1.5rem 1rem;
         gap: 1.5rem;

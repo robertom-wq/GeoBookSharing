@@ -98,7 +98,7 @@ const links = computed(() => {
         
     //aggiunge link solo se admin
     if (utenti_store.utente.ruolo === 'admin') {
-        menu_loggato.push({ label: 'Supervisore', to: '/' })
+        menu_loggato.push({ label: 'Supervisore', to: '/supervisione' })
     }
 
     //inserimento dinamico di logout in fondo al menu
@@ -219,6 +219,13 @@ async function gestioneLink(path) {
     color: var(--text-color-light);
 }
 
+.n-space {
+    justify-content: flex-end !important;
+}
+
+.n-button {
+    min-width: 2rem;
+}
 /* Ottimizzazione per mobile (tablet e smartphone) */
 @media (max-width: 768px) {
 

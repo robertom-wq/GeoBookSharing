@@ -437,11 +437,6 @@ defineExpose({
         padding-left: 0.5rem;
     }
 
-    .ricerca_indirizzo :deep(.n-input),
-    .ricerca_indirizzo :deep(.n-button) {
-        width: 100% !important;
-    }
-
     .mappa_container {
         height: 50vh!important;
     }

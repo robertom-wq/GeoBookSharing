@@ -215,20 +215,6 @@ onMounted(async ()=>{
 
 <style scoped>
 
-/* Contenitore del modulo */
-.contenuto_modulo {
-    margin-top: 2rem;
-}
-
-/*scheda di richiesta*/
-.scheda_richiesta {
-    max-width: clamp(18.75rem, 90vw, 38rem); 
-    margin: 3rem auto;
-    padding: clamp(0.5rem, 3vw, 2rem);
-    background-color: var(--pearl-white-bg);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-}
 
 /*spaziature avvisi */
 .avviso_disponibilita {
@@ -243,13 +229,6 @@ onMounted(async ()=>{
     width: 100%; /*estensione larghezza del selettore date */
 }
 
-/* centratura e spaziatura pulsanti */
-:deep(.n-space) {
-    width: 100%;
-    display: flex;
-    justify-content: center !important; 
-    gap: 0.85rem !important;
-}
 .n-button {
     min-width: 8rem;
 }
@@ -259,38 +238,5 @@ onMounted(async ()=>{
     flex-direction: column!important;
 }
 
-/* Ottimizzazione per mobile (tablet e smartphone) */
-@media (max-width: 768px) {
-    
-    .scheda_richiesta {
-        width: 100% !important;
-        margin: 1rem auto;
-    }
-    /* input più grandi per il touch */
-    :deep(.n-input) {
-        min-height: 2.5rem;
-        font-size: small;
-    }
 
-    /* orientamento verticale pulsanti su mobile */
-    :deep(.n-space) {
-        flex-direction: column !important;
-        align-items: stretch;
-        gap: 1rem !important;
-        padding-bottom: 2rem;
-    }
-
-    :deep(.n-button) {
-        width: 100% !important;
-        height: 2.3rem;
-        font-size: 1.2rem;
-    }
-
-    :deep(.n-card__content) {
-        padding: 0;
-    }
-
-
-
-}
 </style>

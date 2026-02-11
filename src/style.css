@@ -51,8 +51,107 @@ body {
   opacity: 0.9;
 }
 
+/*Schede principali con moduli*/
+.scheda_richiesta, .scheda_registrazione, .profilo_card, .scheda_login, .scheda_libro, .libro_card {
+    max-width: clamp(18.75rem, 90vw, 38rem); 
+    margin: 3rem auto;
+    padding: clamp(0.5rem, 3vw, 2rem);
+    background-color: var(--pearl-white-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+/* Contenitore dei pulsanti*/
+.pulsanti_azione {
+    padding-top: 2rem; /*distanzia i bottoni dal testo */
+    width: 100%;
+    display: flex; /* layout Flexbox  */
+    gap: 1.5rem !important; /* Spazio piu largo tra i bottoni per agevolare click */
+    justify-content: center; /* Centratura bottoni nel contenitore */
+}
+
+.contenuto_modulo {
+    margin-top: 2rem;
+}
+
+/*centratura titolo della card */
+.n-card > .n-card-header {
+    text-align: center; 
+}
+
+.n-button {
+    min-width: 7rem;
+}
+
+/* dimensioni fisse per l'immagine anteprima */
+.avatar_copertina_img {
+    width: 9.375rem !important;
+    height: 9.375rem !important;
+    margin-bottom: 0.625rem;
+}
+
+/* allineamento copertina e gestione spazi interni */
+.avatar_copertina_container {
+    text-align: center;
+    width: 100%;
+}
+
+/* disposizione verticale elementi caricamento copertina */
+.sezione_copertina_avatar .n-form-item-blank {
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.n-button {
+    min-width: 7rem;
+}
+
+/* centratura e spaziatura pulsanti */
+.n-space {
+    width: 100%;
+    justify-content: center !important; 
+    gap: 0.85rem !important;
+}
+
+.n-upload {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
 
 /* Ottimizzazione per mobile (tablet e smartphone) */
 @media (max-width: 748px) {
+  .scheda_richiesta, .scheda_registrazione, .profilo_card, .scheda_login, .scheda_libro, .libro_card {
+        width: 100% !important;
+        margin: 1rem auto;
+    }
+      /* pila verticale dei pulsanti su mobile */
+    .n-space, .pulsanti_azione {
+        flex-direction: column !important;
+        align-items: stretch;
+        gap: 1rem !important;
+        padding-bottom: 2rem;
+    }
 
+    /*bottoni più grandi per il touch */
+    .n-button {
+        width: 100% !important;
+        height: 2.3rem;
+        font-size: 1.2rem;
+    }
+
+    /* input più grandi per il touch */
+    .n-input {
+        min-height: 2.5rem;
+        font-size: small;
+    }
+    
+    /* azzeramento padding per recuperare spazio */
+    .n-card__content {
+        padding: 0!important;
+    }
+    .contenuto_modulo  {
+        padding: 0 0rem;/* rimuovo il padding laterale per aumentare spazio disponibile*/
+    }
 }

@@ -325,12 +325,6 @@ onMounted(()=>{
         max-width: 100%; /* Occupano tutta la larghezza */
     }
 
-    :deep(.n-button) {
-        width: 100% !important;
-        height: 2.3rem;
-        font-size: 1.2rem;
-    }
-
     #scheda_mappa_ricerca {
         height: 28rem; /* Altezza fissa aumentata per l'uso touch della mappa */
     }
