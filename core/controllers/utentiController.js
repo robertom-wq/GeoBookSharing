@@ -186,7 +186,7 @@ export const getProfilo = async (req, res) => {
         }
         console.log(utente)
 
-        return res.status(200).json({message: 'Profilo recuperato con successo', utente: utente})
+        return res.status(200).json({message: 'Profilo recuperato con successo', data: utente})
 
     } catch (err) {
         logger.error('['+ req.ip +'] Errore getProfilo -> : Errore generico ',err)
@@ -337,7 +337,7 @@ export const softDeleteUtente = async (req, res) => {
                 data_richiesta_eliminazione: true
             }
         })
-        return res.status(200).json({ message: "Richiesta di eliminazione inviata con successo", utente })
+        return res.status(200).json({ message: "Richiesta di eliminazione inviata con successo", data: utente })
     } catch (err) {
         logger.error('['+ req.ip +'] Errore softDelete -> : Errore generico ',err)
         console.error('Errore "softDelete":', err)

@@ -9,15 +9,19 @@ import uploadImgERidimensiona from "../middleware/uploadImgERidimensiona.js";
 const utentiRouter = express.Router()
 
 
-utentiRouter.get("/all", auth, getAllUtenti)
+utentiRouter.get("/", auth, getAllUtenti)
 
-utentiRouter.patch("/richiestaCancellazione", auth, csrf_protection, valida_dati(richiestaEliminazioneSchema), softDeleteUtente)
+utentiRouter.delete("/me", auth, csrf_protection, valida_dati(richiestaEliminazioneSchema), softDeleteUtente)
 
-utentiRouter.get("/profilo{/:id}", auth, getProfilo)
+utentiRouter.patch("/me", auth, csrf_protection, uploadImgERidimensiona, valida_dati(updateUtenteSchema), updateUtente)
 
-utentiRouter.patch("/profilo{/:id}", auth, csrf_protection, uploadImgERidimensiona, valida_dati(updateUtenteSchema), updateUtente)
+utentiRouter.get("/me", auth, getProfilo)
 
-utentiRouter.delete("/profilo{/:id}", auth, csrf_protection, deleteUtente)
+utentiRouter.get("/:id", auth, getProfilo)
+
+utentiRouter.patch("/:id", auth, csrf_protection, uploadImgERidimensiona, valida_dati(updateUtenteSchema), updateUtente)
+
+utentiRouter.delete("/:id", auth, csrf_protection, deleteUtente)
 
 
 

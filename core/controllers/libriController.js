@@ -61,7 +61,7 @@ export const createLibro = async (req, res) => {
             }
         })
 
-        return res.status(201).json({message: `Libro ${libro.titolo}, creato con successo`, libro: libro})
+        return res.status(201).json({message: `Libro ${libro.titolo}, creato con successo`, data: libro})
         
     } catch (err) {
         logger.error("["+ req.ip +"] Errore createLibro -> : Errore generico", err)
@@ -117,7 +117,7 @@ export const getMieiLibri = async (req, res) => {
             elementiPerPagina: limit,
             conteggioTotale: conteggioTotale,
             pagineTotali: Math.ceil(conteggioTotale / limit),
-            libri: libri})
+            data: libri})
 
     } catch (err) {
         logger.error("["+ req.ip +"] Errore getMieiLibri -> : Errore generico",err)
@@ -155,14 +155,13 @@ export const getLibroById = async (req, res) => {
         })
         libro.visualizzazioni = libroVisualizzazioneUpdated.visualizzazioni
         }
-        return res.status(200).json({message: `Libro id:${targetId} trovato`, libro: libro})
+        return res.status(200).json({message: `Libro id:${targetId} trovato`, data: libro})
     } catch (err) {
         logger.error("["+ req.ip +"] Errore getLibroById -> : Errore generico", err)
         console.error('Errore "getLibroById":', err)
         return res.status(500).json({ error: `Errore server - Impossibile recuperare libro con id ${targetId}`})        
     }
 }
-
 
 
 //Ricerca libri con query di ricerca autore, titolo o genere
@@ -224,7 +223,7 @@ export const getAllLibri = async (req, res) => {
             elementiPerPagina: limit,
             conteggioTotale: conteggioTotale,
             pagineTotali: Math.ceil(conteggioTotale / limit),
-            libri: libri
+            data: libri
         })
 
     } catch (err) {
@@ -235,62 +234,6 @@ export const getAllLibri = async (req, res) => {
     
 }
 
-
-//Ricerca tutti libri disponibili (da eliminare)
-export const getAllDisponibili = async (req, res) => {
-    // utilizzo la paginazione, il risultato potrebbe contenere parecchi elementi
-    // vedo se nella req esiste una query con pagina e limit
-    const queryPagina = req.query.pagina
-    const queryLimit = req.query.limit
-    // se pagina e/o limit sono  undefined imposto la prima di default 
-    let pagina = parseInt(queryPagina) || 1
-    const limit = parseInt(queryLimit) || 10
-    // intercetto valori inferiori a 1
-    if (pagina < 1) {
-        pagina = 1
-    }
-    if (limit < 1) {
-        limit = 10
-    }
-
-    const skipElementi = (pagina - 1) * limit
-
-    try {
-        // utilizzo transaction che permette di eseguire più operazioni sul database in un unico blocco
-        // invia entrambe le query al database in un unico blocco
-        const [libri, conteggioTotale] = await prisma.$transaction([
-            prisma.libri.findMany({
-                        where: {is_disponibile: true},
-                        include: {
-                            proprietario: {select: {id: true, username: true}},
-                            scaffale: {select: {id: true, nome: true}},
-                            tipo_condivisione:{select: {dettagli: true}} 
-                        },
-                        orderBy: { titolo: 'asc'},
-                        take: limit,
-                        skip: skipElementi
-                }),
-            prisma.libri.count({ // Query per il conteggio
-                where: { is_disponibile: true }
-            })
-        ])
-
-    return res.status(200).json({
-        message: 'Libri trovati',
-        paginaCorrente: pagina,
-        elementiPerPagina: limit,
-        conteggioTotale: conteggioTotale,
-        pagineTotali: Math.ceil(conteggioTotale / limit),
-        libri: libri})
-
-    } catch (err) {
-        logger.error("["+ req.ip +"] Errore getAllDisponibili -> : Errore generico",err)
-        console.error('Errore "getAllDisponibili":', err)
-        return res.status(500).json({ error: `Errore server - Impossibile recuperare libri disponibili`})            
-    }
-}
-
-
 //Restituisce tutti i tipi di condivisione censiti nel DB
 export const getAllTipiCondivisione = async (req, res) => {
         try {
@@ -299,7 +242,7 @@ export const getAllTipiCondivisione = async (req, res) => {
         })
         return res.status(200).json({
             message: 'Tipi di condivisione trovati',
-            tipiCondivisione: tipiCondivisione
+            data: tipiCondivisione
         })
     } catch(err) {
         logger.error("["+ req.ip +"] Errore getAllTipiCondivisione -> : Errore generico",err)
@@ -317,7 +260,7 @@ export const getAllGeneriLetterari = async (req, res) => {
         })
         return res.status(200).json({
             message: 'Generi letterari trovati',
-            generiLetterari: generiLetterari
+            data: generiLetterari
         })
     } catch(err) {
         logger.error("["+ req.ip +"] Errore getAllLibri -> : Errore generico", err)
@@ -400,7 +343,7 @@ export const updateLibro = async (req, res) => {
             })   
         }
         logger.info("["+ req.ip +"] L'utente id:" + mioId + " ha aggiornato il profilo id:" + targetId)
-        return res.status(200).json({message:`Libro id:${targetId} aggiornato: `, libro: libroAggiornato})
+        return res.status(200).json({message:`Libro id:${targetId} aggiornato: `, data: libroAggiornato})
 
     } catch (err) {
         logger.error(`[${req.ip}] Errore updateLibro -> : Errore generico: ${err}`)
@@ -529,7 +472,7 @@ export const createLibroFromMaster = async (req, res) => {
                 is_disponibile: true
             }
         })
-        return res.status(201).json({ message: 'Libro aggiunto alla tua libreria', libro: nuovo_libro})
+        return res.status(201).json({ message: 'Libro aggiunto alla tua libreria', data: nuovo_libro})
     } catch (err) {
         logger.error("["+ req.ip +"] Errore createLibroFromMaster -> : Errore generico",err)
         console.error('Errore "createLibroFromMaster":', err)
@@ -662,7 +605,7 @@ export const getLibriVicini = async (req, res) => {
             limite_ricerca: limit_num,
             trovati: libri_vicini.length,
             parametri: { lat: lat_num, lng: lng_num, dist: dist_num, q: q || null},
-            libri: libri_vicini
+            data: libri_vicini
         })
         } catch (err) {
             logger.error("["+ req.ip +"] Errore getLibriVicini -> : Errore generico", err)

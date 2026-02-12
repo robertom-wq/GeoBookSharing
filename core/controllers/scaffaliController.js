@@ -37,7 +37,7 @@ export const createScaffale = async (req, res) => {
                 id, nome, descrizione, COALESCE(ST_AsText(posizione), 'Nessuna Posizione') AS posizione, data_creazione, data_ultima_modifica
         `
 
-        return res.status(201).json({ message: "Scaffale creato con successo", scaffale })
+        return res.status(201).json({ message: "Scaffale creato con successo", data: scaffale })
     } catch (err) {
         logger.error('['+ req.ip +'] Errore createScaffale -> : Errore generico ',err)
         console.error('Errore "createScaffale":', err)
@@ -177,7 +177,7 @@ export const getMieiScaffali = async (req, res) => {
             libri: (s.libri_array || []).filter(book => book != null)
         }))
 
-        res.status(200).json({scaffali: scaffali_da_restituire})
+        res.status(200).json({data: scaffali_da_restituire})
 
     } catch (err) {
         logger.error('['+ req.ip +'] Errore getMieiScaffali -> : Errore generico ', err)
@@ -250,223 +250,6 @@ export const deleteScaffale = async (req, res) => {
         res.status(500).json({ error: "Errore server - Impossibile eliminare lo scaffale" })
     }
 }
-
-
-//Ricerca di scaffali vicini ad una posizione in base ad una distanza
-export const getScaffaliVicini = async (req, res) => {
-    const { lat, lng, dist = 5000, q = '' } = req.query
-
-    const mioId = req.userId
-    const lat_num = parseFloat(lat)
-    const lng_num = parseFloat(lng)
-    const dist_num = parseFloat(dist)
-    // Preparazione della stringa di ricerca, trasformandola in minuscolo e aggiungendo i wildcards di PostgreSQL
-    const termine_ricercato = `%${q.toLowerCase()}%`
-
-    //controllo che tutti i parametri di posizione siano numerici
-    if (isNaN(lat_num) || isNaN(lng_num) || isNaN(dist_num)) {
-        return res.status(400).json({ error: "Parametri non validi" })
-    }
-
-    try {
-        const scaffali = await prisma.$queryRaw`
-            SELECT
-            s.id,
-            s.nome,
-            s.descrizione,
-            COALESCE(ST_AsText(s.posizione), 'Nessuna Posizione') AS posizione,
-            s.data_creazione,
-            s.data_ultima_modifica,
-            u.username AS proprietario_username,
-            u.avatar || u.avatar_thumb AS proprietario_avatar,
-            -- calcolo della distanza tra due punti di tipo geography,permette a PostGIS di calcolare la 
-            -- distanza sulla superficie curva della Terra (metodo del grande cerchio), restituendo il risultato in metri.
-            ST_Distance(
-                s.posizione::geography,
-                --crea il punto di riferimento (la posizione dell'utente che esegue la ricerca) e gli assegna il sistema di coordinate
-                ST_SetSRID(ST_MakePoint(${lng_num}, ${lat_num}), 4326)::geography
-            ) AS distanza_metri,
-            COALESCE (
-                json_agg( --prende tutti gli oggetti JSON creati e li unisce in un unico array
-                    CASE
-                        WHEN l.is_disponibile = true THEN 
-                            json_build_object( --Creo un oggetto JSON per ogni libro con chiavi specifiche id, titolo, ecc.
-                                'id', l.id,
-                                'titolo', l.titolo,
-                                'anno', l.anno,
-                                'genere', json_build_object(
-                                'dettagli', g.dettagli
-                                )
-                            )
-                        ELSE NULL 
-                    END 
-                ) FILTER (WHERE l.id IS NOT NULL), '[]' 
-            ) AS libri
-            FROM scaffali s
-            LEFT JOIN utenti u ON u.id = s.proprietario_id
-            LEFT JOIN libri l ON l.scaffale_id = s.id AND l.is_disponibile
-            LEFT JOIN generi g ON g.id = l.genere_id
-            WHERE
-                s.posizione IS NOT NULL
-                AND s.proprietario_id != ${mioId} -- esclusione degli scaffali dell'utente loggato 
-                --DWithin è la condizione di filtro principale. Restituisce solo gli scaffali la cui posizione
-                --si trova entro la distanza specificata da $dist_num (in metri).
-                AND ST_DWithin(
-                    s.posizione::geography,
-                    ST_SetSRID(ST_MakePoint(${lng_num}, ${lat_num}), 4326)::geography,
-                    ${dist_num}
-                )
-            GROUP BY s.id, u.username, u.avatar, u.avatar_thumb
-            ORDER BY distanza_metri ASC
-            LIMIT 20          
-        `
-
-        // costruisco la response
-        const result = scaffali.map(s => ({
-            id: s.id,
-            nom: s.nome,
-            descrizione: s.descrizione || null,
-            posizione: s.posizione,
-            proprietario: {
-                username: s.proprietario_username,
-                avatar: s.proprietario_avatar
-            },
-            distanza_metri: Number(s.distanza_metri),
-            distanza_km: (s.distanza_metri / 1000).toFixed(2),
-            libri: s.libri.filter(book => book !== null)
-        }))
-
-        res.status(200).json({
-            message: `Scaffali vicini trovati`,
-            trovati: result.length,
-            scaffali: result
-        })
-
-    } catch (err) {
-        logger.error('['+ req.ip +'] Errore getScaffaliVicini -> : Errore generico ', err)
-        console.error('Errore "getScaffaliVicini":', err)
-        res.status(500).json({ error: "Errore server - Impossibile completare la ricerca di scaffali vicini" })
-    }
-
-}
-
-
-//ricerca di scaffali (non del proprietario) tramite parametri (username proprietario, nome scaffale, libro)
-export const getAllScaffaliConLibri = async (req, res) => {
-    // estrae solo il parametro di ricerca 'q'
-    const { q = '' } = req.query
-
-    const mioId = req.userId
-
-    const is_q_popolato = q.trim().length > 0
-
-    const termine_ricercato = `%${q.toLowerCase()}%`
-
-    // costruisco la clausola WHERE in modo dinamico
-    let condizioni = []
-    // escludo utente loggato
-    condizioni.push(Prisma.sql`s.proprietario_id != ${mioId}`)
-
-    if (is_q_popolato) {
-        // Aggiunge i filtri testuali se 'q' è presente
-        condizioni.push(Prisma.sql`
-            LOWER(s.nome) LIKE ${termine_ricercato}
-            OR LOWER(s.descrizione) LIKE ${termine_ricercato}
-            OR LOWER(u.username) LIKE ${termine_ricercato}
-            -- Controlla solo l'esistenza e passa true/false
-            OR EXISTS (
-            --SELECT 1 per dire al database di preoccuparsi solo dell'esistenza di una riga
-                SELECT 1 FROM libri l2
-                WHERE l2.scaffale_id = s.id
-                AND LOWER(l2.titolo) LIKE ${termine_ricercato}
-            )
-        `)
-    }
-
-    let whereCondizione = {}
-
-    if (condizioni.length > 0) {
-        // Unisco le condizioni con una stringa ' AND ' 
-        const joinedConditions = Prisma.join(condizioni, ' AND ')
-
-        // Racchiudo il tutto nel template literal WHERE per l'interpolazione finale
-        whereCondizione = Prisma.sql`WHERE ${joinedConditions}`
-    } else {
-        whereCondizione = Prisma.sql`` // Se non ci sono condizioni
-    }
-
-    try {
-        const scaffali = await prisma.$queryRaw`
-            SELECT
-                s.id,
-                s.nome,
-                s.descrizione,
-                COALESCE(ST_AsText(s.posizione), 'Nessuna Posizione') AS posizione,
-                s.data_creazione,
-                s.data_ultima_modifica,
-                u.username AS proprietario_username,
-                u.avatar || u.avatar_thumb AS proprietario_avatar,
-               
-                COALESCE (
-                    json_agg(
-                        CASE
-                            WHEN l.is_disponibile = true THEN 
-                                json_build_object(
-                                    'id', l.id,
-                                    'titolo', l.titolo,
-                                    'anno', l.anno,
-                                    'genere', json_build_object(
-                                        'dettagli', g.dettagli
-                                    )
-                                )
-                            ELSE NULL 
-                        END 
-                    ) FILTER (WHERE l.id IS NOT NULL), '[]' 
-                ) AS libri
-            FROM scaffali s
-            LEFT JOIN utenti u ON u.id = s.proprietario_id
-            LEFT JOIN libri l ON l.scaffale_id = s.id AND l.is_disponibile
-            LEFT JOIN generi g ON g.id = l.genere_id
-            
-            -- Inserisco la clausola WHERE costruita
-            ${whereCondizione} 
-            
-            GROUP BY s.id, u.username, u.avatar, u.avatar_thumb
-            
-            -- Ordinamento per data di creazione, non per distanza
-            ORDER BY s.data_creazione DESC
-            
-            LIMIT 20
-        `
-
-        // costruisco la response
-        const result = scaffali.map(s => ({
-            id: s.id,
-            nome: s.nome,
-            descrizione: s.descrizione || null,
-            posizione: s.posizione,
-            proprietario: {
-                username: s.proprietario_username,
-                avatar: s.proprietario_avatar
-            },
-            libri: s.libri.filter(book => book !== null)
-        }))
-
-        const messaggio = is_q_popolato ? `corrispondenti a "${q}"` : 'trovati nel database'
-
-        res.status(200).json({
-            message: `Scaffali ${messaggio}`,
-            trovati: result.length,
-            scaffali: result
-        })
-
-    } catch (err) {
-        logger.error('['+ req.ip +'] Errore getAllScaffaliConLibri -> : Errore generico ', err)
-        console.error('Errore "getAllScaffaliConLibri":', err)
-        res.status(500).json({ error: "Errore server - Impossibile completare la ricerca." })
-    }
-}
-
 
 //restituisce scaffale tramite id
 export const getScaffaleById = async (req, res) => {
@@ -548,7 +331,7 @@ export const getScaffaleById = async (req, res) => {
             libri: scaffale.libri.filter(libro => libro != null)
         }
 
-        return res.status(200).json({message: 'Scaffale recuperato con successo', scaffale: scaffale_da_restiturie})
+        return res.status(200).json({message: 'Scaffale recuperato con successo', data: scaffale_da_restiturie})
     } catch (err) {
         logger.error('['+ req.ip +'] Errore getScaffaleById -> : Errore generico ',err)
         console.error('Errore getScaffaleById', err)

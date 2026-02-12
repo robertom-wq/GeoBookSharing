@@ -106,7 +106,7 @@ export const getVotazioneMediaUtente = async (req, res) => {
                 utente_valutato: targetId,
                 media_voto: voto_medio ? parseFloat(voto_medio).toFixed(2) : 0,
                 totale_voti: totale_voti,
-                valutazioni_recenti: valutazioni_recenti
+                data: valutazioni_recenti
             }
         })
 

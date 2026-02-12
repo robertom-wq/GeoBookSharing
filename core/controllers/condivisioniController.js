@@ -7,7 +7,6 @@ import logger from "../config/logging.js"
 export const creaRichiestaCondivisione = async (req, res) => {
     const richiedenteId = req.userId
     const dati_validati = { ...req.dati_validati }
-    const today = new Date()
 
     // verifico che il libro esista e sia disponibile
     const libro_ricercato = await prisma.libri.findUnique({
@@ -90,7 +89,7 @@ export const creaRichiestaCondivisione = async (req, res) => {
         return res.status(500).json({ error: "Errore server - Impossibile processare la richiesta di condivisione" })
     }
 
-    return res.status(200).json({ message: `Richiesta inviata con successo`, condivisione: nuovaCondivisione })
+    return res.status(200).json({ message: `Richiesta inviata con successo`, data: nuovaCondivisione })
 }
 
 
@@ -252,7 +251,7 @@ export const deleteCondivisione = async (req, res) => {
             })
         })
 
-        return res.status(200).json({message: `La condivisione con id:${targetId} è stata eliminata`, motivo: motivo || null})
+        return res.status(200).json({message: `La condivisione con id:${targetId} è stata eliminata`, data: motivo || null})
 
     } catch (err) {
         logger.error("["+ req.ip +"] Errore deleteCondivisione -> : Errore generico", err)

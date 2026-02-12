@@ -16,7 +16,6 @@ import { generateCsrfToken, CSRF_COOKIE_OPTIONS } from "../middleware/csrf.js"
 
 import prisma from '../config/prisma.js'
 import logger from '../config/logging.js'
-import { error } from 'console'
 
 
 //SETUP INIZIALE JWT E COOKIES
@@ -100,7 +99,7 @@ export const registrazione = async (req, res) => {
         logger.info("["+ req.ip +"] Tentativo di registrazione -> " + utente.username + ": Effettuato con successo")
         res.status(201).json({ 
             message: "Registrazione completata con successo",
-            utente,
+            data: utente,
             csrf_token: csrf_token_value
         })
 
@@ -151,7 +150,7 @@ export const login = async (req, res) => {
         // Risponsta positiva alla richiesta
         return res.status(200).json({
             message: "Login Effettuato",
-            utente:
+            data:
              {
                 id: utente.id,
                 username: utente.username,

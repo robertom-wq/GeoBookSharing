@@ -9,16 +9,17 @@ import uploadImgERidimensiona from "../middleware/uploadImgERidimensiona.js"
 const libriMasterRouter = express.Router()
 
 
-libriMasterRouter.post('/nuovoFromISBN', auth, csrf_protection, addLibroMasterFromISBN)
 
-libriMasterRouter.post('/nuovo', auth, csrf_protection, uploadImgERidimensiona, valida_dati(createLibroMasterSchema), createLibroMaster)
+libriMasterRouter.post('/', auth, csrf_protection, uploadImgERidimensiona, valida_dati(createLibroMasterSchema), createLibroMaster)
 
-libriMasterRouter.get('/all', auth, getAllLibriMaster)
+libriMasterRouter.get('/', auth, getAllLibriMaster)
 
-libriMasterRouter.get('/libro/:id', auth, getLibroMasterById)
+libriMasterRouter.post('/isbn', auth, csrf_protection, addLibroMasterFromISBN)
 
-libriMasterRouter.delete('/libro/:id', auth, csrf_protection, deleteLibroMaster)
+libriMasterRouter.get('/:id', auth, getLibroMasterById)
 
-libriMasterRouter.patch('/libro/:id', auth, csrf_protection, uploadImgERidimensiona,valida_dati(updateLibroMasterSchema), updateLibroMaster)
+libriMasterRouter.delete('/:id', auth, csrf_protection, deleteLibroMaster)
+
+libriMasterRouter.patch('/:id', auth, csrf_protection, uploadImgERidimensiona,valida_dati(updateLibroMasterSchema), updateLibroMaster)
 
 export default libriMasterRouter

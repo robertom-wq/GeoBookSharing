@@ -8,11 +8,12 @@ import valida_dati from "../middleware/validate.js";
 const valutazioniRouter = express.Router()
 
 
-valutazioniRouter.post('/nuova', auth, csrf_protection, valida_dati(createValutazioneSchema), creaValutazione)
+valutazioniRouter.post('/', auth, csrf_protection, valida_dati(createValutazioneSchema), creaValutazione)
 
-valutazioniRouter.get('/valutazioniRecenti/:id', auth, getVotazioneMediaUtente)
+valutazioniRouter.get('/', auth, getAllValutazioni)
 
-valutazioniRouter.get('/mieValutazioni', auth, getAllValutazioni)
+valutazioniRouter.get('/recenti/:id', auth, getVotazioneMediaUtente)
+
 
 
 
