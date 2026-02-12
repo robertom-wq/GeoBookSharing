@@ -17,8 +17,8 @@ export const useCondivisioniStore = defineStore('condivisioni', () => {
             // eseguo contemporaneamente le due richieste per le condivisioni da richiedente e da proprietario
             //è prevista paginazione ma per ora imposto solo il limit a 100 risultati per pagina
             const [c_richiedente, c_proprietario] = await Promise.all([
-                chiamaAPI('/condivisioni/getMieCondivisioni?ruolo=richiedente&limit=100'),
-                chiamaAPI('/condivisioni/getMieCondivisioni?ruolo=proprietario&limit=100')
+                chiamaAPI('/condivisioni?ruolo=richiedente&limit=100'),
+                chiamaAPI('/condivisioni?ruolo=proprietario&limit=100')
             ])
             mie_condivisioni_richiedente.value = c_richiedente.data || []
             mie_condivisioni_proprietario.value = c_proprietario.data || []
@@ -35,16 +35,18 @@ export const useCondivisioniStore = defineStore('condivisioni', () => {
     }
 
     //invio di una nuova richiesta di condivisione
-    async function createRichiestaCondivisione(data) {
+    async function createRichiestaCondivisione(dati_condivisione) {
         loading.value = true
 
         try {
-            const nuova_richiesta = await chiamaAPI('/condivisioni/nuova', {
+            const nuova_richiesta = await chiamaAPI('/condivisioni', {
                 method: 'POST',
-                body: data
+                body: dati_condivisione
             })
 
-            mie_condivisioni_richiedente.value.push(nuova_richiesta.data)
+            if (nuova_richiesta && nuova_richiesta.data) {
+                mie_condivisioni_richiedente.value.push(nuova_richiesta.data)
+            }
             return nuova_richiesta
 
         } catch (err) {
@@ -56,11 +58,11 @@ export const useCondivisioniStore = defineStore('condivisioni', () => {
     }
 
     // gestione dei cambi di stato accettazione o rifiuto
-    async function aggiornaStatoCondivisione(data) {
+    async function aggiornaStatoCondivisione(dati_condivisione) {
         //data es {id: 10, azione: 'accetta', note:'test'}
         loading.value = true
-        const { id, ...parametri } = data //scorporo id dai dati necessari nel body
-        console.log('data',data)
+        const { id, ...parametri } = dati_condivisione //scorporo id dai dati necessari nel body
+        console.log('data', dati_condivisione)
         try {
             const condivisione_aggiornata = await chiamaAPI(`/condivisioni/${id}/stato`, {
                 method: 'PATCH',
@@ -110,7 +112,7 @@ export const useCondivisioniStore = defineStore('condivisioni', () => {
     async function deleteCondivisione(id, motivo) {
         loading.value = true
         try {
-            const eliminata = await chiamaAPI(`/condivisioni/${id}/delete`, {
+            const eliminata = await chiamaAPI(`/condivisioni/${id}`, {
                 method: 'DELETE',
                 body: { motivo}
             })

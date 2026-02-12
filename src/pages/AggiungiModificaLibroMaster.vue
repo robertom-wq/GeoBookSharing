@@ -122,7 +122,7 @@
     <!--modale di conferma eliminazione libro master-->
     <ModaleConferma v-model:show="mostra_modale_conferma" titolo="Elimina Libro"
         :messaggio="'Sei sicuro di voler eliminare il libro \'\'' + libro_master?.titolo + '\'\'? Questa operazione è irreversibile. Assicurati di aver chiuso tutte le condivisioni.'"
-        testoConferma="Elimina Definitivamente" tipo="warning" @conferma="deleteLibro(props.libro_master_id)" />
+        testoConferma="Elimina Definitivamente" tipo="warning" @conferma="deleteLibro(libro_master_id)" />
 </template>
 
 <script setup>
@@ -424,12 +424,12 @@ async function aggiungiAScaffale() {
     console.log(form.value)
     // VALIDAZIONE: Controlla che uno scaffale sia stato selezionato
     if (!form.value.scaffale_id) {
-        message.error(err.message || 'Devi selezionare uno scaffale a cui aggiungere il libro.');
+        message.error('Devi selezionare uno scaffale a cui aggiungere il libro.');
         return;
     }
     //Preparazione dei dati
     const data = {
-        master_id: props.libro_master_id,
+        master_id: libro_master_id,
         scaffale_id:  form.value.scaffale_id,
     };
   

@@ -18,7 +18,7 @@ export const useLibriMasterStore = defineStore('libriMaster', ()=>{
 
         try {
            // Costruisco l'URL con i parametri richiesti dal backend
-            let url_richiesta = `/libriMaster/all?pagina=${pagina}&limit=${limit}`
+            let url_richiesta = `/libriMaster?pagina=${pagina}&limit=${limit}`
             if (query) {
                 url_richiesta += `&q=${encodeURIComponent(query)}`
             }
@@ -44,7 +44,7 @@ export const useLibriMasterStore = defineStore('libriMaster', ()=>{
         loading.value = true
 
         try {
-            const libro_master = await chiamaAPI(`/libriMaster/libro/${id}`)
+            const libro_master = await chiamaAPI(`/libriMaster/${id}`)
             libro_master_selezionato.value = libro_master.data
             return libro_master
 
@@ -62,7 +62,7 @@ export const useLibriMasterStore = defineStore('libriMaster', ()=>{
         console.log(isbn)
 
         try {
-            const nuovo_libro_master = await chiamaAPI('/libriMaster/nuovoFromISBN',{
+            const nuovo_libro_master = await chiamaAPI('/libriMaster/isbn',{
                 method: 'POST',
                 body: {isbn},                
             })
@@ -92,7 +92,7 @@ export const useLibriMasterStore = defineStore('libriMaster', ()=>{
                 libro.append('file', copertina)
                 libro.append('type','copertina')
             }
-            const nuovo_libro_master = await chiamaAPI('/libriMaster/nuovo', {
+            const nuovo_libro_master = await chiamaAPI('/libriMaster', {
                 method: 'POST',
                 body: libro
             })
@@ -120,7 +120,7 @@ export const useLibriMasterStore = defineStore('libriMaster', ()=>{
                 libro.append('type','copertina')
             }
             //effettuo la chiamata al backend per aggiornare il libro
-            const libro_master_aggiornato = await chiamaAPI(`/libriMaster/libro/${id}`, {
+            const libro_master_aggiornato = await chiamaAPI(`/libriMaster/${id}`, {
                 method: 'PATCH',
                 body:  libro 
             })
@@ -130,7 +130,7 @@ export const useLibriMasterStore = defineStore('libriMaster', ()=>{
             // cerco elemento con id e lo aggiorno con i dati aggiornati
             const elemento = catalogo_master.value.find( elemento_array => elemento_array.id === id)
             console.log("elemento:", elemento)
-            if (elemento !== -1) {
+            if (elemento) {
                 Object.assign(elemento, libro_master_aggiornato.data)
             }
 
@@ -157,7 +157,7 @@ export const useLibriMasterStore = defineStore('libriMaster', ()=>{
         loading.value = true
 
         try {
-            const libro_eliminato = await chiamaAPI(`/libriMaster/libro/${id}`, {
+            const libro_eliminato = await chiamaAPI(`/libriMaster/${id}`, {
                 method: 'DELETE'
             })
 
@@ -166,7 +166,7 @@ export const useLibriMasterStore = defineStore('libriMaster', ()=>{
             return libro_eliminato
 
         } catch (err) {
-            console.error("Impossibile eliminare lo scaffale")
+            console.error("Impossibile eliminare il libro master")
             throw err
         } finally {
             loading.value = false

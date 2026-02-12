@@ -79,35 +79,35 @@ const routes = [
       path: '/libro/nuovo',
       component: AggiungiModificaLibro,
       name: 'AggiungiLibro',
-      meta: { requiresAuth: true },
+      meta: { solo_autenticati: true },
     },
     //Pagina dedicata alla modifica di un libro esistente
     {
       path: '/libro/modifica/:id',
       component: AggiungiModificaLibro,
       name: 'ModificaLibro',
-      meta: { requiresAuth: true },
+      meta: { solo_autenticati: true },
     },
     //Pagina dedicata alla ricerca geoloc. di un libro
     {
       path: '/libro/ricerca',
       component: RicercaLibriVicini,
       name: 'RicercaLibriVicini',
-      meta: { requiresAuth: true },
+      meta: { solo_autenticati: true },
     },
     //pagina dedicata al catalogo di tutti i libri master già censiti
     {
     path: '/catalogo',
     component: CatalogoLibriMaster,
     name: 'CatalogoLibriMaster',
-    meta: { requiresAuth: true }
+    meta: { solo_autenticati: true }
   },
   //pagina dedicata alla creazione manuale di un libro master
   {
     path: '/catalogo/LibroMaster/nuovo',
     component: LibroMaster,
     name: 'CreaLibroMaster',
-    meta: { requiresAuth: true },
+    meta: { solo_autenticati: true },
 
   },
   //pagina dedicata alla vsualizzazioe dettaglio di un libro master (admin può modificare)
@@ -115,29 +115,29 @@ const routes = [
     path: '/catalogo/libroMaster/:id',
     component: LibroMaster,
     name: 'ModificaLibroMaster',
-    meta: { requiresAuth: true },
+    meta: { solo_autenticati: true },
   },
   //pagina dedicata alla gestione delle varie richieste effettuate o ricevute
   {
     path: '/condivisioni',
     component: Condivisioni,
     name: 'Condivisioni',
-    meta: { requiresAuth: true }
+    meta: { solo_autenticati: true }
   },
   //pagina dedicata alle richieste di condivisione
   {
     path: '/richiestaCondivisione/:id',
     component: RichiestaCondivisione,
     name: 'RichiestaCondivisione',
-    meta: { requiresAuth: true }
+    meta: { solo_autenticati: true }
   },
   //pagina dedicata agli admin
   {
     path: '/supervisione',
     component: AdminPage,
     name: 'AdminPage',
-    meta: { requiresAuth: true,
-            requiresAdmin: true
+    meta: { solo_autenticati: true,
+            solo_admin: true
           }
   },
     //pagina dedicata agli admin per modifica di un profilo 

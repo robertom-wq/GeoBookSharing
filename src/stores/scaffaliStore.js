@@ -21,7 +21,7 @@ export const useScaffaliStore = defineStore('scaffali', () => {
             const scaffali = await chiamaAPI('/scaffali/mieiScaffali')
 
             // Il database manda la posizione in un formato e uso map per girarli tutti e trasformarli in un formato con lat e lng leggibili.
-            const dati_scomposti = scaffali.scaffali.map(scaffale => {
+            const dati_scomposti = scaffali.data.map(scaffale => {
 
                 //parsePosizione è una funzione creata per estrarre lat/lng da formato formato WKT tipo POINT(lng lat) restituisce un oggetto da usare con Leaflet
                 const coordinate = parsePosizione(scaffale.posizione) 
@@ -49,11 +49,11 @@ export const useScaffaliStore = defineStore('scaffali', () => {
         //console.log('Creo scaffale')
         loading.value = true
         try {
-            const response = await chiamaAPI('/scaffali/nuovo', {
+            const scaffale = await chiamaAPI('/scaffali', {
                 method: 'POST',
                 body: dati_scaffale,                
             })
-            const nuovo_scaffale = response.scaffale
+            const nuovo_scaffale = scaffale.data
 
             // Invece di richiamare getMieiScaffali per avere la lista completa ogni volta, lo aggiungo manualmente alla lista locale
             scaffali_utente.value.push(nuovo_scaffale)
@@ -78,7 +78,7 @@ export const useScaffaliStore = defineStore('scaffali', () => {
                 body: dati_scaffale,                
             })
 
-            const scaffale_aggiornato = scaffale.scaffale
+            const scaffale_aggiornato = scaffale.data
             
             if (scaffale_selezionato.value) {
                 // Se c'è già qualcosa (non è null), facciamo il merge dei dati
@@ -103,7 +103,7 @@ export const useScaffaliStore = defineStore('scaffali', () => {
         loading.value = true
 
         try {
-            await chiamaAPI(`/scaffali/mieiScaffali/${scaffale_id}`, {
+            await chiamaAPI(`/scaffali/${scaffale_id}`, {
                 method: 'DELETE',                
             })
 
@@ -125,7 +125,7 @@ export const useScaffaliStore = defineStore('scaffali', () => {
         try {
             const scaffale = await chiamaAPI(`/scaffali/${id}`);
             // come sopra rendo le coordinate usabili per la mappa
-            const coordinate = parsePosizione(scaffale.scaffale.posizione);
+            const coordinate = parsePosizione(scaffale.data.posizione);
             const scaffale_parsificato = {
                 ...scaffale,
                 lat: coordinate.lat,
@@ -134,7 +134,7 @@ export const useScaffaliStore = defineStore('scaffali', () => {
 
             // 3. Salva nello stato reattivo e restituisce
             scaffale_selezionato.value = scaffale_parsificato;
-
+            console.log("Scaffale parsificato", scaffale_parsificato)
             return scaffale_parsificato;
 
         } catch (err) {

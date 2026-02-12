@@ -216,7 +216,7 @@ async function inizializzaPagina() {
         }
     } catch (err) {
         message.error("Errore inizializzazione Dati")
-        console.error("Errore inizializzazione:", ErrorCodes)
+        console.error("Errore inizializzazione:", err)
     }     
 }
 
@@ -226,7 +226,7 @@ async function caricaDatiUtente() {
     // logica per admin che modifica altro utente
     if (is_admin_modifica.value) {
         const utente_by_id = await utenti_store.getUtenteByID(utente_da_modificare_id.value)
-        utente.value = utente_by_id.utente
+        utente.value = utenti_store.utente_selezionato
     } else {
         // logica per utente che modifica il profilo personale
         if (!utenti_store.utente) {
@@ -278,7 +278,7 @@ async function getStatisticheLibriUtente() {
         valutazioni_store.getRankingUtenteByID(utente.value.id)
         ])
     const voto = valutazioni_store.ranking_utente_selezionato
-    const ultime_valutazioni = [...valutazioni_store.mie_alutazioni_ricevute].sort((a, b) => new Date(b.data_creazione) - new Date(a.data_creazione)).slice(0, 5)
+    const ultime_valutazioni = [...valutazioni_store.mie_valutazioni_ricevute].sort((a, b) => new Date(b.data_creazione) - new Date(a.data_creazione)).slice(0, 5)
     dati_report.value.media_voto = parseFloat(voto.media_voto)
     dati_report.value.recensioni = ultime_valutazioni
 

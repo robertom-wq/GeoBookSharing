@@ -6,14 +6,14 @@ export const useValutazioniStore = defineStore('valutazioni', () => {
 
     //stati
     const loading = ref(false)
-    const mie_alutazioni_ricevute = ref([])
+    const mie_valutazioni_ricevute = ref([])
     const mie_valutazioni_inviate = ref([])
     const ranking_utente_selezionato = ref(null)
     const ranking_utenti = ref({}) // { id_utente : voto} raccoglie tutte le valutazioni degli utenti con cui interagisco
 
     // calcolo combinato di tutte le valutazioni (inviate/ricevute)
     const mie_valutazioni_all = computed(() => {
-        return [...mie_valutazioni_inviate.value, ...mie_alutazioni_ricevute.value]
+        return [...mie_valutazioni_inviate.value, ...mie_valutazioni_ricevute.value]
     })
 
     //Azioni
@@ -29,7 +29,7 @@ export const useValutazioniStore = defineStore('valutazioni', () => {
 
             // Se non ci sono dati, effettuo la chiamata
             try {
-                const valutazione = await chiamaAPI(`/valutazioni/valutazioniRecenti/${id}`)
+                const valutazione = await chiamaAPI(`/valutazioni/recenti/${id}`)
                 // salvo nell'oggetto usando l'ID come chiave
                 ranking_utenti.value[id] = valutazione.data
                 return valutazione.data
@@ -45,7 +45,7 @@ export const useValutazioniStore = defineStore('valutazioni', () => {
         loading.value = true
         
         try {
-            const valutazione = await chiamaAPI(`/valutazioni/valutazioniRecenti/${id}`)
+            const valutazione = await chiamaAPI(`/valutazioni/recenti/${id}`)
             ranking_utente_selezionato.value = valutazione.data
             ranking_utenti.value[id] = valutazione.data
             return valutazione
@@ -62,7 +62,7 @@ export const useValutazioniStore = defineStore('valutazioni', () => {
         loading.value = true
         
         try {
-            const valutazione = await chiamaAPI(`/valutazioni/nuova`,{
+            const valutazione = await chiamaAPI(`/valutazioni`,{
                 method: 'POST',
                 body: data
             })
@@ -85,11 +85,11 @@ export const useValutazioniStore = defineStore('valutazioni', () => {
             // eseguo contemporaneamente le due richieste per le condivisioni da richiedente e da proprietario
             //è prevista paginazione ma per praticita ho impostato solo il limit a 100 risultati per pagina
             const [recensore, recensito] = await Promise.all([
-                chiamaAPI('/valutazioni/mieValutazioni?ruolo=recensore&limit=100'),
-                chiamaAPI('/valutazioni/mieValutazioni?ruolo=recensito&limit=100')
+                chiamaAPI('/valutazioni?ruolo=recensore&limit=100'),
+                chiamaAPI('/valutazioni?ruolo=recensito&limit=100')
             ])
             mie_valutazioni_inviate.value = recensore.data || []
-            mie_alutazioni_ricevute.value = recensito.data || []
+            mie_valutazioni_ricevute.value = recensito.data || []
         } catch (err) {
             console.error("Impossibile recuperare le mie valutazioni", err)
             throw err
@@ -100,7 +100,7 @@ export const useValutazioniStore = defineStore('valutazioni', () => {
 
     return {
         loading,
-        mie_alutazioni_ricevute,
+        mie_valutazioni_ricevute,
         mie_valutazioni_inviate,
         ranking_utente_selezionato,
         mie_valutazioni_all,

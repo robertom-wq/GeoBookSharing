@@ -34,13 +34,13 @@ export const useLibriStore = defineStore('libri', () => {
 
 
             //effettuo la chiamata al backend per la creazione di un nuovo libro
-            const nuovo_libro = await chiamaAPI('/libri/nuovo', {
+            const nuovo_libro = await chiamaAPI('/libri', {
                 method: 'POST',
                 body: libro,                
             })
 
             // aggiorno lo stato aggiungendo il nuovo libro ai miei libri
-            miei_libri.value.push(nuovo_libro.libro)
+            miei_libri.value.push(nuovo_libro.data)
 
             return nuovo_libro
 
@@ -59,7 +59,7 @@ export const useLibriStore = defineStore('libri', () => {
         try {
             //effettuo la chiamata al backend per ricevere i miei libri
             const libri = await chiamaAPI('/libri/mieiLibri')
-            miei_libri.value = libri.libri
+            miei_libri.value = libri.data
         } catch (err) {
             console.error('Errore durante il caricamento dei libri', err)
             miei_libri.value = []
@@ -82,7 +82,7 @@ export const useLibriStore = defineStore('libri', () => {
             }
 
             //effettuo la chiamata al backend per aggiornare il libro
-            const libro_aggiornato = await chiamaAPI(`/libri/libro/${libro_id}`, {
+            const libro_aggiornato = await chiamaAPI(`/libri/${libro_id}`, {
                 method: 'PATCH',
                 body: libro,
                 
@@ -90,10 +90,10 @@ export const useLibriStore = defineStore('libri', () => {
 
             // Se ci sono già i dettagli caricati, faccio il merge per non perdere nulla
             if (libro_selezionato_dettagli.value) {
-                Object.assign(libro_selezionato_dettagli.value, libro_aggiornato.libro)
+                Object.assign(libro_selezionato_dettagli.value, libro_aggiornato.data)
             } else {
                 // Se per qualche motivo era null, lo inizializzo ora
-                libro_selezionato_dettagli.value = libro_aggiornato.libro
+                libro_selezionato_dettagli.value = libro_aggiornato.data
             }
 
             return libro_aggiornato
@@ -111,7 +111,7 @@ export const useLibriStore = defineStore('libri', () => {
         loading_eliminazione.value = true
 
         try {
-            await chiamaAPI(`/libri/libro/${libro_id}`, {
+            await chiamaAPI(`/libri/${libro_id}`, {
                 method: 'DELETE',                
             })
 
@@ -134,8 +134,8 @@ export const useLibriStore = defineStore('libri', () => {
         loading.value = true
 
         try {
-            const libro = await chiamaAPI(`/libri/libro/${libro_id}`)
-            libro_selezionato_dettagli.value = libro.libro
+            const libro = await chiamaAPI(`/libri/${libro_id}`)
+            libro_selezionato_dettagli.value = libro.data
             return libro
 
         } catch (err) {
@@ -168,10 +168,10 @@ export const useLibriStore = defineStore('libri', () => {
                 parametri.append('limit', dati.limit)
             }
             //console.log(parametri.toString())
-            const libri_vicini = await chiamaAPI(`/libri/ricercaLibriVicini?${parametri.toString()}`)
+            const libri_vicini = await chiamaAPI(`/libri/libriVicini?${parametri.toString()}`)
 
             // Trasformo la posizione del DB in coordinate lat/lng pulite per la mappa
-            const libri_vicini_parsificati = libri_vicini.libri.map(libro => {
+            const libri_vicini_parsificati = libri_vicini.data.map(libro => {
                 const coordinate = parsePosizione(libro.posizione)
                 return {
                     ...libro,
@@ -219,7 +219,7 @@ export const useLibriStore = defineStore('libri', () => {
         try {
             const generi = await chiamaAPI('/libri/generi')
             //console.log("GENERI",generi)
-            generi_letterari.value = generi.generiLetterari
+            generi_letterari.value = generi.data
             return generi
         } catch (err) {
             console.error("", err)
@@ -234,7 +234,7 @@ export const useLibriStore = defineStore('libri', () => {
         loading.value = true
         try {
             const tipi_condivisione_res = await chiamaAPI('/libri/tipiCondivisione')
-            tipi_condivisione.value = tipi_condivisione_res.tipiCondivisione
+            tipi_condivisione.value = tipi_condivisione_res.data
             return tipi_condivisione
         } catch (err) {
             console.error("", err)

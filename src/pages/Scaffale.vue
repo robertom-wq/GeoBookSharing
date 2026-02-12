@@ -9,10 +9,10 @@
                 <div v-if="scaffale">
                     <!-- intestazione dello scaffale -->
                     <div class="intestazione">
-                        <h1>{{ scaffale.scaffale.nome }}</h1>
+                        <h1>{{ scaffale.data.nome }}</h1>
 
                         <!-- descrizione dello scaffale -->
-                        <p class="sottotitolo">{{ scaffale.scaffale.descrizione }}</p>
+                        <p class="sottotitolo">{{ scaffale.data.descrizione }}</p>
                     </div>
 
                     <!-- contenuto principale dello scaffale -->
@@ -30,12 +30,12 @@
 
                             <!-- stato vuoto se nessun libro presente -->
                             <n-empty description="Nessun Libro trovato in questo scaffale"
-                                v-if="scaffale.scaffale.libri?.length === 0 || !scaffale.scaffale.libri" />
+                                v-if="scaffale.data.libri?.length === 0 || !scaffale.data.libri" />
 
                             <!-- griglia dei libri contenuti nello scaffale -->
                             <div class="griglia_libri" v-else>
 
-                                <div class="scheda_libro_singola" v-for="libro in scaffale.scaffale.libri"
+                                <div class="scheda_libro_singola" v-for="libro in scaffale.data.libri"
                                     :key="libro.id">
                                     <LibriCard :titolo="'(id:' + libro.id + ') ' + libro.titolo"
                                         :immagine="libro.copertina" alt="Copertina Libro" :info_autore="libro.autore"
@@ -72,7 +72,7 @@
                             </div>
                             <!-- modale di conferma eliminazione scaffale -->
                             <ModaleConferma v-model:show="mostra_modale_conferma" titolo="Elimina Scaffale"
-                                :messaggio="'Sei sicuro di voler eliminare lo scaffale ' + scaffale?.scaffale.nome + '? L\'azione è irreversibile.'"
+                                :messaggio="'Sei sicuro di voler eliminare lo scaffale ' + scaffale?.data.nome + '? L\'azione è irreversibile.'"
                                 testoConferma="Elimina Definitivamente" tipo="warning"
                                 @conferma="eseguiCancellazione" />
                         </template>
@@ -110,7 +110,7 @@
             return false
         }
         // confronto id utente dello scaffale con id utente loggato
-        return scaffale.value.scaffale.utente.id === utenti_store.utente.id
+        return scaffale.value.data.utente.id === utenti_store.utente.id
     })
 
     //AZIONI
@@ -122,8 +122,10 @@
 
     //permette di aggiungere libri tramite codice ISBN
     function aggiungiLibroISBN() {
-        console.log("aggiungiLibroISBN") // da implementare
+        console.log("aggiungiLibroISBN") 
+        router.push({ name: 'CatalogoLibriMaster'})
     }
+
     function deleteScaffale() {
         mostra_modale_conferma.value = true
     }
@@ -136,7 +138,7 @@
 
     // naviga alla pagina di modifica passando l'id
     function vaiModificaScaffale() {
-        router.push({ name: 'ModificaScaffale', params: { id: scaffale.value.scaffale.id } })
+        router.push({ name: 'ModificaScaffale', params: { id: scaffale.value.data.id } })
     }
 
     // cancellazione scaffale
@@ -145,7 +147,7 @@
             is_cancellazione_in_corso.value = true
             await nextTick()
             // chiamo lo store per eliminare definitivamente
-            await scaffali_store.deleteScaffale(scaffale.value.scaffale.id)
+            await scaffali_store.deleteScaffale(scaffale.value.data.id)
             mostra_modale_conferma.value = false
             message.success("Scaffale eliminato correttamente")
 
@@ -176,14 +178,15 @@
             const scaffale_recuperato = await scaffali_store.getScaffaleById(scaffale_id)
 
             // se lo scaffale non esiste nel db
-            if (!scaffale_recuperato) {
+            if (!scaffale_recuperato.data) {
                 router.push({ name: 'Libreria' }) // torno alla libreria
                 message.error('Risorsa non trovata. Reindirizzamento in corso...')
                 return
             }
             // assegno i dati allo stato locale
-            scaffale.value = scaffale_recuperato
-            console.log(scaffale_recuperato.scaffale)
+            //scaffale.value = scaffale_recuperato.data
+            scaffale.value = scaffali_store.scaffale_selezionato
+            console.log("Scaffale recuperato",scaffale.value)
 
             // controllo se chi visualizza è il proprietario
             if (!is_utente_proprietario.value) {

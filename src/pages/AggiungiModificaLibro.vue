@@ -242,7 +242,8 @@ async function caricaDatiLibro() {
     if (libro_id) {
         try {
             const risposta_libro = await libri_store.getLibroByID(libro_id)
-            libro.value = risposta_libro.libro
+            //libro.value = risposta_libro.data
+            libro.value = libri_store.libro_selezionato_dettagli
             console.log(libro.value)
 
             form.value = {
@@ -375,10 +376,12 @@ async function inviaDati() {
             //modalità modifica libro
             risposta = await libri_store.updateLibro(libro_id, fd)
             //Aggiorna il form con i nuovi dati
-            if (risposta && risposta.libro) {
+            if (risposta && risposta.data) {
                 form.value = { ...form.value, // prendo i dati attuali del form
-                    ...risposta.libro, //li sovrascrivo con quelli nuovi restituiti
-                    anno: String(risposta.libro.anno) //FORZO l'anno a stringa per Naive UI
+                    ...libri_store.libro_selezionato_dettagli,
+                    //...risposta.data, //li sovrascrivo con quelli nuovi restituiti
+                    anno: String(libri_store.libro_selezionato_dettagli.anno)
+                    //anno: String(risposta.libro.anno) //FORZO l'anno a stringa per Naive UI
                     }
             }
 
@@ -386,7 +389,7 @@ async function inviaDati() {
         } else {
             //modalità creazione libro
             risposta = await libri_store.createLibro(fd)
-            message.success(`Libro "${risposta.libro.titolo}" creato con successo!`)
+            message.success(`Libro "${libri_store.libro_selezionato_dettagli.titolo}" creato con successo!`)
             router.back()
         }
     } catch (err) {

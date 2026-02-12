@@ -139,7 +139,7 @@ onMounted(async () => {
                 router.push({ name: 'Libreria' })
                 return
             }
-            scaffale.value = scaffale_recuperato
+            scaffale.value = scaffali_store.scaffale_selezionato
 
             // controllo proprieta
             if (!is_utente_proprietario.value) {
@@ -150,10 +150,10 @@ onMounted(async () => {
             }
             // riempio il form con i dati ricevuti
             form.value = {
-                nome: scaffale_recuperato.scaffale.nome,
-                descrizione: scaffale_recuperato.scaffale.descrizione,
-                lat: scaffale_recuperato.lat,
-                lng: scaffale_recuperato.lng
+                nome: scaffale.value.data.nome,
+                descrizione: scaffale.value.data.descrizione,
+                lat: scaffale.value.lat,
+                lng: scaffale.value.lng
             }
 
             //forzo aggiornamento mappa tramite funzione esposta su Mappa.vue
@@ -182,7 +182,7 @@ const is_utente_proprietario = computed(() => {
         return false
     }
     // confronto id proprietario scaffale con utente loggato
-    return scaffale.value.scaffale.utente.id === utenti_store.utente.id
+    return scaffale.value.data.utente.id === utenti_store.utente.id
 })
 
 // funzione unica che gestisce il salvataggio delle impostazioni,

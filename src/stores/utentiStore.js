@@ -49,12 +49,12 @@ export const useUtentiStore = defineStore('utente', () => {
     async function getUtente() {
         loading.value = true
         try {
-            const risposta = await chiamaAPI('/utenti/profilo', {
+            const profilo_utente = await chiamaAPI('/utenti/me', {
                 method: 'GET',
             })
             // Prendo i dati del profilo e li metto nello stato
-            utente.value = risposta.utente
-            return risposta
+            utente.value = profilo_utente.data
+            return profilo_utente
         } catch (err) {
             utente.value = null
             localStorage.removeItem('csrf_token')
@@ -70,12 +70,12 @@ export const useUtentiStore = defineStore('utente', () => {
         loading.value = true
         const id_utente = parseInt(id)
         try {
-            const risposta = await chiamaAPI(`/utenti/profilo/${id_utente}`, {
+            const utente_by_id = await chiamaAPI(`/utenti/${id_utente}`, {
                 method: 'GET',
             })
             // Prendo i dati del profilo e li metto nello stato
-            utente_selezionato.value = risposta.utente
-            return risposta
+            utente_selezionato.value = utente_by_id.data
+            return utente_by_id
         } catch (err) {
             utente_selezionato.value = null
             console.error("Impossibile recuperare il profilo selezionato", err)
@@ -137,17 +137,17 @@ export const useUtentiStore = defineStore('utente', () => {
             }
 
             // Chiamata API con i parametri
-            const risposta = await chiamaAPI(`/utenti/all?${query.toString()}`, {
+            const all_utenti = await chiamaAPI(`/utenti?${query.toString()}`, {
                 method: 'GET'
             })
 
             // Salviamo i dati negli stati dello store
-            risultati_ricerca.value = risposta.data
-            nr_totale_utenti.value = risposta.conteggioTotale
-            nr_pagine_totali.value = risposta.nr_pagine_totali
-            nr_pagina_corrente.value = risposta.nr_pagina_corrente
+            risultati_ricerca.value = all_utenti.data
+            nr_totale_utenti.value = all_utenti.conteggioTotale
+            nr_pagine_totali.value = all_utenti.nr_pagine_totali
+            nr_pagina_corrente.value = all_utenti.nr_pagina_corrente
 
-            return risposta
+            return all_utenti
         } catch (err) {
             console.error("Errore nel recupero della lista utenti", err)
             throw err
@@ -161,18 +161,18 @@ export const useUtentiStore = defineStore('utente', () => {
         loading.value = true
         try {
             const new_data_richiesta = new Date().toISOString()
-            const utente_con_richiesta_delete = chiamaAPI('/utenti/richiestaCancellazione', {
-                method: 'PATCH',
+            const utente_con_richiesta_delete = await chiamaAPI('/utenti/me', {
+                method: 'DELETE',
                 // Passo un oggetto semplice 
                 body: {
                     richiesta_eliminazione: valore,
                     data_richiesta_eliminazione: valore ? (utente.value.data_richiesta_eliminazione || new_data_richiesta) : null
                 }
             });
-            Object.assign(utente, utente_con_richiesta_delete.data)
+            Object.assign(utente.value, utente_con_richiesta_delete.data)
             return utente_con_richiesta_delete
         } catch (err) {
-            console.err("Impossibile procedere con il softDelete", err)
+            console.error("Impossibile procedere con il softDelete", err)
             throw err
         } finally {
             loading.value = false
@@ -189,8 +189,8 @@ export const useUtentiStore = defineStore('utente', () => {
         }
         loading.value = true
         const path = is_admin_mode
-            ? `/utenti/profilo/${id}`
-            : `/utenti/profilo`
+            ? `/utenti/${id}`
+            : `/utenti/me`
 
         try {
             const aggiornato = await chiamaAPI(path, {
@@ -199,9 +199,9 @@ export const useUtentiStore = defineStore('utente', () => {
             })
 
             if (is_admin_mode) {
-                Object.assign(utente_selezionato, aggiornato.data)
+                Object.assign(utente_selezionato.value, aggiornato.data)
             } else {
-                Object.assign(utente, aggiornato.data)
+                Object.assign(utente.value, aggiornato.data)
             }
             return aggiornato
         } catch (err) {
@@ -216,7 +216,7 @@ export const useUtentiStore = defineStore('utente', () => {
     async function deleteUtente(id) {
         loading.value = true
         try {
-            const cancellato = await chiamaAPI(`/utenti/profilo/${id}`, {
+            const cancellato = await chiamaAPI(`/utenti/${id}`, {
                 method: 'DELETE'
             })
         } catch (err) {
