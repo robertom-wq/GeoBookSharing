@@ -35,7 +35,7 @@ const COOKIE_OPTIONS = {
 
 //REGISTRAZIONE UTENTE
 export const registrazione = async (req, res) => {
-    const { email, cognome, nome, password, username, privacy_policy_accettata} = req.body    
+    const { email, cognome, nome, password, username, privacy_policy_accettata} = req.dati_validati    
     try {
         // controllo se utente esiste nel db tramite username o email
         const esiste = await prisma.utenti.findFirst({
@@ -57,8 +57,8 @@ export const registrazione = async (req, res) => {
             return res.status(422).json({error: 'Accettare le Privacy Policy per completare la registrazione'})
         }
 
-        //  cifratura della password tramite bcryptjs con wf 12
-        const password_cifrata = await bcrypt.hash(password, 12)
+        //  hashed della password tramite bcryptjs con wf 12
+        const hashed_password = await bcrypt.hash(password, 12)
 
         // creazione utente nel database tramite prisma
         const utente = await prisma.utenti.create({
@@ -67,7 +67,7 @@ export const registrazione = async (req, res) => {
                 cognome,
                 email: email.toLowerCase(),
                 username: username.toLowerCase(),
-                hashed_password: password_cifrata,
+                hashed_password: hashed_password,
                 privacy_policy_accettata
             },
             // dati da inviare assieme alla response
@@ -114,7 +114,7 @@ export const registrazione = async (req, res) => {
 
 //LOGIN UTENTE
 export const login = async (req, res) => {
-    const { username, password } = req.body //destructuring, etraggo username e password dal body della richiesta
+    const { username, password } = req.dati_validati //destructuring, etraggo username e password dal body della richiesta
     try {
         const utente = await prisma.utenti.findUnique({
             where: { username: username.toLowerCase()},

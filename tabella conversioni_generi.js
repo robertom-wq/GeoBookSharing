@@ -49,7 +49,7 @@ export const tabella_conversioni_generi = {
   "JUVENILE FICTION": "Fiction per Ragazzi",
   "JUVENILE NONFICTION": "Non-Fiction per Ragazzi",
   "STUDY AIDS": "Supporti Didattici",
-  "YOUNG ADULT FICTION": "Young Adult Fiction (Narrativa per Giovani Adulti)",
-  "YOUNG ADULT NONFICTION": "Young Adult Nonfiction (Saggistica per Giovani Adulti)",
+  "YOUNG ADULT FICTION": "Narrativa per Ragazzi",
+  "YOUNG ADULT NONFICTION": "Saggistica per Ragazzi",
   "REFERENCE": "Riferimento"
 }

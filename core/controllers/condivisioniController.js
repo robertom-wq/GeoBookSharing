@@ -230,7 +230,7 @@ export const deleteCondivisione = async (req, res) => {
 
         // La condivisione sarà eliminabile se è conclusa, oppure se non ancora confermata dal proprietario.
         const isEliminabile = !condivisione.is_confermato || condivisione.is_completato
-        console.log("Eliminabile?",condivisione.is_completato)
+        ////console.log("Eliminabile?",condivisione.is_completato)
         if (!isEliminabile) {
             return res.status(403).json({ error: `Non puoi eliminare una condivisione in corso (confermata e non completata)` })
         }
@@ -271,7 +271,7 @@ export const getMieCondivisioni = async (req, res) => {
     // vedo se nella req esiste una query con pagina e limit
     const queryPagina = req.query.pagina
     const queryLimit = req.query.limit
-    console.log(ruolo)
+    //console.log(ruolo)
     // se pagina e/o limit sono  undefined imposto la prima di default 
     let pagina = parseInt(queryPagina) || 1
     const limit = parseInt(queryLimit) || 10
@@ -287,7 +287,7 @@ export const getMieCondivisioni = async (req, res) => {
     try {
         let where
         if (ruolo) {
-            console.log("ruolo", ruolo)
+            //console.log("ruolo", ruolo)
             if (ruolo === 'proprietario') {
                 where = { proprietario_id: mioId }
             } else if (ruolo === 'richiedente') {

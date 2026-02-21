@@ -21,14 +21,14 @@ const auth = async (req, res, next) => {
     // cerco  token nei cookies
     if (req.cookies?.jwt) {
         token = req.cookies.jwt
-        console.log("Token jwt da cookie: ", token)
+        //console.log("Token jwt da cookie: ", token)
     }
     
     // cerco token nell'header Authorization
     const authHeader = req.header('Authorization')
     if (authHeader?.startsWith('Bearer ')) {
         token = authHeader.replace('Bearer ', '').trim()
-        console.log("Token jwt da header: ", token)
+        //console.log("Token jwt da header: ", token)
     }
     
     // se non trovo il token resrtituisco 401 Unauthorized

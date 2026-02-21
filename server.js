@@ -20,7 +20,7 @@ const app = express()
 // Serve per leggere il body delle richieste in formato json
 app.use(express.json())
 
-/* app.use(cors({
+app.use(cors({
     origin: [
         process.env.FRONTEND_URL,
         'http://localhost:3000'
@@ -28,8 +28,10 @@ app.use(express.json())
     credentials: true,
     methods: ['GET','POST','PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type','Authorization','x-csrf-token']
-})) */
+}))
 
+/*
+//UTILIZZATO PER PROVE SU RETE LOCALE
 app.use(cors({
   origin: [
     process.env.FRONTEND_URL,
@@ -40,6 +42,7 @@ app.use(cors({
   methods: ['GET','POST','PATCH','DELETE'],
   allowedHeaders: ['Content-Type','Authorization','x-csrf-token']
 }))
+*/
 
 app.use(cookieParser())
 
@@ -64,12 +67,15 @@ app.use('/uploads', (req, res, next)=>{
     next()    
 }, express.static(path.join(__dirname, '/uploads')))
 
-/* app.listen(3000, 'localhost', () => {
+app.listen(3000, 'localhost', () => {
     logger.info("Server Backend avviato - API su http://localhost:3000")
     console.log("API su http://localhost:3000")
-}) */
+}) 
 
+    /*
+//UTILIZZATO PER PROVE SU RETE LOCALE
 app.listen(3000, '0.0.0.0', () => {
   logger.info("Server Backend avviato - API su tutte le interfacce (3000)")
   console.log("API su http://0.0.0.0:3000")
 })
+*/

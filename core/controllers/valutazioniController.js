@@ -64,7 +64,7 @@ export const creaValutazione = async (req, res) => {
 
 //Restituisce votazione media piu ultime 5 recensioni
 export const getVotazioneMediaUtente = async (req, res) => {
-    console.log("Dentro getVotazioneMediaUtente")
+    //console.log("Dentro getVotazioneMediaUtente")
     const targetId = req.targetId
 
     if (isNaN(targetId)) {
@@ -127,7 +127,7 @@ export const getAllValutazioni = async (req, res) => {
     // vedo se nella req esiste una query con pagina e limit
     const queryPagina = req.query.pagina
     const queryLimit = req.query.limit
-    console.log(ruolo)
+    //console.log(ruolo)
     // se pagina e/o limit sono  undefined imposto la prima di default 
     let pagina = parseInt(queryPagina) || 1
     const limit = parseInt(queryLimit) || 10
@@ -164,7 +164,7 @@ export const getAllValutazioni = async (req, res) => {
             includeDinamico = { recensito: { select: { username: true, avatar: true, avatar_thumb: true }},
                                 recensore: { select: { username: true, avatar: true, avatar_thumb: true }}}
         }
-        console.log("WHERE finale:", where)
+        //console.log("WHERE finale:", where)
         
         const [valutazioni_all, conteggioTotale] = await prisma.$transaction([
             prisma.utente_valutazioni.findMany({

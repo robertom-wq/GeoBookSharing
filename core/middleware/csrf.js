@@ -12,7 +12,7 @@ export const CSRF_COOKIE_OPTIONS = {
 
 
 export const generateCsrfToken = (req, res) => {
-    console.log(req.cookies)
+    //console.log(req.cookies)
     // cerco csrf token nel cookie
     let token = req.cookies['csrf_token']
 
@@ -29,10 +29,10 @@ export const csrf_protection = (req,res,next) => {
     if (['GET','HEAD','OPTIONS'].includes(req.method)) {
         return next()
     }
-    console.log("req.cookies['csrf_token']",req.cookies['csrf_token'] )
-    console.log("req.headers:", req.headers)
-    console.log("req.headers['x-csrf-token']", req.headers['x-csrf-token'])
-    console.log("req.headers['X-CSRF-Token']", req.headers['X-CSRF-Token'])
+    //console.log("req.cookies['csrf_token']",req.cookies['csrf_token'] )
+    //console.log("req.headers:", req.headers)
+    //console.log("req.headers['x-csrf-token']", req.headers['x-csrf-token'])
+    //console.log("req.headers['X-CSRF-Token']", req.headers['X-CSRF-Token'])
     // tento di estrarre il token
 
     const cookie_token = (req.cookies['csrf_token'] || '').trim() // T1 recuperato dal cookie inviato automaticamente dal browser (grazie a cookie-parser).

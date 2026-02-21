@@ -1,5 +1,4 @@
-# 1. FASE DI COSTRUZIONE (BUILD STAGE)
-# Usiamo un'immagine Node.js come ambiente per installare le dipendenze e generare Prisma Client
+# immagine Node.js come ambiente per installare le dipendenze e generare Prisma Client
 FROM node:lts-slim as builder
 
 WORKDIR /usr/src/app
@@ -15,7 +14,6 @@ RUN npm install
 
 # ----------------------------------------------------------------------------------
 
-# 2. FASE DI ESECUZIONE (DEVELOPMENT STAGE)
 FROM node:lts-slim
 
 WORKDIR /usr/src/app

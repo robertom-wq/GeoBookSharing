@@ -25,7 +25,7 @@ const upload  = multer({
 
 // Ridimensionamento dell'immagine caricata
 const ridimensiona = async (req, res, next) => {
-    console.log("UPLOAD")
+    //console.log("UPLOAD")
 
     if (!req.file) {
         return next() // se il file non cè passa al prossimo middleware
@@ -56,7 +56,7 @@ const ridimensiona = async (req, res, next) => {
             main: path_immagine_principale,
             thumb: path_immagine_anteprima
         }
-        console.log( req.fileRidimensionato)
+        //console.log( req.fileRidimensionato)
         next()
 
     } catch (err) {

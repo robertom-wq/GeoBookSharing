@@ -18,11 +18,11 @@ export const createLibroSchema = Joi.object({
         'string.min': 'Il codice isbn deve contenere almeno 10 caratteri.',
         'string.max': 'Il codice isbn non può superare i 20 caratteri.',
     }),
-    anno: Joi.number().integer().min(1000).max(new Date().getFullYear() + 1).optional().messages({
+    anno: Joi.number().integer().min(1000).max(new Date().getFullYear()).optional().messages({
         'number.base': 'L\'anno deve essere un numero intero.',
         'number.integer': 'L\'anno deve essere un numero intero.',
         'number.min': 'L\'anno minimo valido è 1000.',
-        'number.max': `L\'anno non può superare l'anno corrente più uno.`
+        'number.max': `L\'anno non può superare l'anno corrente.`
     }),
     descrizione: Joi.string().max(1000).trim().allow('').optional().messages({
         'string.base': 'La descrizione deve essere una stringa di testo.',
@@ -45,7 +45,6 @@ export const createLibroSchema = Joi.object({
         'number.min': 'L\'ID del tipo di condivisione deve essere maggiore o uguale a 1.',
     })
 }).options({
-    stripUnknown: true,
     convert: true
 })
 
@@ -95,7 +94,6 @@ export const updateLibroSchema = Joi.object({
         'boolean.base': 'La disponibilità deve essere un valore booleano (true o false).'
     })
 }).options({
-    stripUnknown: true,
     convert: true
 }).min(1).messages({
     'object.min': 'La richiesta di aggiornamento deve contenere almeno un campo da modificare.'

@@ -221,7 +221,7 @@ export const deleteScaffale = async (req, res) => {
         }
         //verifico la presenza di libri
         if (Number(scaffale.libri_disponibili) > 0) {
-            res.status(409).json({ error: "Impossibile eliminare lo scaffale, contiene ancora dei libri. Eliminare prima i libri contenuti" })
+            return res.status(409).json({ error: "Impossibile eliminare lo scaffale, contiene ancora dei libri. Eliminare prima i libri contenuti" })
         }
 
         //Delete

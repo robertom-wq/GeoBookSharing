@@ -34,10 +34,10 @@ export const updateStatoCondivisioniSchema = Joi.object({
             'any.required' : 'Inserisci una motivazione per il rifiuto'
         })
     })
-}).min(1).options({stripUnknown : true})
+}).min(1)
 
 export const deleteCondivisioneSchema = Joi.object({
     motivo: Joi.string().max(500).allow('').optional().messages({
         'string.max': 'La motivazione non può superare i 500 caratteri'
     })
-}).options({stripUnknown: true})
+})

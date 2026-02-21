@@ -7,11 +7,11 @@ import auth from "../middleware/auth.js"
 const authRouter = express.Router();
 
 
-authRouter.post('/registrazione', valida_dati(schema_registrazione), registrazione);
-
+authRouter.post('/registrazione', valida_dati(schema_registrazione), registrazione)
 authRouter.post('/login', valida_dati(schema_login), login)
-
 authRouter.post('/logout',auth, logout)
+
+
 
 
 

@@ -1,6 +1,6 @@
 /*SCHEMA PER LA VALIDAZIONE DEI DATI DELLA REGISTRAZIONE E DEL LOGIN */
 
-import Joi from "joi";
+import Joi from "joi"
 
 export const schema_registrazione = Joi.object({
     nome: Joi.string().min(3).max(50).required().messages({
@@ -43,4 +43,4 @@ export const schema_login = Joi.object({
         "any.required" : "La password è obbligatoria",
         "string.empty": "Il campo password non può essere vuoto.",
     })
-}).options({ stripUnknown: true})  // rimuove i campi extra non definiti
+})

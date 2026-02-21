@@ -139,7 +139,7 @@ Restituisce il profilo dell'utente loggato oppure tramite id. Differenziazione t
 admin (oppure utente loggato) e altri utenti
 */
 export const getProfilo = async (req, res) => {
-    console.log('controllo profilo')
+    //console.log('controllo profilo')
 
     //recupero valori passati da middleware auth
     const targetId = req.targetId //controller auth stabilisce se esiste un parametro oppure se usare utente loggato
@@ -175,7 +175,7 @@ export const getProfilo = async (req, res) => {
             res.status(404).json({ error: 'Utente non trovato' })
         }
 
-        console.log(utente)
+        //console.log(utente)
         //incremento visualizzazioni utente (se profilo visitato è diverso dal suo)
         if (targetId !== mio_id) {
             const utenteVisualizzazioneUpdated = await prisma.utenti.update({
@@ -184,7 +184,7 @@ export const getProfilo = async (req, res) => {
             })
             utente.visualizzazioni = utenteVisualizzazioneUpdated.visualizzazioni
         }
-        console.log(utente)
+        //console.log(utente)
 
         return res.status(200).json({message: 'Profilo recuperato con successo', data: utente})
 
@@ -205,11 +205,11 @@ export const updateUtente = async (req, res) => {
     const targetId = req.targetId // auth stabilisce se esiste un parametro oppure se usare utente loggato
     const mio_id = req.userId
     const isAdmin = req.isAdmin
-    console.log("IS ADMIN", isAdmin)
+    //console.log("IS ADMIN", isAdmin)
 
     //uso i dati già validati da Joi tramite validator utenteValidator
     let data = { ...req.dati_validati }
-    console.log(data)
+    //console.log(data)
     let vecchi_path_files = null // Variabile per i path degli avatar da eliminare
 
     //verifica autorizzazione all'update
@@ -292,7 +292,7 @@ export const updateUtente = async (req, res) => {
 
                 fs.unlink(file_path, err => {
                     if (err && err.code !== 'ENOENT') {
-                        // Logghiamo l'errore non bloccante. Se il file fisico è già sparito per qualche motivo, 
+                        // Log errore non bloccante. Se il file fisico è già sparito per qualche motivo, 
                         // non lo considero un errore critico è un "File Not Found" ma l'obiettivo di non averlo più è comunque raggiunto
                         console.error("ATTENZIONE: Non è stato possibile rimuovere vecchie immagini: File o directory non trovata", err)
                         logger.warn("["+ req.ip +"] Non è stato possibile rimuovere vecchie immagini: File o directory non trovata")

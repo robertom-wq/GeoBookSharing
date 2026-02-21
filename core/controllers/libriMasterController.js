@@ -41,7 +41,7 @@ export const addLibroMasterFromISBN = async (req, res) => {
     //se ISBN e stato etichettao come valido ed è stato normalizzato
     if (check_isbn.is_valido && check_isbn.isbn_normalizzato !== null) {
         isbn_pulito = check_isbn.isbn_normalizzato
-        console.log("ISBN pulito in controller:", isbn_pulito)
+        //console.log("ISBN pulito in controller:", isbn_pulito)
     } else {
         return res.status(400).json({ error: check_isbn.error, isbn: isbn_pulito})
     }
@@ -76,7 +76,7 @@ export const addLibroMasterFromISBN = async (req, res) => {
         // mi appoggio ad un oggetto json costruito con le traduzioni dei generi letterali piu usati su google Books
         // in modo da averli tradotti in italiano
         const genere_nome = tabella_conversioni_generi[libro_trovato.categories?.[0].toUpperCase()] || 'Non definito' 
-        console.log("GENERE", libro_trovato.categories?.[0].toUpperCase(), genere_nome)
+        //console.log("GENERE", libro_trovato.categories?.[0].toUpperCase(), genere_nome)
         //verifico esistenza genere nel db, se non esiste lo crea upsert(). Questo fa si che chi sceglierà di creare un libro da 0
         // utilizzera generi prestabiliti, in modo da essere uniformi e ottenere statistiche sui generi uniformi
         const genere = await prisma.generi.upsert({
@@ -229,7 +229,7 @@ export const createLibroMaster = async (req, res) => {
 
         if (check_isbn.is_valido && check_isbn.isbn_normalizzato !== null) {
             isbn_pulito = check_isbn.isbn_normalizzato
-            console.log("ISBN pulito in controller:", isbn_pulito)
+            //console.log("ISBN pulito in controller:", isbn_pulito)
         } else {
             return res.status(400).json({ error: check_isbn.error, isbn: isbn_pulito})
         }
@@ -358,8 +358,8 @@ export const updateLibroMaster = async (req, res) => {
     const targetId = parseInt(req.targetId)
     // dati validati da validate(updateLibriSchema)
     let data = {...req.dati_validati}
-    console.log("DATA",data)
-    console.log("DATA ANNO LIBRO MASTER",typeof(data.anno))
+    //console.log("DATA",data)
+    //console.log("DATA ANNO LIBRO MASTER",typeof(data.anno))
 
     if (isAdmin) {
         //rimuovo il campo type dall'oggetto.. è utile solo per l'upload dell'immagine ma non fa parte dei campi db

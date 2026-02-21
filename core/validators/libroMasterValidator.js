@@ -31,7 +31,6 @@ export const createLibroMasterSchema = Joi.object({
     // tipo di file : COPERTINA
     type: Joi.string().valid('copertina').optional()
 }).options({
-    stripUnknown: true,
     convert: true
 })
 
@@ -67,7 +66,6 @@ export const updateLibroMasterSchema = Joi.object({
         // tipo di file : COPERTINA
     type: Joi.string().valid('copertina').optional(),
 }).options({
-    stripUnknown: true,
     convert: true
 }).min(1)
 .messages({

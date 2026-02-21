@@ -45,7 +45,6 @@ export const updateUtenteSchema = (context = {}) => {
 
     })
     .min(1) // almeno un campo da modificre
-    .options({ stripUnknown: true })
 }
 
 
@@ -58,4 +57,4 @@ export const richiestaEliminazioneSchema = Joi.object({
         "date.base": "Il campo 'data_richiesta_eliminazione' deve essere una data valida.",
         "date.format": "La data deve essere nel formato ISO 8601 (es. .toISOString())."
     })
-}).options({ stripUnknown: true})
+})

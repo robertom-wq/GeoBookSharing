@@ -23,6 +23,5 @@ export const createValutazioneSchema = Joi.object({
         'string.max' : 'Il commento non può superare i 1000 caratteri'
     })
 }).options({
-    stripUnknown: true,
     convert: true
 })

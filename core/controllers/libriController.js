@@ -293,7 +293,7 @@ export const updateLibro = async (req, res) => {
         data.copertina = nuovaCopertina
         data.copertina_thumb = nuovaCopertina_thumb
     }
-    console.log("DATA ANNO LIBRO",typeof(data.anno))
+    //console.log("DATA ANNO LIBRO",typeof(data.anno))
     //verifico che siano stati inviati dati aggiornare in data
     if(Object.keys(data).length === 0) {
         return res.status(304).json({message: "Niente da aggiornare"})
@@ -351,7 +351,6 @@ export const updateLibro = async (req, res) => {
         return res.status(500).json({ error: "Errore server - updateLibro"})           
     }
 }
-
 
 
 //Eliminazione definitiva libro dal DB (admin o proprietario)

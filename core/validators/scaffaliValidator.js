@@ -18,7 +18,7 @@ export const createScaffaleSchema = Joi.object({
             'number.base': 'La longitudine deve essere un numero valido.',
             'number.min': 'La longitudine deve essere compresa tra -180 e 180.',
             'number.max': 'La longitudine deve essere compresa tra -180 e 180.'}),
-}).options({ stripUnknown: true})
+})
 
 export const updateScaffaleSchema = Joi.object({
     nome: Joi.string().min(3).max(100).allow('').optional().messages({
@@ -38,4 +38,4 @@ export const updateScaffaleSchema = Joi.object({
             'number.base': 'La longitudine deve essere un numero valido.',
             'number.min': 'La longitudine deve essere compresa tra -180 e 180.',
             'number.max': 'La longitudine deve essere compresa tra -180 e 180.'}),
-}).min(1).with('lat', 'lng').options({ stripUnknown: true})
+}).min(1).with('lat', 'lng')

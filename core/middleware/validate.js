@@ -6,12 +6,12 @@ const valida_dati = (schema) => {
     return (req, res, next) => {
 
         let schemaDaValidare = schema
-        console.log("body",req.body)
+        //console.log("body",req.body)
         //se lo schema ha un contesto dinamico, es utilizzo di isAdmin
         //in updateUtente dove lo schema è definito come factory function
-        console.log(req.context, typeof schema === 'function')
+        //console.log(req.context, typeof schema === 'function')
         if (typeof schema === 'function') {
-            console.log(req.context)
+            //console.log(req.context)
             schemaDaValidare = schema(req.context || {})
         } else if (schema.context){
             schemaDaValidare = schema.context(req.context || {})
