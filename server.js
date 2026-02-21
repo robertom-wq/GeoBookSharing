@@ -67,15 +67,15 @@ app.use('/uploads', (req, res, next)=>{
     next()    
 }, express.static(path.join(__dirname, '/uploads')))
 
+/*
 app.listen(3000, 'localhost', () => {
     logger.info("Server Backend avviato - API su http://localhost:3000")
     console.log("API su http://localhost:3000")
-}) 
+}) */ 
 
-    /*
-//UTILIZZATO PER PROVE SU RETE LOCALE
+
+//UTILIZZATO PER PROVE SU RETE LOCALE e docker
 app.listen(3000, '0.0.0.0', () => {
   logger.info("Server Backend avviato - API su tutte le interfacce (3000)")
   console.log("API su http://0.0.0.0:3000")
 })
-*/
