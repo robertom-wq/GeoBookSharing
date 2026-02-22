@@ -1,0 +1,65 @@
+ id |     username      |                                          biografia                                          | id |          nome
+----+-------------------+---------------------------------------------------------------------------------------------+----+-------------------------
+  4 | anna.neri         | Appassionata di romanzi fantasy e scienza fiction. Cerco sempre nuovi libri da condividere. |  1 | Scaffale Fantasy
+  4 | anna.neri         | Appassionata di romanzi fantasy e scienza fiction. Cerco sempre nuovi libri da condividere. |  2 | Scaffale Sci-Fi
+  5 | fabio.gialli      | Collezionista di classici. Non presto i libri, li condivido con chi li apprezza.            |  3 | Classici Italiani
+  5 | fabio.gialli      | Collezionista di classici. Non presto i libri, li condivido con chi li apprezza.            |  4 | Classici Stranieri
+  6 | chiara.blu        | Studente universitaria alla ricerca di testi storici rari. Disponibile a scambi.            |  5 | Storia Antica
+  6 | chiara.blu        | Studente universitaria alla ricerca di testi storici rari. Disponibile a scambi.            |  6 | Saggi Contemporanei
+  7 | davide.arancio    |                                                                                             |  7 | Fumetti e Graphic Novel
+  7 | davide.arancio    |                                                                                             |  8 | Thriller Internazionali
+  8 | elena.viola       | Leggo un libro a settimana. Ho una vasta collezione di gialli svedesi.                      |  9 | Gialli Svedesi
+  8 | elena.viola       | Leggo un libro a settimana. Ho una vasta collezione di gialli svedesi.                      | 10 | Horror & Gotico
+  9 | francesco.marrone | Amo la saggistica. Chiedetemi qualsiasi cosa su filosofia e politica.                       | 11 | Filosofia Tedesca
+  9 | francesco.marrone | Amo la saggistica. Chiedetemi qualsiasi cosa su filosofia e politica.                       | 12 | Politica Attuale
+ 10 | greta.rosa        | Nuova sulla piattaforma, ma con tanti libri da mettere in circolo!                          | 13 | Nuove Voci
+ 10 | greta.rosa        | Nuova sulla piattaforma, ma con tanti libri da mettere in circolo!                          | 14 | Cucina dal Mondo
+ 11 | luca.grigio       | Preferisco il formato digitale, ma presto anche i miei pochi volumi cartacei.               | 15 | Poesia Moderna
+ 11 | luca.grigio       | Preferisco il formato digitale, ma presto anche i miei pochi volumi cartacei.               | 16 | Fantascienza Hard
+ 12 | silvia.nero       | Viaggiatrice e lettrice di guide e racconti di viaggio.                                     | 17 | Guide di Viaggio Europa
+ 12 | silvia.nero       | Viaggiatrice e lettrice di guide e racconti di viaggio.                                     | 18 | Letteratura di Viaggio
+ 13 | tommaso.azzurro   |                                                                                             | 19 | Narrativa Breve
+ 13 | tommaso.azzurro   |                                                                                             | 20 | Libri d'Arte
+
+  id |                                                titolo                                                 | genere_id |           dettagli
+----+-------------------------------------------------------------------------------------------------------+-----------+------------------------------
+ 42 | Elementi Di Matematica Discreta                                                                       |         1 | Non definito
+ 34 | L'uomo che piantava gli alberi                                                                        |         1 | Non definito
+  6 | I, Robot                                                                                              |         1 | Non definito
+ 22 | Storia dell'arte italiana. Dal manierismo al neoclassicismo. Per le Scuole superiori                  |         2 | Non-Fiction per Ragazzi
+ 21 | Storia dell'arte italiana. Antichità e Medioevo. Con DVD                                              |         2 | Non-Fiction per Ragazzi
+  7 | Storia dell'arte italiana. Il Rinascimento. Per le Scuole superiori                                   |         2 | Non-Fiction per Ragazzi
+ 20 | Veneti. Ricettario della memoria                                                                      |         3 | Scienze Sociali
+ 18 | Manuale di cultura veneta                                                                             |         3 | Scienze Sociali
+ 14 | Folklore e magia popolare del Veneto. Rituali, superstizioni e antica stregoneria                     |         3 | Scienze Sociali
+ 39 | Manuale di elettronica e telecomunicazioni                                                            |         4 | Tecnologia e Ingegneria
+  8 | Meccanica Analitica                                                                                   |         4 | Tecnologia e Ingegneria
+  9 | Modern Physics for Scientists and Engineers                                                           |         5 | Educazione
+ 41 | Programmare con Python. Guida completa                                                                |         6 | Informatica
+ 40 | C++ Fondamenti di programmazione                                                                      |         6 | Informatica
+ 10 | C++. Fondamenti di programmazione                                                                     |         6 | Informatica
+ 13 | Anatomia umana. Atlante                                                                               |         7 | Medico
+ 12 | Fisiologia medica                                                                                     |         7 | Medico
+ 11 | Harrison. Principi di medicina interna                                                                |         7 | Medico
+ 15 | Veneto. Storytelling turistico e identità storica                                                     |         8 | Viaggi
+ 30 | La Caduta di Costantinopoli: Le testimonianze dei contemporanei                                       |         9 | Storia
+ 29 | Storia d'Italia. Il cammino tormentato di una nazione 1861-2016                                       |         9 | Storia
+ 19 | Storia del Veneto dalle origini ai giorni nostri                                                      |         9 | Storia
+ 17 | Memorie di terra e d'acqua. Note di storia e cultura del Veneto                                       |         9 | Storia
+ 16 | Venezia. Una storia di mare e di terra                                                                |         9 | Storia
+ 23 | Poesie. Testo inglese a fronte                                                                        |        10 | Poesia
+ 37 | Il trono di spade. Libro primo delle Cronache del ghiaccio e del fuoco                                |        11 | Fumetti e Romanzi Illustrati
+ 36 | Il trono di spade. Un gioco di troni                                                                  |        11 | Fumetti e Romanzi Illustrati
+ 28 | Watchmen: DC Compact Comics Edition                                                                   |        11 | Fumetti e Romanzi Illustrati
+ 27 | Sandman                                                                                               |        11 | Fumetti e Romanzi Illustrati
+ 24 | Nella mente di Sherlock Holmes. Il caso del biglietto misterioso                                      |        11 | Fumetti e Romanzi Illustrati
+ 38 | Lo Hobbit                                                                                             |        12 | Narrativa
+ 35 | American Gods                                                                                         |        12 | Narrativa
+ 33 | Delitto e castigo. Ediz. integrale                                                                    |        12 | Narrativa
+ 31 | Guerra e pace                                                                                         |        12 | Narrativa
+ 26 | La ragazza che giocava con il fuoco. Millennium                                                       |        12 | Narrativa
+ 25 | Non lasciarmi                                                                                         |        12 | Narrativa
+ 32 | Il ritratto di Dorian Gray. Ediz. illustrata                                                          |        13 | Fiction per Ragazzi
+ 43 | Il museo dei numeri. Da zero verso l'infinito, storie dal mondo della matematica                      |        14 | Matematica
+ 44 | Voglio correre. Allenamento e alimentazione: come diventare più veloci, più resistenti, più magri     |        15 | Salute e Fitness
+ 45 | I genitori perfetti non esistono. Mindfulness per mamme e papà liberi dall'ansia e per bambini felici |        16 | Famiglia e Relazioni

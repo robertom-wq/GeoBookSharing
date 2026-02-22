@@ -1,35 +1,28 @@
 {
-  "name": "geobooksharing_backend",
-  "version": "1.0.0",
-  "description": "WebApp volta a favorire la condivisione “peer-to-peer” del patrimonio librario privato, sfruttando la geolocalizzazione per connettere gli utenti residenti in prossimità - Backend",
-  "keywords": [],
-  "license": "ISC",
-  "author": "Roberto Marongiu",
+  "name": "geobooksharing-frontend-vue",
+  "private": true,
+  "version": "0.0.0",
   "type": "module",
-  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@prisma/client": "^6.18.0",
-    "axios": "^1.13.2",
-    "bcryptjs": "^3.0.3",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "express-rate-limit": "^8.2.1",
-    "helmet": "^8.1.0",
-    "hpp": "^0.2.3",
-    "isbn3": "^2.0.1",
-    "joi": "^18.0.1",
-    "jsonwebtoken": "^9.0.2",
-    "multer": "^2.0.2",
-    "nodemon": "^3.1.11",
-    "prisma": "^6.18.0",
-    "sharp": "^0.34.4",
-    "winston": "^3.18.3",
-    "winston-daily-rotate-file": "^5.0.0",
-    "xss": "^1.0.15"
+    "@vicons/ionicons5": "^0.13.0",
+    "@vue-leaflet/vue-leaflet": "^0.10.1",
+    "leaflet": "^1.9.4",
+    "naive-ui": "^2.43.2",
+    "pinia": "^3.0.4",
+    "vfonts": "^0.0.3",
+    "vue": "^3.5.24",
+    "vue-chartjs": "^5.3.3",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "unplugin-auto-import": "^21.0.0",
+    "unplugin-vue-components": "^31.0.0",
+    "vite": "^7.2.4"
   }
 }

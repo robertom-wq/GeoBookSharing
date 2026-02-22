@@ -1,26 +1,20 @@
+# Usa Node 18 su Alpine
 FROM node:22-slim
-
-# Installa OpenSSL
-RUN apt-get update -y && \
-    apt-get install -y openssl libssl-dev && \
-    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
 
-# Copia i file manifest
+# Copia i file dei pacchetti
 COPY package*.json ./
 
-# Installa le dipendenze
+# Installa le dipendenze (Naive UI, Pinia, ecc.)
 RUN npm install
 
-# Copia la cartella prisma e genera il client per Linux
-COPY prisma ./prisma/
-RUN npx prisma generate
-
-# Copia il resto del codice
+# Copia il resto del codice sorgente
 COPY . .
 
-EXPOSE 3000
+# Espone la porta di Vite
+EXPOSE 5173
 
-# Avvio con nodemon
-CMD [ "npm", "run", "dev" ]
+# CMD fondamentale: aggiungiamo --host per rendere accessibile Vite fuori dal container
+# e --port per forzare la 5173 definita nel compose
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]

@@ -1,0 +1,155 @@
+:root {
+  --dark_gray: #5c5b5be0;
+  --text-color-light: #ffffff;
+  --white-bg: #ffffff;
+  --box-shadow: 0 7px 7px rgba(81, 86, 150, 0.623); /* ombra più morbida e professionale */
+  --border-radius: 12px;
+  --pearl-white-bg: rgb(241, 238, 238); 
+  /*--color-text-dark: #333333;*/
+  --color-text-dark: #434343;
+  --navbar-text-hover: #82c4f7;
+  --btn-primary-color : #3194E7;
+  --btn-primary-color-text: #ffffff;
+
+  --section-spacing: clamp(1rem, 5vw, 2.5rem); /* spaziatura tra sezioni elastica */
+  --container-max-width: 1900px;
+  --transition-speed: 0.3s;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  color: var(--color-text-dark); /* grigio scuro */
+  line-height: 1.6; /* aumenta l'aria tra le righe */
+  margin: 0;
+  padding: 0;
+}
+
+.page {
+  padding: 3vw; 
+}
+
+.intestazione {
+  margin-bottom: 2rem;
+  margin-top: 4.25rem;
+}
+
+.intestazione h1 {
+  /* font-size: minimo 20px, ideale 4% dello schermo, massimo 36px */
+  font-size: clamp(1.25rem, 30vw, 2.25rem)!important;
+  font-weight: 300; /* leggero per uno stile moderno */
+  letter-spacing: -0.02em; /* stringe leggermente le lettere */
+  line-height: 1.3;
+  opacity: 0.9;
+}
+
+.sottotitolo {
+  /* font-size: minimo 20px, ideale 4% dello schermo, massimo 36px */
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.3;
+  opacity: 0.9;
+}
+
+/*schede principali con moduli*/
+.scheda_richiesta, .scheda_registrazione, .profilo_card, .scheda_login, .scheda_libro, .libro_card {
+    max-width: clamp(18.75rem, 90vw, 38rem); 
+    margin: 3rem auto;
+    padding: clamp(0.5rem, 3vw, 2rem);
+    background-color: var(--pearl-white-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+/* contenitore dei pulsanti*/
+.pulsanti_azione {
+    padding-top: 2rem; /*distanzia i bottoni dal testo */
+    width: 100%;
+    display: flex; /* layout Flexbox  */
+    gap: 1.5rem !important; /* Spazio piu largo tra i bottoni per agevolare click */
+    justify-content: center; /* Centratura bottoni nel contenitore */
+}
+
+.contenuto_modulo {
+    margin-top: 2rem;
+}
+
+/*centratura titolo della card */
+.n-card > .n-card-header {
+    text-align: center; 
+}
+
+.n-button {
+    min-width: 7rem;
+}
+
+/* dimensioni fisse per l'immagine anteprima */
+.avatar_copertina_img {
+    width: 9.375rem !important;
+    height: 9.375rem !important;
+    margin-bottom: 0.625rem;
+}
+
+/* allineamento copertina e gestione spazi interni */
+.avatar_copertina_container {
+    text-align: center;
+    width: 100%;
+}
+
+/* disposizione verticale elementi caricamento copertina */
+.sezione_copertina_avatar .n-form-item-blank {
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.n-button {
+    min-width: 7rem;
+}
+
+/* centratura e spaziatura pulsanti */
+.n-space {
+    width: 100%;
+    justify-content: center !important; 
+    gap: 0.85rem !important;
+}
+
+.n-upload {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+/* Ottimizzazione per mobile (tablet e smartphone) */
+@media (max-width: 748px) {
+  .scheda_richiesta, .scheda_registrazione, .profilo_card, .scheda_login, .scheda_libro, .libro_card {
+        width: 100% !important;
+        margin: 1rem auto;
+    }
+      /* pila verticale dei pulsanti su mobile */
+    .n-space, .pulsanti_azione {
+        flex-direction: column !important;
+        align-items: stretch;
+        gap: 1rem !important;
+        padding-bottom: 2rem;
+    }
+
+    /*bottoni più grandi per il touch */
+    .n-button {
+        width: 100% !important;
+        height: 2.3rem;
+        font-size: 1.2rem;
+    }
+
+    /* input più grandi per il touch */
+    .n-input {
+        min-height: 2.5rem;
+        font-size: small;
+    }
+    
+    /* azzeramento padding per recuperare spazio */
+    .n-card__content {
+        padding: 0!important;
+    }
+    .contenuto_modulo  {
+        padding: 0 0rem;/* rimuovo il padding laterale per aumentare spazio disponibile*/
+    }
+}
