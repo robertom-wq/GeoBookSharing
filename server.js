@@ -31,7 +31,7 @@ app.use(cors({
 }))
 
 /*
-//UTILIZZATO PER PROVE SU RETE LOCALE
+//Utilizzato per prove su rete locale
 app.use(cors({
   origin: [
     process.env.FRONTEND_URL,
@@ -74,7 +74,7 @@ app.listen(3000, 'localhost', () => {
 }) */ 
 
 
-//UTILIZZATO PER PROVE SU RETE LOCALE e docker
+//Utilizzato per prove su rete locale e docker
 app.listen(3000, '0.0.0.0', () => {
   logger.info("Server Backend avviato - API su tutte le interfacce (3000)")
   console.log("API su http://0.0.0.0:3000")

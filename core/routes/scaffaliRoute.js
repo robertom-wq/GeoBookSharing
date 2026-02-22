@@ -1,8 +1,8 @@
-import express from "express";
-import auth from "../middleware/auth.js";
-import { csrf_protection } from "../middleware/csrf.js";
-import valida_dati from "../middleware/validate.js";
-import { createScaffale, getScaffaleById, deleteScaffale, getMieiScaffali, updateScaffale } from "../controllers/scaffaliController.js";
+import express from "express"
+import auth from "../middleware/auth.js"
+import { csrf_protection } from "../middleware/csrf.js"
+import valida_dati from "../middleware/validate.js"
+import { createScaffale, getScaffaleById, deleteScaffale, getMieiScaffali, updateScaffale } from "../controllers/scaffaliController.js"
 import { createScaffaleSchema, updateScaffaleSchema } from "../validators/scaffaliValidator.js"
 
 const scaffaliRouter = express.Router()

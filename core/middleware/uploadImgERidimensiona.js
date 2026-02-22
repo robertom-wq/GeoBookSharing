@@ -34,7 +34,7 @@ const ridimensiona = async (req, res, next) => {
     const cartella = tipo === 'avatar' ? AVATAR_PATH: COPERTINE_PATH // 
     const estensione = path.extname(req.file.originalname) || '.jpg'
     // genero come base del nome file da caricare nella cartella basato su now (in modo da renderlo univoco)
-    // assieme ad un numero casuale  in modo da evitare collissioni, seppur improbabili, di utenti
+    // assieme ad un numero casuale  in modo da evitare collisioni, seppur improbabili, di utenti
     // che dovessero caricare un file nello stesso preciso momento (es. 1765038069509-876543210.....jpg)
     const base_nome_file = `${Date.now()}-${Math.round(Math.random() * 1E9 )}`
     const buffer = req.file.buffer

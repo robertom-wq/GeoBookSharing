@@ -1,5 +1,5 @@
 /*
-Questo middleware cerca un tocken JWT nel cookie o nell'header. Lo verifica con la chiave
+Questo middleware cerca un token JWT nel cookie o nell'header. Lo verifica con la chiave
 segreta JWT_SECRET e se è valido salva userId, ruolo, isAdmin ed eventuali targetId nella req e prosegue. In caso contrario
 blocca la richiesta
 */
@@ -57,7 +57,7 @@ const auth = async (req, res, next) => {
         if (!req.params.id || req.params.id === '' || req.params.id === '{id}') {
             // pulizia, controlla se il parametro id è mancante (ad esempio, se l'utente ha chiamato
             // un URL come /utenti/ invece di /utenti/123) oppure se ha un valore falsy in JavaScript, come null o undefined.
-            // se viene inviato una stringa vuota come id oppure il placeolder {id} 
+            // se viene inviato una stringa vuota come id oppure il placeholder {id} 
             delete req.params.id
             // in quelle casistiche si intente come parametro l'id dell'utente loggato
             req.targetId = decodificato.userId

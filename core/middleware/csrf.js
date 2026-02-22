@@ -4,7 +4,7 @@ import crypto from 'crypto'
 
 //
 export const CSRF_COOKIE_OPTIONS = {
-    httpOnly: false, // il frontend deve poterlo leggere per inviarlo in X-CSFR-Token
+    httpOnly: false, // il frontend deve poterlo leggere per inviarlo in X-CSRF-Token
     secure: false, // false in ambiente di sviluppo in quanto non si dispone di https
     sameSite: 'lax',
     maxAge: 7*24*60*60*1000 // 7 giorni

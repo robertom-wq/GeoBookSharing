@@ -20,5 +20,5 @@ if (process.env.NODE_ENV === 'production') {
   prisma = global.prisma
 }
 
-//Rend0 l'unica istanza disponibile a tutto il resto dell'app.
+//Rendo l'unica istanza disponibile a tutto il resto dell'app.
 export default prisma

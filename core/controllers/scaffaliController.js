@@ -316,7 +316,7 @@ export const getScaffaleById = async (req, res) => {
             return res.status(404).json({error: 'Scaffale non trovato'})
         }
 
-        const scaffale_da_restiturie = {
+        const scaffale_da_restituire = {
             id: scaffale.id,
             nome: scaffale.nome,
             descrizione: scaffale.descrizione,
@@ -331,7 +331,7 @@ export const getScaffaleById = async (req, res) => {
             libri: scaffale.libri.filter(libro => libro != null)
         }
 
-        return res.status(200).json({message: 'Scaffale recuperato con successo', data: scaffale_da_restiturie})
+        return res.status(200).json({message: 'Scaffale recuperato con successo', data: scaffale_da_restituire})
     } catch (err) {
         logger.error('['+ req.ip +'] Errore getScaffaleById -> : Errore generico ',err)
         console.error('Errore getScaffaleById', err)

@@ -13,7 +13,7 @@ const transport = new winston.transports.DailyRotateFile({
 })
 
 const logger = winston.createLogger({
-  level: 'info', // identifica la la soglia di sensibilità, al di sotto del quale i messaggi verranno ignorati
+  level: 'info', // identifica la la soglia di sensibilità, al di sotto della quale i messaggi verranno ignorati
   format: winston.format.combine( // composizione del log
     winston.format.timestamp(),
     winston.format.json()

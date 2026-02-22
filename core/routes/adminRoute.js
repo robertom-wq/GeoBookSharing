@@ -1,10 +1,9 @@
-import { Router } from 'express';
-import { getLogs } from '../controllers/adminController.js';
-import auth from "../middleware/auth.js";
-import { csrf_protection } from "../middleware/csrf.js";
+import express from "express"
+import { getLogs } from '../controllers/adminController.js'
+import auth from "../middleware/auth.js"
 
-const routerAdmin = Router();
+const routerAdmin = express.Router()
 
-routerAdmin.get('/system-logs', auth, getLogs);
+routerAdmin.get('/system-logs', auth, getLogs)
 
-export default routerAdmin;
+export default routerAdmin

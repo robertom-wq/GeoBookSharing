@@ -1,12 +1,12 @@
-import express from "express";
-import auth from "../middleware/auth.js";
-import { csrf_protection } from "../middleware/csrf.js";
-import valida_dati from "../middleware/validate.js";
-import uploadImgERidimensiona from "../middleware/uploadImgERidimensiona.js";
+import express from "express"
+import auth from "../middleware/auth.js"
+import { csrf_protection } from "../middleware/csrf.js"
+import valida_dati from "../middleware/validate.js"
+import uploadImgERidimensiona from "../middleware/uploadImgERidimensiona.js"
 import { createLibro, createLibroFromMaster, deleteLibro,
      getAllGeneriLetterari, getAllLibri, getAllTipiCondivisione,
-      getLibriPiuVisitati,getLibriVicini, getLibroById, getMieiLibri, updateLibro } from "../controllers/libriController.js";
-import { createLibroSchema, updateLibroSchema, createLibroFromMasterSchema } from "../validators/libroValidator.js";
+      getLibriPiuVisitati,getLibriVicini, getLibroById, getMieiLibri, updateLibro } from "../controllers/libriController.js"
+import { createLibroSchema, updateLibroSchema, createLibroFromMasterSchema } from "../validators/libroValidator.js"
 
 const libriRouter = express.Router()
 
