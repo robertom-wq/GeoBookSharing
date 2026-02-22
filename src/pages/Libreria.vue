@@ -1,18 +1,11 @@
 <template>
-    <!-- contenitore principale della pagina -->
     <div class="page">
         <section>
-            <!-- intestazione della libreria -->
             <div class="intestazione">
-
-                <!-- titolo principale -->
                 <h1>La tua Libreria</h1>
-
-                <!-- sottotitolo con messaggio di benvenuto e riepilogo scaffali -->
                 <p class="sottotitolo">Ciao {{ utenti_store.utente?.nome.toUpperCase() }}. <br>
                     Gestisci la tua libreria aggiungendo o modificando i tuoi scaffali.
                     <br>
-                    <!-- conteggio totale degli scaffali dell'utente -->
                     Attualmente possiedi <span class="evidenza_numero">
                         {{ scaffali_store?.conteggio_scaffali_totali }}</span>
                     <a
@@ -26,28 +19,22 @@
                     <Mappa :is_home_scaffali="true" ref="mappa_ref" :centra_mappa="coordinate_centrate"
                     :dati_scaffali="scaffali_store.scaffali_utente" />
                 </div>
-                <!-- carousel degli scaffali (visibile solo se esistono scaffali) -->
                 <div class="carousel_scaffali"
                     v-if="scaffali_store.scaffali_utente && scaffali_store.conteggio_scaffali_totali > 0">
-                     <!-- carousel naive in modalità card -->
                     <n-carousel effect="card" prev-slide-style="transform: translateX(-150%) translateZ(-800px)"
                         next-slide-style="transform: translateX(50%) translateZ(-800px)" style="height: 240px;"
                         :show-dots="true" :key="scaffali_store.conteggio_scaffali_totali" :autoplay="false"
                         @update:current-index="gestisciCambioCarousel">
-                        <!-- scheda scaffale -->
                         <n-carousel-item v-for="(scaffale, index) in scaffali_store.scaffali_utente" :key="scaffale.id">
                             <n-card :title="scaffale.nome" size="medium" class="scheda_scaffale">
-                                <!-- badge con numero di libri nello scaffale -->
                                 <template #header-extra>
                                     <n-badge :value="scaffale.libri?.length || 0" type="info" />
                                 </template>
-                                <!-- corpo della scheda -->
                                 <div class="corpo_scheda">
                                     <n-text depth="3" class="testo_descrizione">
                                         {{ troncaStringa(scaffale.descrizione) || 'Nessuna descrizione presente per questo scaffale.' }}
                                     </n-text>
                                 </div>
-                                <!-- footer con bottone per entrare nella pagina di dettaglio scaffale -->
                                 <template #footer>
                                     <n-button  type="warning" round
                                         @click="vaiDettagliScaffale(scaffale.id)">
@@ -59,7 +46,6 @@
                     </n-carousel>
 
                 </div>
-                    <!-- stato vuoto, nessuno scaffale presente -->
                     <n-empty v-else-if="!scaffali_store.loading" description="Non hai acora creato nessun scaffale. Aggiungine uno!"/>
             </div>
         </section>
@@ -76,11 +62,11 @@
 
 <script setup>
 import { useUtentiStore } from '@/stores/utentiStore'
-import { useScaffaliStore } from '@/stores/scaffaliStore';
-import { computed, onMounted, onBeforeMount, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useScaffaliStore } from '@/stores/scaffaliStore'
+import { computed, onMounted, onBeforeMount, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { troncaStringa } from '@/utils/toolkit'
-import Mappa from '@/components/Mappa.vue';
+import Mappa from '@/components/Mappa.vue'
 
 const utenti_store = useUtentiStore()
 const scaffali_store = useScaffaliStore()
@@ -95,21 +81,21 @@ const mappa_ref = ref(null)
 //porta l'utente alla creazione
 function vaiCreaScaffale() {
     //naviga verso la rotta per la creazione di un nuovo scaffale
-    console.log("Vai alla rotta nuovo scaffale")
+    //console.log("Vai alla rotta nuovo scaffale")
     router.push({ name: 'AggiungiScaffale' })
 }
 
 //porta l'utente al dettaglio
 function vaiDettagliScaffale(scaffale_id) {
     //naviga verso la rotta per la visualizzazione di uno scaffale
-    console.log("Vai alla rotta dettagli scaffale")
+    //console.log("Vai alla rotta dettagli scaffale")
     router.push({ name: 'DettaglioScaffale', params: { id: scaffale_id } })
 }
 
 // Gestisce l'evento di scorrimento del carousel aggiornando l'indice
 function gestisciCambioCarousel(index) {
     indice_carousel_corrente.value = index
-    console.log("Nuovo indice carousel", indice_carousel_corrente.value)
+    //console.log("Nuovo indice carousel", indice_carousel_corrente.value)
 
 }
 
@@ -120,11 +106,11 @@ const coordinate_centrate = computed(() => {
     if (scaffali && scaffali.length > 0) {
         //prendo lo scaffale selezionato con il carousel grazie a 'indice_carousel_corrente'
         // fallback all'indice 0 se l'indice corrente non è valido
-        const index_fallback = indice_carousel_corrente.value < scaffali.length ? indice_carousel_corrente.value : 0;
-        const scaffale_corrente = scaffali[index_fallback];
+        const index_fallback = indice_carousel_corrente.value < scaffali.length ? indice_carousel_corrente.value : 0
+        const scaffale_corrente = scaffali[index_fallback]
         if (scaffale_corrente) {
             const coordinate_scaffale = { lat: scaffale_corrente.lat, lng: scaffale_corrente.lng, zoom: 15 }
-            console.log("Coordinate Scaffale: ", coordinate_scaffale)
+            //console.log("Coordinate Scaffale: ", coordinate_scaffale)
             return coordinate_scaffale
         }
     }
@@ -153,22 +139,20 @@ onMounted(async () => {
     color: var(--btn-primary-color);
 }
 
-/* Area Mappa */
 #contenitore_mappa {
-    margin-bottom: 2rem; /* spazio sotto il contenitore della mappa */
+    margin-bottom: 2rem; 
     box-shadow: var(--box-shadow);
     border-radius: var(--border-radius);
-    height: clamp(18.75rem, 40vh, 31.25rem);/* definisce l'altezza della card dinamicamente tra 300px e 500px in base all'altezza dello schermo */
-    overflow: hidden;/* nasconde le parti di mappa che escono dagli angoli arrotondati */
+    height: clamp(18.75rem, 40vh, 31.25rem);
+    overflow: hidden;
 }
 
 /* rimuovo il padding interno della card Naive per far toccare la mappa ai bordi */
 .contenitore_mappa :deep(.n-card__content) {
-    padding: 0 !important; /* forza zero padding per full width */
-    height: 100%; /* assicura che il contenuto occupi tutta l'altezza disponibile */
+    padding: 0 !important; 
+    height: 100%; 
 }
 
-/* Assicuriamoci che il componente Mappa occupi tutto lo spazio */
 #contenitore_mappa :deep(.sezione_mappa_inner),
 #contenitore_mappa :deep(.mappa_container) {
     height: 100% !important;

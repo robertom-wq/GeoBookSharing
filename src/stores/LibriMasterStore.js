@@ -59,7 +59,7 @@ export const useLibriMasterStore = defineStore('libriMaster', ()=>{
     // crea nuovo libro master da codice isbn
     async function createLibroMasterISBN(isbn) {
         loading.value = true
-        console.log(isbn)
+        //console.log(isbn)
 
         try {
             const nuovo_libro_master = await chiamaAPI('/libriMaster/isbn',{
@@ -124,12 +124,12 @@ export const useLibriMasterStore = defineStore('libriMaster', ()=>{
                 method: 'PATCH',
                 body:  libro 
             })
-            console.log("Catalogo Master:", catalogo_master.value)
-            console.log("id:", id)
+            //console.log("Catalogo Master:", catalogo_master.value)
+            //console.log("id:", id)
 
             // cerco elemento con id e lo aggiorno con i dati aggiornati
             const elemento = catalogo_master.value.find( elemento_array => elemento_array.id === id)
-            console.log("elemento:", elemento)
+            //console.log("elemento:", elemento)
             if (elemento) {
                 Object.assign(elemento, libro_master_aggiornato.data)
             }
@@ -166,7 +166,7 @@ export const useLibriMasterStore = defineStore('libriMaster', ()=>{
             return libro_eliminato
 
         } catch (err) {
-            console.error("Impossibile eliminare il libro master")
+            console.error("Impossibile eliminare il libro master",err)
             throw err
         } finally {
             loading.value = false

@@ -23,21 +23,21 @@ const props = defineProps({
   testoConferma: { type: String, default: 'Conferma' },
   testoAnnulla: { type: String, default: 'Annulla' },
   tipo: { type: String, default: 'warning' } // 'warning', 'error', 'info', 'success'
-});
+})
 
-const emit = defineEmits(['conferma', 'annulla', 'update:show']);
+const emit = defineEmits(['conferma', 'annulla', 'update:show'])
 
 function conferma() {
-  emit('conferma');
+  emit('conferma')
 }
 
 function annulla() {
-  emit('annulla');
-  emit('update:show', false);
+  emit('annulla')
+  emit('update:show', false)
 }
 
 function chiudi(valore) {
-  emit('update:show', valore);
+  emit('update:show', valore)
 }
 </script>
 

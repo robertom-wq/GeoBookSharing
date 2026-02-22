@@ -88,7 +88,7 @@ export const useUtentiStore = defineStore('utente', () => {
     // Eseguo registrazione (crazione nuovo accoubnt)
     async function registrati(form_data) {
         loading.value = true
-        console.log(form_data)
+        //console.log(form_data)
         try {
             // Faccio la POST con tutti i dati del nuovo utente
             const nuovo_utente = await chiamaAPI('/auth/registrazione', {
@@ -141,7 +141,7 @@ export const useUtentiStore = defineStore('utente', () => {
                 method: 'GET'
             })
 
-            // Salviamo i dati negli stati dello store
+            // salvo i dati negli stati dello store
             risultati_ricerca.value = all_utenti.data
             nr_totale_utenti.value = all_utenti.conteggioTotale
             nr_pagine_totali.value = all_utenti.nr_pagine_totali
@@ -168,7 +168,7 @@ export const useUtentiStore = defineStore('utente', () => {
                     richiesta_eliminazione: valore,
                     data_richiesta_eliminazione: valore ? (utente.value.data_richiesta_eliminazione || new_data_richiesta) : null
                 }
-            });
+            })
             Object.assign(utente.value, utente_con_richiesta_delete.data)
             return utente_con_richiesta_delete
         } catch (err) {
@@ -184,8 +184,8 @@ export const useUtentiStore = defineStore('utente', () => {
         // un amministratore può modificare alcuni parametri dell'utente, in tal caso nella richiesta deve
         //essere specificato l'ID dell'utente da modificare
         if (is_admin_mode && !id) {
-            console.error("Errore: ID mancante in modalità amministratore.");
-            return;
+            console.error("Errore: ID mancante in modalità amministratore.")
+            return
         }
         loading.value = true
         const path = is_admin_mode
@@ -205,7 +205,7 @@ export const useUtentiStore = defineStore('utente', () => {
             }
             return aggiornato
         } catch (err) {
-            console.error("Impossibile affiornare utente", err)
+            console.error("Impossibile aggiornare utente", err)
             throw err
         } finally {
             loading.value = false
@@ -237,7 +237,7 @@ export const useUtentiStore = defineStore('utente', () => {
             console.warn('Logout fallito', err)
             throw err
         } finally {
-            // Pulisco tutto, utente, token e svuoto il localStorage
+            // Pulisco utente, token e svuoto il localStorage
             utente.value = null
             csrf_token.value = null
             localStorage.removeItem('csrf_token')

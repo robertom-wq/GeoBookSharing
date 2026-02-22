@@ -1,11 +1,8 @@
 <template>
-    <!-- contenitore principale pagina -->
     <div class="page">
         <section>
-            <!-- intestazione pagina -->
             <div class="intestazione">
                 <h1>Catalogo Master</h1>
-                <!-- saluto utente e link guida -->
                 <p class="sottotitolo">
                     Ciao, {{ utenti_store.utente?.nome?.toUpperCase() || 'UTENTE' }}.
                     Pubblica il tuo libro in un istante. <br>
@@ -13,33 +10,26 @@
                 </p>
             </div>
             <div class="contenuto_pagina">
-                <!-- card ricerca -->
                 <n-card class="barra_input">
                     <n-flex justify="center" align="center">
-                        <!-- input ricerca titolo o autore -->
                         <n-input v-model:value="query_ricerca" placeholder="Cerca Titolo o Autore..." clearable
                             class="input_ricerca" />
                     </n-flex>
                 </n-card>
-                <!-- pulsanti azioni -->
                  <div class="azioni_utente">
                  <n-space>
-                    <!-- aggiunta libro tramite isbn -->
                     <n-button type="info" ghost @click="mostra_modale_ricercaISBN = true">
                         Aggiungi da ISBN
                     </n-button>
-                    <!-- creazione manuale visibile solo admin -->
-                    <n-button v-if="utenti_store.utente.ruolo == 'admin'" type="warning" @click="CreateLibroMaster">
+                    <n-button v-if="utenti_store.utente.ruolo == 'admin'" type="warning" @click="createLibroMaster">
                         Crea Manuale
                     </n-button>
                 </n-space>
                 </div>
             </div>
-            <!-- spinner caricamento catalogo -->
             <n-spin :show="libri_master_store.loading">
 
                 <n-divider />
-                <!-- catalogo vuoto -->
                 <n-empty v-if="libri_master_store.catalogo_master.length === 0" description="Nessun Libro Master trovato nel catalogo"/>
                     <div v-else>
                         <n-flex justify="end" align="center" class="riga_opzioni_visualizzazione">
@@ -50,10 +40,8 @@
                             class="selettore_quantita"
                         />
                         </n-flex>
-                        <!-- griglia libri master -->
                         <div class="griglia_libri_master">
                             <div v-for="libro_master in libri_da_visualizzare" :key="libro_master.id">
-                                <!-- singolo libro -->
                                 <libri-card 
                                     :titolo="libro_master.titolo"
                                     :immagine="libro_master.copertina"
@@ -64,7 +52,6 @@
                                 />
                             </div>
                         </div>
-                        <!-- navigazione pagine -->
                         <n-flex justify="center" class="area_navigazione_pagine">
                             <NPagination v-model:page="pagina_corrente"
                                 :page-size="risultati_pagina"
@@ -77,7 +64,6 @@
             </n-spin>
         </section>
     </div>
-    <!-- modale guida rapida -->
     <n-modal v-model:show="mostra_info" >
          <n-card title="Guida Rapida" class="scheda_informativa" closable @close="mostra_modale_ricercaISBN= false">
             <p>Non vuoi perdere tempo a compilare i dati del tuo libro? Da questa pagina è possibile attingere alle informazioni del tuo Libro
@@ -102,12 +88,11 @@
             </n-button>
         </n-card>
     </n-modal>
-    <!-- modale ricerca isbn -->
     <n-modal v-model:show="mostra_modale_ricercaISBN">
         <n-card title="Aggiungi Libro tramite ISBN" class="scheda_isbn" closable @close="mostra_modale_ricercaISBN= false">
             <n-space vertical>
                 <n-input v-model:value="codice_isbn" placeholder="Inserisci ISBN-10 oppure ISBN-13"/>
-                <n-button type="primary" @click="CreateLibroMasterDaISBN" ghost :loading="libri_master_store.loading">Cerca e Aggiungi</n-button>
+                <n-button type="primary" @click="createLibroMasterDaISBN" ghost :loading="libri_master_store.loading">Cerca e Aggiungi</n-button>
             </n-space>
             <div></div>
         </n-card>
@@ -130,9 +115,9 @@ const libri_master_store = useLibriMasterStore()
 const message = useMessage()
 const router = useRouter()
 
-// stati e visibilità modali
+// stati
 const mostra_info = ref(false)
-const mostra_modale_ricercaISBN = ref(false);
+const mostra_modale_ricercaISBN = ref(false)
 const query_ricerca = ref('')
 const codice_isbn = ref('')
 
@@ -150,7 +135,6 @@ const opzioni_limit_ricerca = [
     {label: '100', value: 100} 
 ]
 
-// Funzione per caricamento dei libri
 async function caricaLibri() {
     await libri_master_store.getLibriMaster(
         query_ricerca.value, 
@@ -171,12 +155,12 @@ function gestioneCambioPagina(pagina) {
 // chiamate ripetute allo store mentre l’utente sta ancorta digitando
 let timeout_ricerca = null
 watch(query_ricerca, (nuova_query) => {
-    clearTimeout(timeout_ricerca);
+    clearTimeout(timeout_ricerca)
     timeout_ricerca = setTimeout(() => {
         pagina_corrente.value = 1
         caricaLibri()
-    }, 300); // Debounce di 300ms
-});
+    }, 300) // Debounce di 300ms
+})
 
 // reset pagina al variare del numero di risultati richiesti
 watch(risultati_pagina, () => {
@@ -185,8 +169,8 @@ watch(risultati_pagina, () => {
 })
 
 // creazione nuovo libro tramite isbn
-async function CreateLibroMasterDaISBN() {
-    console.log(codice_isbn.value)
+async function createLibroMasterDaISBN() {
+    //console.log(codice_isbn.value)
     if (!codice_isbn.value) {
         message.warning("Inserisci un codice ISBN prima di iniziare la ricerca")
         return
@@ -195,12 +179,12 @@ async function CreateLibroMasterDaISBN() {
         const libro_creato = await libri_master_store.createLibroMasterISBN(codice_isbn.value)
         codice_isbn.value = ''
         message.success(libro_creato.message)
+        vaiALibroMaster(libro_creato.data.id)
 
     } catch (err) {
         message.error("Errore durante la creazione del libro da Master", err)
     } finally {
         mostra_modale_ricercaISBN.value = false
-
     }
 }
 // navigazione verso pagina dettaglio/modifica libro
@@ -209,18 +193,16 @@ function vaiALibroMaster(id) {
 }
 
 // navigazione verso pagina creazione manuale libro
-function CreateLibroMaster() {
+function createLibroMaster() {
     router.push( {name:'CreaLibroMaster'})
 }
 
 onMounted(async ()=> {
-    // carico lista di libriMaster
     caricaLibri()
 })
 </script>
 
 <style scoped>
-/* link apertura guida */
 .link_guida {
     font-style: italic;
     font-size: 0.8rem;
@@ -229,7 +211,6 @@ onMounted(async ()=> {
     text-decoration: underline;
 }
 
-/* barra ricerca */
 .barra_input {
     margin-bottom: 2rem;
     box-shadow: var(--box-shadow);
@@ -243,10 +224,9 @@ onMounted(async ()=> {
 
 /*selettore risultati per pagina */
 .selettore_quantita {
-    width: 7.5rem; /* 120px */
+    width: 7.5rem; 
 }
 
-/* layout flex per elenco libri */
 .griglia_libri_master {
     display: flex;
     flex-wrap: wrap;
@@ -257,14 +237,11 @@ onMounted(async ()=> {
     margin-top: 1.25rem;
 }
 
-/* Paginazione */
 .area_navigazione_pagine {
     margin-top: 3rem;
     padding-bottom: 2rem;
 }
 
-
-/* modale scheda informativa */
 .scheda_informativa {
     max-width: 90%;
 }

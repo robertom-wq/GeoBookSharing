@@ -1,38 +1,26 @@
 <template>
-    <!-- contenitore principale pagina -->
     <div class="page">
         <div class="intestazione">
             <h1>Condivisioni</h1>
             <p class="sottotitolo">Gestisci le tue condivisioni</p>
         </div>
-        <!-- contenuto principale -->
         <div class="contenuto_principale">
-            <!-- spinner caricamento -->
             <n-spin :show="condivisioni_store.loading">
                 <n-tabs type="card" animated class="contenitore_tab" default-value="in_attesa">
-                    <!-- tab condivisioni in attesa di azione utente (proprietario) -->
                     <n-tab-pane name="in_attesa" tab="Richieste in Attesa">
-                        <!--lista vuota -->
                         <n-alert v-if="richieste_in_attesa?.length === 0" title="Nessuna Richiesta" type="info" :show-icon="false" class="avviso_lista_vuota">
                             Non ci sono azioni richieste per le condivisioni concesse.
                         </n-alert>
-                        <!-- lista richieste in pending-->
                         <n-list hoverable v-else class="lista_richieste">
-                            <!-- item per singola richiesta -->
                             <n-list-item v-for="richiesta in richieste_in_attesa" :key="richiesta.id" class="item_ricevuto" >
                                 <n-thing>
-                                    <!-- header richiesta -->
                                     <template #header>
                                         <div class="header_prioritario">
-                                            <!-- tipo richiesta -->
                                             <n-tag type="success" size="small" strong round class="tag_tipo_richiesta">Richiesta Ricevuta</n-tag>
-                                            <!-- stato richiesta -->
                                             <n-tag type="warning" size="small" round>In attesa</n-tag>
-                                            <!-- info utente -->
                                             <div class="header_richiesta">
                                                 <n-avatar round size="small" :src="`${image_url}/${richiesta.richiedente.avatar}`" />
                                                 <span @click="apriDettaglioUtente(richiesta.richiedente_id)" class="nome_utente_enfasi">{{ richiesta.richiedente.username }}</span>
-                                                <!-- badge valutazione richiedente (utile per decidere se accettare o meno la richiesta)-->
                                                 <div class="badge_voti">
                                                     <n-icon size="14" color="#fbb337">
                                                         <Star />
@@ -43,14 +31,12 @@
                                         </div>
                                     </template>
                                     
-                                    <!-- info libro richiesto -->
                                     <template #description>
                                         <div class="info_libro_richiesto">
-                                            <span class="label_grigia">Libro richiesto: </span>
+                                            <span class="label_grigia_bio">Libro richiesto: </span>
                                             <span class="titolo_libro_info">{{ richiesta.libro.titolo }}</span>
                                         </div>
                                     </template>
-                                    <!-- periodo per cui è stata richiesta condivisione -->
                                     <div class="periodo_condivisione">
                                         <n-icon size="16"><CalendarOutline /></n-icon>
                                         <span>Dal <strong>{{ formattaData(richiesta.data_dal) }}</strong> al <strong>{{ formattaData(richiesta.data_al) }}</strong></span>
@@ -60,7 +46,6 @@
                                         <br>
                                         {{ richiesta.note || "Nessuna nota"}}
                                     </div>
-                                    <!-- azioni richiesta (accetta o rifiuta) -->
                                     <template #action>
                                         <div class="area_azioni_condivisione">
                                             <n-button type="primary" ghost size="small" @click="gestisciAccetta(richiesta.id)">Accetta</n-button>
@@ -71,37 +56,28 @@
                             </n-list-item>
                         </n-list>
                     </n-tab-pane>
-                    <!-- tab storico richieste condivisione effettuate o ricevute-->
                     <n-tab-pane name="storico" tab="Storico">
-                        <!-- lista storico -->
                         <n-list hoverable bordered v-if="storico_condivisioni?.length > 0" class="lista_storico">
-                            <!-- singolo elemento dello storico -->
                             <n-list-item v-for="elemento in storico_condivisioni" :key="elemento.id" :class="elemento.is_inviata ? 'item_inviato' : 'item_ricevuto'">
                                 <n-thing>
-                                    <!-- header storico -->
                                     <template #header>
                                         <div class="header_prioritario">
-                                            <!-- tipo richiesta -->
                                             <n-tag :type="elemento.is_inviata ? 'info' : 'success'" size="small" strong round class="tag_tipo_richiesta">
                                                 {{ elemento.is_inviata ? 'Richiesta Inviata' : 'Richiesta Ricevuta' }}
                                             </n-tag>
-                                            <!-- stato della condivisione -->
                                             <n-tag :type="getStatoCondivisione(elemento).type" size="small" ghost>{{ getStatoCondivisione(elemento).text }}</n-tag>
-                                            <!-- info utente richiedente o proprietario-->
                                             <div class="header_richiesta">
                                                 <n-avatar round size="small" :src="elemento.is_inviata ? `${image_url}/${elemento.proprietario.avatar}` : `${image_url}/${elemento.richiedente.avatar}`" />
                                                 <span @click="apriDettaglioUtente(elemento.richiedente_id)" class="nome_utente_enfasi">{{ elemento.is_inviata ? elemento.proprietario.username : elemento.richiedente.username }}</span>
                                             </div>
                                         </div>
                                     </template>
-                                    <!-- info libro richiesto/prestato-->
                                     <template #description>
                                         <div class="info_libro_richiesto">
-                                            <span class="label_grigia">Libro: </span>
+                                            <span class="label_grigia_bio">Libro: </span>
                                             <span class="titolo_libro_info">"{{ elemento.libro.titolo }}"</span>
                                         </div>
                                     </template>
-                                    <!-- periodo per cui è stata richiesta condivisione -->
                                     <div class="periodo_condivisione">
                                         <n-icon size="16"><CalendarOutline /></n-icon>
                                         <span>Dal <strong>{{ formattaData(elemento.data_dal) }}</strong> al <strong>{{ formattaData(elemento.data_al) }}</strong></span>
@@ -115,11 +91,8 @@
                                      elemento da storico e recensione della condivisione) -->
                                     <template #action>
                                         <div class="area_azioni_condivisione">
-                                            <!-- concludi condivisione -->
                                             <n-button v-if="elemento.is_confermato && !elemento.is_completato && !elemento.is_inviata" type="primary" size="small" @click="gestisciCompletamentoCondivisione(elemento.id)">Concludi</n-button>
-                                            <!-- lascia recensione -->
                                             <n-button v-if="elemento.is_completato && !elemento.is_recensita" type="warning" size="small" ghost @click="preparaRecensione(elemento)">Lascia Recensione</n-button>
-                                            <!-- annulla o elimina -->
                                             <n-button v-if="(elemento.is_inviata && !elemento.is_confermato ) || elemento.is_completato" type="primary" ghost size="small" @click="gestisciDeleteCondivisione(elemento.is_inviata, elemento.is_completato, elemento.id )">
                                                 {{ elemento.is_completato ? 'Elimina' : 'Annulla' }}
                                             </n-button>
@@ -128,18 +101,15 @@
                                 </n-thing>
                             </n-list-item>
                         </n-list>
-                        <!-- avviso storico vuoto -->
                         <n-alert v-else type="info" class="avviso_margine_alto">Nessuno storico presente.</n-alert>
                     </n-tab-pane>
                 </n-tabs>
             </n-spin>
         </div>
-        <!-- modale conferma eliminazione -->
         <ModaleConferma v-model:show="mostra_modale_conferma" 
             titolo="Conferma" :messaggio="`Sei sicuro di voler ${testo_azione}?`"
             @conferma="confermaDeleteCondivisione(id_elemento_da_eliminare)" />
 
-        <!-- modale recensione -->
         <n-modal v-model:show="mostra_modale_recensione" preset="dialog" title="Recensione" class="modale_feedback">
             <n-form-item label="Voto">
                 <div class="stelle_centrate"><n-rate v-model:value="form_recensione.voto" :size="42" /></div>
@@ -150,7 +120,6 @@
             </template>
         </n-modal>
 
-        <!-- modale rifiuto -->
         <n-modal v-model:show="mostra_modale_rifiuto" preset="dialog" title="Motivo Rifiuto" class="modale_feedback">
             <n-input v-model:value="form_rifiuto.note" type="textarea" placeholder="Perché rifiuti?" />
             <template #action>
@@ -158,7 +127,6 @@
             </template>
         </n-modal>
 
-        <!--modale dettagli utente-->
         <n-modal v-model:show="mostra_modale_dettaglio" preset="card" title="Profilo Utente" class="modale_profilo" style="width: 400px;">
             <div class="dettaglio_utente_container" v-if="utente_selezionato">
                 <div class="testata_profilo">
@@ -169,7 +137,7 @@
                 <n-divider />
 
                 <div class="sezione_bio">
-                    <p class="label_grigia">Biografia</p>
+                    <p class="label_grigia_bio">Biografia</p>
                     <p class="testo_bio">
                         {{ utente_selezionato.biografia || 'Nessuna biografia inserita.' }}
                     </p>
@@ -226,7 +194,7 @@ const richieste_in_attesa = computed(() => {
 
 // identifico id delle condivisioni gia recensite dall'utente
 const id_condivisioni_recensite = computed(() => {
-    //se non è stato caricato lo store Set vuoto per evitare errori
+    //se non è stato caricato lo store, Set vuoto per evitare errori
     if (!valutazioni_store.mie_valutazioni_all) {
         return new Set()
     }
@@ -268,20 +236,20 @@ const storico_condivisioni = computed(() => {
 
 // formattazione stringa data in dd-mm-yyyy
 const formattaData = (data) => {
-    const d = new Date(data);
-    return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
-};
+    const d = new Date(data)
+    return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`
+}
 
 // mappatura stato in etichette e stili ui
 function getStatoCondivisione(condivisione) {
-    if (condivisione.is_completato) return { text: 'Completato', type: 'success' };
-    if (condivisione.is_rifiutato) return { text: 'Rifiutato', type: 'error' };
-    if (condivisione.is_annullato) return { text: 'Annullato', type: 'warning' };
-    if (condivisione.is_confermato) return { text: 'Accettato (Attivo)', type: 'info' };
+    if (condivisione.is_completato) return { text: 'Completato', type: 'success' }
+    if (condivisione.is_rifiutato) return { text: 'Rifiutato', type: 'error' }
+    if (condivisione.is_annullato) return { text: 'Annullato', type: 'warning' }
+    if (condivisione.is_confermato) return { text: 'Accettato (Attivo)', type: 'info' }
     
-    if (condivisione.is_inviata) return { text: 'In Attesa Risposta', type: 'default' };
+    if (condivisione.is_inviata) return { text: 'In Attesa Risposta', type: 'default' }
 
-    return { text: 'In Attesa Gestione', type: 'default' };
+    return { text: 'In Attesa Gestione', type: 'default' }
 }
 
 // chiusura del prestito attivo (all'atto della restituzione)
@@ -358,7 +326,7 @@ async function invioDati() {
         }        
         
     } catch (err) {
-        console.log("Impossibile inviare la recensione",err)
+        //console.log("Impossibile inviare la recensione",err)
         message.error(err.message || 'Impossibile inviare la recensione')
     } finally {
         mostra_modale_recensione.value = false
@@ -406,9 +374,9 @@ async function gestisciAccetta(id) {
 }
 
 // monitoraggio richieste in attesa per aggiornamento ranking
-watch(() => richieste_in_attesa.value, (nuovaLista) => {
-    if (nuovaLista?.length) {
-        nuovaLista.forEach(richiesta => valutazioni_store.getRankingUtenti(richiesta.richiedente.id))
+watch(() => richieste_in_attesa.value, (nuova_lista) => {
+    if (nuova_lista?.length) {
+        nuova_lista.forEach(richiesta => valutazioni_store.getRankingUtenti(richiesta.richiedente.id))
     }
 }, { immediate: true })
 
@@ -418,9 +386,9 @@ onMounted(async () => {
         condivisioni_store.getMieCondivisioni(),
         valutazioni_store.getMieValutazioni()
     ])
-    console.log(condivisioni_store.mie_condivisioni_richiedente)
-    console.log(condivisioni_store.mie_condivisioni_proprietario)
-    console.log(richieste_in_attesa.value)
+    //console.log(condivisioni_store.mie_condivisioni_richiedente)
+    //console.log(condivisioni_store.mie_condivisioni_proprietario)
+    //console.log(richieste_in_attesa.value)
 })
 
 </script>
@@ -436,7 +404,7 @@ onMounted(async () => {
     flex-wrap: wrap;
     margin-bottom: 8px;
 }
-/* tag dedicato al tipo di richiesta  */
+
 .tag_tipo_richiesta {
     min-width: 140px;
     justify-content: center;
@@ -504,7 +472,7 @@ onMounted(async () => {
 .info_libro_richiesto { 
     margin-top: 0.5rem; 
 }
-.label_grigia {
+.label_grigia_bio {
     color: #8c8c8c; 
     font-size: 0.9rem; 
 }

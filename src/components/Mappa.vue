@@ -1,11 +1,7 @@
 <template>
-    <!-- contenitore principale della sezione mappa -->
     <div class="sezione_mappa_inner">
-        <!-- sezione di ricerca localita visibile solo se non siamo nella home scaffali -->
         <div v-if="!is_home_scaffali" class="ricerca_localita">
             <div class="ricerca_indirizzo">
-
-                <!-- barra con azioni posizione attuale, precisione gps e ricerca indirizzo -->
                 <n-space>
                     <!-- bottone per centrare la mappa sulla posizione attuale -->
                     <n-button @click="ottieniPosizioneAttuale" type="info" primary ghost
@@ -35,19 +31,14 @@
                 </div>
             </div>
         </div>
-        <!-- contenitore della mappa leaflet -->
         <div class="mappa_container">
-            <!-- spinner visibile durante il caricameto della mappa -->
             <div class="spinner_container" v-if="is_loading">
                 <n-spin size="large" description="Caricamento Mappa...">
                 </n-spin>
             </div>
-            <!-- componente mappa principale -->
             <LMap v-model:zoom="zoom" :center="[centratura_mappa.lat, centratura_mappa.lng]" @ready="mappaPronta">
-                <!-- layer base openstreetmap -->
                 <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png">
                 </LTileLayer>
-                <!-- marker draggabile per selezionare manualmente una posizione -->
                 <LMarker v-if="!is_home_scaffali" :lat-lng="coordinate_marker" draggable 
                     @moveend="gestisciMovimentiMarker">
                     <LIcon
@@ -59,7 +50,6 @@
                         :shadow-size="[41, 41]"
                     />
                 </LMarker>
-                <!-- marker degli scaffali mostrati nella home -->
                  <template v-if="is_home_scaffali">
                         <LMarker v-for="scaffale in scaffali_validi" 
                             :key="scaffale.id" :lat-lng="[scaffale.lat, scaffale.lng]"
@@ -72,7 +62,6 @@
                                 :popup-anchor="[1, -34]"
                                 :shadow-size="[41, 41]"
                             />
-                            <!-- tooltip con il nome dello scaffale -->
                             <LTooltip>{{ scaffale.nome }}</LTooltip>
                             <LPopup>
                                 <a style="font-weight: bold;">Nome</a>{{ scaffale.nome }}
@@ -80,7 +69,6 @@
                             </LPopup>
                         </LMarker>
                 </template>
-                <!-- marker dei libri trovati nelle vicinanze -->
                 <template v-if="is_cerca_libri_vicini">
                     <LMarker
                         v-for="libro in props.dati_libri"
@@ -97,7 +85,6 @@
                             :popup-anchor="[1, -34]"
                             :shadow-size="[41, 41]"
                         />
-                        <!-- tooltip con il nome del libro -->
                         <LTooltip>{{ libro.nome }}</LTooltip>
                     </LMarker>
                 </template>
@@ -130,12 +117,12 @@ leaflet.Icon.Default.mergeOptions({
 
 
 // STATI
-const is_loading = ref(true) // mostra lo spinner mentre carica
+const is_loading = ref(true) 
 const zoom = ref(15)
-const mappa_ref = ref(null) // riferimento alla mappa
-const query_ricerca = ref("") // testo per la ricerca indirizzo
-const risultati_ricerca = ref([]) // array risultati ricerca
-const alta_precisione = ref(false) // opzione gps alta precisione
+const mappa_ref = ref(null) 
+const query_ricerca = ref("") 
+const risultati_ricerca = ref([]) 
+const alta_precisione = ref(false)
 
 // evita crash resize al cambio pagina
 let timer_aggiornamento_mappa = null
@@ -200,7 +187,6 @@ onBeforeUnmount(() => {
     }
 })
 
-// --- WATCHERS ---
 // osservo cambio coordinate dal padre
 watch(() => props.centra_mappa, (nuovo_centro) => {
     // Controllo sicurezza, se la mappa non c'è o non ha coordinate valide, esci
@@ -218,16 +204,16 @@ watch(() => props.centra_mappa, (nuovo_centro) => {
     }
 }, { deep: true })
 
-// osservo i dati degli scaffali. uso nexttick per aspettare che il dom sia pronto.
-watch(() => props.dati_scaffali, async (nuoviDati) => {
-    if (nuoviDati && nuoviDati.length > 0 && mappa_ref.value && mappa_ref.value._container) {
-        await nextTick();
+// osservo i dati degli scaffali. uso nextTick per aspettare che il dom sia pronto.
+watch(() => props.dati_scaffali, async (nuovi_dati) => {
+    if (nuovi_dati && nuovi_dati.length > 0 && mappa_ref.value && mappa_ref.value._container) {
+        await nextTick()
        // doppio controllo dopo l'attesa
         if (mappa_ref.value && mappa_ref.value._container) {
-            mappa_ref.value.invalidateSize();
+            mappa_ref.value.invalidateSize()
         }
     }
-}, { deep: true });
+}, { deep: true })
 
 // funzione chiamata quando leaflet è pronto
 function mappaPronta(mappa) {
@@ -237,9 +223,8 @@ function mappaPronta(mappa) {
     if (centro.lat && centro.lng) {
         mappa_ref.value.setView([centro.lat, centro.lng], centro.zoom || 15)
         
-        // Usa la funzione che gestisce loading e timeout
         forzaAggiornamentoMappa()
-        console.log("Mappa aggiornata correttamente")
+        //console.log("Mappa aggiornata correttamente")
     }
 }
 
@@ -272,8 +257,8 @@ async function cercaIndirizzo() {
         )}&countrycodes=it&limit=${limite_risultati}`
 
     try {
-        const response = await fetch(url) // Non servono più gli headers qui, li mette Vite
-        console.log(response.ok)
+        const response = await fetch(url) 
+        //console.log(response.ok)
         if (!response.ok) throw new Error('Errore risposta server')
         const trovati = await response.json()
         risultati_ricerca.value = trovati.slice(0, 5)

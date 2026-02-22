@@ -1,25 +1,20 @@
 <template>
-    <!--contenitore principale della pagina-->
     <div class="page">
         <section>
-            <!--spinner durante il caricamento dei dati del libro -->
             <n-spin :show="libri_master_store.loading">
-
-                <!--mosta il contenuto solo quando il titolo è disponibile oppure quando il caricamento è terminato -->
                 <div v-show="form.titolo || !libri_master_store.loading">
                     <div class="intestazione">
                         <h1>{{ titolo_pagina || 'TITOLO'}}</h1>
                     </div>
                     <div class="contenuto_modulo">
                         <n-card class="scheda_libro" title="Dettagli Libro Master" :bordered="true">
-
-                            <!--form principale per creazione o modifica libro master -->
                             <n-form :model="form" :rules="rules" ref="form_ref" label-placement="top"
                                 :disabled="!is_admin">
-                                <!--Copertina-->
                                 <n-form-item class="sezione_copertina_avatar" label="Copertina">
                                     <div class="avatar_copertina_container">
                                         <n-avatar :src="copertina_src" round size="large" class="avatar_copertina_img" />
+                                        <!--:default-upload="false" perché non voglio che il file venga inviato al back-end appena selezionato
+                                        ma solo quando l'utente invia il form-->
                                         <n-upload @before-upload="controlloPreUpload" :default-upload="false"
                                             accept="image/*" :max-count="1" v-model:file-list="lista_files"
                                             @update:file-list="gestisciCaricamentoFile">
@@ -31,35 +26,28 @@
                                         </n-upload>
                                     </div>
                                 </n-form-item>
-                                <!--ISBN-->
                                 <n-form-item label="ISBN" path="isbn">
                                     <n-input round v-model:value="form.isbn" />
                                 </n-form-item>
-                                <!--titolo-->
                                 <n-form-item label="Titolo" path="titolo">
                                     <n-input round v-model:value="form.titolo" />
                                 </n-form-item>
-                                <!--Autore-->
                                 <n-form-item label="Autore" path="autore">
                                     <n-input round v-model:value="form.autore" />
                                 </n-form-item>
-                                <!--Anno-->
                                 <n-form-item label="Anno" path="anno">
                                     <n-input round v-model:value="form.anno" />
                                 </n-form-item>
-                                <!--descrizione libro-->
                                 <n-form-item label="Descrizione" path="descrizione">
                                     <n-input type="textarea" round v-model:value="form.descrizione" :autosize="{
                                         minRows: 3,
                                         maxRows: 6
                                     }" />
                                 </n-form-item>
-                                <!--senere letterario -->
                                 <n-form-item label="Genere" path="genere_id">
                                     <n-select round v-model:value="form.genere_id" :options="lista_generi"
                                         placeholder="Genere Letterario" />
                                 </n-form-item>
-                                <!--scaffale-->
                                 <n-form-item v-if="id_presente" label="Scaffale"
                                     path="scaffale_id">
                                     <n-select round v-model:value="form.scaffale_id"
@@ -74,9 +62,7 @@
                         </n-card>                        
                     </div>
                     <n-divider />
-                    <!--spazio dei bottoni per le varie azioni-->
                     <n-space justify="end">
-                        <!-- torna alla pagina precedente -->
                         <n-button type="info"
                             primary 
                             ghost
@@ -84,7 +70,6 @@
                             Indietro
                         </n-button>
 
-                        <!--salvataggio modifica solo per admin-->
                         <n-button 
                             v-if="is_admin"
                             type="primary"
@@ -96,7 +81,6 @@
                         {{ testo_salvataggio }}
                         </n-button>
 
-                        <!-- aggiunta del libro allo scaffale personale -->
                         <n-button
                             v-if="id_presente" 
                             type="warning"
@@ -105,7 +89,6 @@
                         >
                         Aggiungi al tuo Scaffale
                         </n-button>
-                        <!-- rimuovi libro master dal catalogo -->
                         <n-button
                             v-if="id_presente && is_admin" 
                             type="error"
@@ -119,7 +102,6 @@
             </n-spin>
         </section>
     </div>
-    <!--modale di conferma eliminazione libro master-->
     <ModaleConferma v-model:show="mostra_modale_conferma" titolo="Elimina Libro"
         :messaggio="'Sei sicuro di voler eliminare il libro \'\'' + libro_master?.titolo + '\'\'? Questa operazione è irreversibile. Assicurati di aver chiuso tutte le condivisioni.'"
         testoConferma="Elimina Definitivamente" tipo="warning" @conferma="deleteLibro(libro_master_id)" />
@@ -187,7 +169,7 @@ const rules = {
         { pattern: /^\d{4}$/, message: 'Inserisci un anno valido (es. 2025)', trigger: 'blur' }
     ],
     genere_id: { type: 'number', required: true, message: 'Seleziona un genere', trigger: 'change' },
-};
+}
 
 
 //computed dedicato alla scelta di cosa visualizzare nel riquadro della copertina
@@ -263,7 +245,7 @@ async function caricaDatiLibro() {
         try {
             const risposta_libro_master = await libri_master_store.getLibroMasterByID(libro_master_id)
             libro_master.value = risposta_libro_master.data
-            console.log(libro_master.value)
+            //console.log(libro_master.value)
 
             form.value = {
                 ...libro_master.value,
@@ -315,24 +297,24 @@ function controlloPreUpload({ file }) {
 
 // gestisco il file quando viene selezionato e creo l'anteprima
 function gestisciCaricamentoFile(upload) {
-    console.log("gestisciCaricamentoFile chiamata con parametro", upload)
+    //console.log("gestisciCaricamentoFile chiamata con parametro", upload)
     if (upload.length > 1) {
         // Se l'utente ha aggiunto più file forzo la lista a prendere solo l'ultimo.
         upload = [upload[upload.length - 1]]
     }
     lista_files.value = upload
     const f = lista_files.value[0]?.file
-    console.log("gestisciCaricamentoFile chiamata -> f", lista_files.value[0]?.file)
+    //console.log("gestisciCaricamentoFile chiamata -> f", lista_files.value[0]?.file)
     if (!f) {
         file.value = null
         anteprima.value = null
-        console.log("Nessun File")
+        //console.log("Nessun File")
         return
     }
-    console.log("File caricato", f)
+    //console.log("File caricato", f)
     file.value = f
     anteprima.value = URL.createObjectURL(f) // URL temporaneo
-    console.log("anteprima Value:", anteprima.value)
+    //console.log("anteprima Value:", anteprima.value)
 }
 
 
@@ -353,9 +335,9 @@ const data_formattata = computed(() => {
 
     // Controlla se il valore è presente (dovrebbe essere una stringa ISO)
     if (data_str) {
-        const dataObj = new Date(data_str)
+        const data_obj = new Date(data_str)
         // Usa le opzioni già definite, 'it-IT' per l'ordine gg/mm/aaaa
-        return dataObj.toLocaleString('it-IT', opzioni)
+        return data_obj.toLocaleString('it-IT', opzioni)
     }
     return 'Non disponibile'
 })
@@ -411,7 +393,7 @@ async function inviaDati() {
         
     } catch (err) {
         router.push({name: 'CatalogoLibriMaster'})
-        console.log(err)
+        //console.log(err)
         message.error(err.message || 'Errore durante il salvataggio')
     } finally {
         pulisciStatoFile() // resetta input file dopo invio
@@ -420,34 +402,34 @@ async function inviaDati() {
 
 // copia del libro master nello scaffale utente
 async function aggiungiAScaffale() {
-     //console.log("Aggiungo a Scaffale");
-    console.log(form.value)
+     //console.log("Aggiungo a Scaffale")
+    //console.log(form.value)
     // VALIDAZIONE: Controlla che uno scaffale sia stato selezionato
     if (!form.value.scaffale_id) {
-        message.error('Devi selezionare uno scaffale a cui aggiungere il libro.');
-        return;
+        message.error('Devi selezionare uno scaffale a cui aggiungere il libro.')
+        return
     }
     //Preparazione dei dati
     const data = {
         master_id: libro_master_id,
         scaffale_id:  form.value.scaffale_id,
-    };
+    }
   
     //Esecuzione dell'azione e gestione UI
     try {
-        const nuovo_libro = await libri_store.createLibroDaMaster(data);
+        const nuovo_libro = await libri_store.createLibroDaMaster(data)
         
         //Feedback di successo
-        message.success(`${nuovo_libro.message}`);
+        message.success(`${nuovo_libro.message}`)
         
         //Reindirizzamento o aggiornamento locale
         router.push({
                       name: 'DettaglioScaffale',
                       params: { id: form.value.scaffale_id }
-                  }); // Porta l'utente alla sua libreria
+                  }) // Porta l'utente alla sua libreria
         
     } catch (err) {
-        message.error(`Aggiunta fallita: ${err.message || 'Errore di rete'}`);
+        message.error(`Aggiunta fallita: ${err.message || 'Errore di rete'}`)
         
     }
 }

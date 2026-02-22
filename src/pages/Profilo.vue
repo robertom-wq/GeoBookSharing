@@ -1,14 +1,9 @@
 <template>
-    <!-- contenitore principale della pagina -->
     <div class="page">
         <section>
-            <!-- intestazione della pagina di profilo -->
             <div class="intestazione">
-
-                <!-- Titolo principale -->
-                <h1>{{ titoloPagina }}</h1>
-
-                <!-- Sottotitolo personalizzato in base al ruolo di chi accede al profilo-->
+                <h1>{{ titolo_pagina }}</h1>
+                <!--doppia casistica per la modifica, admin o utente loggato-->
                 <p v-if="is_admin_modifica" class="sottotitolo">
                     Ciao <strong>{{ utenti_store.utente.nome.toUpperCase() }}</strong>, stai modificando il profilo di
                     <span class="testo_evidenziato">{{ username_target }}</span>
@@ -17,29 +12,22 @@
                     Ciao {{utenti_store.utente.nome.toUpperCase() }}, modifica il tuo profilo o accedi alle tue statistiche
                 </p>
             </div>
-            <!-- Contenitore del contenuto del profilo -->
             <div class="contenuto_modulo">
-
-                <!--spin caricamento pagina che atetnde il caricamento dati dallo store-->
                 <n-spin :show="utenti_store.loading">
-
                     <!-- Tabs per navigare tra profilo e dashboard -->
                     <n-tabs type="card" animated class="scheda_tab" default-value="profilo">
                         
                         <!-- TAB: Modifica Profilo -->
                         <n-tab-pane :tab="`Dati Profilo`" name="profilo">
 
-                            <!-- Card che contiene il form di modifica profilo -->
                             <n-card v-if="form_data" class="profilo_card" title="Modifica Profilo" :bordered="true">
-                                <!-- Form naive con validazione -->
                                 <n-form :model="form_data" :rules="rules" ref="form_ref" label-width="120px"
                                     class="responsive-form">
-
-                                    <!-- Sezione Avatar -->
                                     <n-form-item class="sezione_copertina_avatar" label="Avatar">
                                         <div class="avatar_copertina_container">
                                             <n-avatar :src="avatar_src" round size="large" class="avatar_copertina_img" />
-                                            <!-- Upload immagine avatar -->
+                                            <!--:default-upload="false" perché non voglio che il file venga inviato al back-end appena selezionato
+                                             ma solo quando l'utente invia il form-->
                                             <n-upload @before-upload="controlloPreUpload" :default-upload="false"
                                                 accept="image/*" :max-count="1" v-model:file-list="lista_files"
                                                 :show-file-list="false" @update:file-list="gestisciCaricamentoFile">
@@ -47,28 +35,22 @@
                                             </n-upload>
                                         </div>
                                     </n-form-item>
-                                    <!-- Campo Nome -->
                                     <n-form-item label="Nome" path="nome">
                                         <n-input round v-model:value="form_data.nome" />
                                     </n-form-item>
-                                    <!-- Campo Cognome -->
                                     <n-form-item label="Cognome" path="cognome">
                                         <n-input round v-model:value="form_data.cognome" />
                                     </n-form-item>
-                                    <!-- Campo Username -->
                                     <n-form-item label="Username" path="username">
                                         <n-input round v-model:value="form_data.username" />
                                     </n-form-item>
-                                    <!-- Campo Biografia -->
                                     <n-form-item label="Biografia" path="biografia">
                                         <n-input round v-model:value="form_data.biografia" type="textarea"
                                             :autosize="{ minRows: 3, maxRows: 6 }" />
                                     </n-form-item>
-                                    <!-- Campo Email (non modificabile) -->
                                     <n-form-item label="Email" path="email">
                                         <n-input round v-model:value="form_data.email" type="email" :disabled="true" />
                                     </n-form-item>
-                                    <!-- Campo nuova password -->
                                     <n-form-item label="Nuova password" path="password">
                                         <n-input round v-model:value="form_data.password" type="password"
                                             placeholder="Minimo 6 caratteri" autocomplete="new-password" />
@@ -76,17 +58,14 @@
                                     <!-- Sezione visibile solo agli amministratori -->
                                     <template v-if="is_admin_modifica">
                                         <n-divider title-placement="left">Amministrazione</n-divider>
-                                        <!-- Selezione ruolo utente -->
                                         <n-form-item label="Assegna ruolo" path="ruolo">
                                             <n-select round v-model:value="form_data.ruolo"
                                                 :options="[{ label: 'Admin', value: 'admin' }, { label: 'Utente', value: 'user' }]" />
                                         </n-form-item>
-                                        <!-- Stato richiesta eliminazione (sola lettura) -->
                                         <n-form-item label="Richiesta eliminazione" path="richiesta_eliminazione">
                                             <n-checkbox v-model:checked="form_data.richiesta_eliminazione"
                                                 :disabled="true">Richiesta Eliminazione inviata</n-checkbox>
                                         </n-form-item>
-                                        <!-- Blocco utente -->
                                         <n-form-item label="Blocca Utente" path="bannato">
                                             <n-checkbox v-model:checked="form_data.bannato">Blocca Utente</n-checkbox>
                                         </n-form-item>
@@ -123,7 +102,6 @@
                 </n-spin>
             </div>
         </section>
-        <!-- Modale di conferma eliminazione utente -->
         <ModaleConferma v-model:show="mostra_modale_conferma" titolo="Elimina Utente"
                 :messaggio="'Sei sicuro di voler eliminare l\'utente \'\'' + form_data?.username + '\'\'? Questa operazione è irreversibile.'"
                 testoConferma="Elimina Definitivamente" tipo="warning" @conferma="gestisciDeleteUtente()" />
@@ -131,7 +109,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount, ErrorCodes } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import { useUtentiStore } from '@/stores/utentiStore'
@@ -139,8 +117,6 @@ import { useLibriStore } from '@/stores/libriStore'
 import { useCondivisioniStore } from '@/stores/condivisioniStore'
 import { useValutazioniStore } from '@/stores/valutazioniStore'
 import DashboardUtente from '@/components/DashboardUtente.vue'
-
-// Componenti
 import ModaleConferma from '@/components/ModaleConferma.vue'
 
 const route = useRoute()
@@ -155,7 +131,7 @@ const image_url = import.meta.env.VITE_ROOT_URL // url base per le immagini da f
 
 // Stati
 const form_ref = ref(null) // riferimento al componente form per la validazione
-const mostra_modale_conferma = ref(false) // stato visibilita modale eliminazione
+const mostra_modale_conferma = ref(false) 
 const form_data = ref(null) // Dati locali per il form
 const utente = ref(null)
 const dati_report = ref({ 
@@ -171,12 +147,10 @@ const file = ref(null) // file da inviare
 const anteprima = ref(null) // url temporaneo per visualizzazione immediata
 
 
-//Logica di navigazione
 const utente_da_modificare_id = computed(() => route.params.id ? parseInt(route.params.id) : null) // recupera id da url se presente
 const is_admin_modifica = computed(() => !!utente_da_modificare_id.value && utenti_store.utente.ruolo === 'admin') // true se admin sta modificando altri
 const username_target = computed(() => form_data.value?.username || '...') // username utente target
-const titoloPagina = computed(() => is_admin_modifica.value ? 'Gestione Utente' : 'Il Mio Profilo') // titolo dinamico
-
+const titolo_pagina = computed(() => is_admin_modifica.value ? 'Gestione Utente' : 'Il Mio Profilo') // titolo dinamico
 
 const testo_richiesta_eliminazione = computed(() => form_data.value?.richiesta_eliminazione ? 'Richiesta in corso' : 'Invia Richiesta')// testo dinamico checkbox richiesta eliminazione
 
@@ -200,19 +174,18 @@ const avatar_src = computed(() => {
 })
 
 
-//inizializzaazione pagina
 async function inizializzaPagina() {
     pulisciStatoFile() //resetta variabili upload
-    await caricaDatiUtente()//carica info utente
+    await caricaDatiUtente()
     try {
-        // Eseguo in parallelo il recupero dell'utente e i report
+        // Eseguo in parallelo il recupero dati libri, condivisioni e valutazioni utente
         if (utente.value) {
             await Promise.all([
                 getStatisticheLibriUtente(),
                 getStatisticheCondivisioniUtente(),
                 getStatisticheValutazioniUtente()
             ])
-            console.log("VALORI", dati_report.value)
+            //console.log("VALORI", dati_report.value)
         }
     } catch (err) {
         message.error("Errore inizializzazione Dati")
@@ -220,7 +193,6 @@ async function inizializzaPagina() {
     }     
 }
 
-//caricamento dati dell'utente
 async function caricaDatiUtente() {
     utente.value = null
     // logica per admin che modifica altro utente
@@ -236,8 +208,7 @@ async function caricaDatiUtente() {
     }
 
     if (utente.value) {
-        // compilazione form_data locale clonando l'oggetto
-        //console.log("dati utente caricati", utente.value)
+        // compilazione form_data locale clonando l'oggetto utente
         form_data.value = {
             ...utente.value,
             password: '', // reset password per sicurezza
@@ -296,13 +267,13 @@ function controlloPreUpload({ file }) {
         return false
     }
 
-    //Controllo della dimensione
+    //controllo della dimensione
     if (file_nativo.size > dimensione_massima) {
         message.error('L’immagine non deve superare i 5 MB')
         return false
     }
 
-    return true // Solo se valido
+    return true 
 }
 
 //gestione caricamento effettivo dell'immagine
@@ -315,10 +286,10 @@ function gestisciCaricamentoFile(upload) {
     const f = lista_files.value[0]?.file
     // se nessun file caricato, pulisci tutto
     if (!f) {
-        file.value = null
-        anteprima.value = null
+        pulisciStatoFile()
         return
     }
+
     file.value = f
     anteprima.value = URL.createObjectURL(f) // crea url blob per anteprima
 }
@@ -365,7 +336,7 @@ async function inviaDati() {
 
         const id_target = is_admin_modifica.value ? utente_da_modificare_id.value : null
 
-        // chiamata api aggiornamento profilo tramite store
+        //aggiornamento profilo tramite store
         const risposta_update = await utenti_store.updateUtente(id_target, fd, is_admin_modifica.value)
 
         // gestione separata richiesta eliminazione, soft delete
@@ -404,7 +375,6 @@ async function gestisciDeleteUtente() {
     }
 }
 
-// watchers
 // ricarica i dati se cambia id nell'url (in caso di navigazione tra profili da parte degli admin)
 watch(() => route.fullPath, () => {
     inizializzaPagina()
@@ -419,6 +389,7 @@ onBeforeUnmount(() => {
         URL.revokeObjectURL(anteprima.value)
     }
 })
+
 </script>
 
 <style scoped>    

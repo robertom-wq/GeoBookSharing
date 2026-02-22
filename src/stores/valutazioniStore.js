@@ -22,23 +22,25 @@ export const useValutazioniStore = defineStore('valutazioni', () => {
     // gestione delle condivisioni dove ho bisogno di avere le votazioni di piu utenti o anche dello stesso utente piu volte
     // in modo SILENZIOSO SENZ LOADING
     async function getRankingUtenti(id) {
-            // Se ho già i dati di questo utente, non carico nulla
-            if (ranking_utenti.value[id]) {
-                return ranking_utenti.value[id]
-            }
-
-            // Se non ci sono dati, effettuo la chiamata
-            try {
-                const valutazione = await chiamaAPI(`/valutazioni/recenti/${id}`)
-                // salvo nell'oggetto usando l'ID come chiave
-                ranking_utenti.value[id] = valutazione.data
-                return valutazione.data
-            } catch (err) {
-                console.error(`Errore cache per utente ${id}`, err)
-                // salvo un valore di default per evitare chiamate infinite in caso di errore
-                ranking_utenti.value[id] = { media_voto: 0, totale_recensioni: 0 }
-            }
+        // Se ho già i dati di questo utente, non carico nulla
+        if (ranking_utenti.value[id]) {
+            return ranking_utenti.value[id]
         }
+
+        // Se non ci sono dati, effettuo la chiamata
+        try {
+            const valutazione = await chiamaAPI(`/valutazioni/recenti/${id}`)
+            // salvo nell'oggetto usando l'ID come chiave
+            ranking_utenti.value[id] = valutazione.data
+            return valutazione.data
+        } catch (err) {
+            console.error(`Errore cache per utente ${id}`, err)
+            // salvo un valore di default per evitare chiamate infinite in caso di errore
+            const default_value = { media_voto: 0, totale_recensioni: 0 }
+            ranking_utenti.value[id] = default_value
+            return default_value 
+        }
+    }
 
     //recupero ranking medio di un utente tramite id (con LOADING)
     async function getRankingUtenteByID(id) {
@@ -62,7 +64,7 @@ export const useValutazioniStore = defineStore('valutazioni', () => {
         loading.value = true
         
         try {
-            const valutazione = await chiamaAPI(`/valutazioni`,{
+            const valutazione = await chiamaAPI(`/valutazioni` ,{
                 method: 'POST',
                 body: data
             })

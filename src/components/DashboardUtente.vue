@@ -1,29 +1,22 @@
 <template>
- <!-- Griglia principale responsiva: 1 colonna su mobile, 2 colonne da medium in su -->
     <n-grid cols="1 m:2" x-gap="16" y-gap="16" responsive="screen" class="griglia_principale">
-        <!-- colonna sx, statistiche e analisi -->
         <n-gi>
             <div class="contenitore_statistiche">
-                <!-- card media voto  -->
                 <n-card class="margine_basso_medio">
                     <n-statistic label="Media Voto Totale" :value="dati_report.media_voto">
                         <template #suffix>
                              / 5
                         </template>
                     </n-statistic>
-                    <!-- stelle di valutazione, sola lettura -->
                     <n-rate readonly :allow-half="true" :value="dati_report.media_voto" class="margine_alto_grande" />
                 </n-card>
                 
-                <!-- Sotto-griglia con 2 statistiche riepilogative -->
                 <n-grid cols="1 s:2" x-gap="12" y-gap="12" responsive="screen" class="margine_basso_medio">
-                    <!-- nr di libri richiesti -->
                     <n-gi>
                         <n-card size="small" class="altezza_piena">
                             <n-statistic label="Libri Richiesti" :value="dati_report.libri_richiesti" />
                          </n-card>
                     </n-gi>
-                    <!-- nr di libri prestati -->
                     <n-gi>
                         <n-card size="small" class="altezza_piena">
                             <n-statistic label="Libri Prestati" :value="dati_report.libri_condivisi" />
@@ -31,26 +24,23 @@
                     </n-gi>
                 </n-grid>
                 
-                <!-- card con analisi delle visualizzazioni dei libri -->
                 <n-card title="Analisi Visualizzazioni" size="small" class="altezza_piena">
-                    <!-- se non c'è nessuna visualizzazione -->
                     <n-empty v-if="!dati_report.libri_ricercati.length" description="Nessuna Visualizzazione" />
-                    <!-- lista TOP e FLOP dei libri più e meno visualizzati -->
                     <n-list hoverable clickable v-else>
                         <n-list-item v-for="(libro, index) in dati_report.libri_ricercati" :key="libro.id">
                             <template #prefix>
+                                <!--stabilisco i colori in base alla posizione del libro nell'array delle visualizzazioni-->
                                 <n-tag :type="index === 0 ? 'success' : 'error'" size="small" round ghost>
                                     {{ index === 0 ? 'TOP' : 'FLOP' }}
                                 </n-tag>
                             </template>
-                            <!-- titolo libro -->
                             <n-thing :title="libro.titolo"
                                 :description="index === 0 ? 'Il più visualizzato' : 'Il meno visualizzato'" 
                                 class="elemento_lista_titolo" />
-                            <!-- nr animato di visualizzazioni -->
                             <template #suffix>
                                 <div class="suffisso_personalizzato">
                                     <span class="valore_numerico">
+                                        <!--animazione dei numeri da 0 al totale delle visualizzazioni per aspetto dinamico-->
                                         <n-number-animation :from="0" :to="libro.visualizzazioni" />
                                     </span>
                                 </div>
@@ -91,23 +81,25 @@
 <script setup>
 const image_url = import.meta.env.VITE_ROOT_URL
 
+// ricevo i dati dal componente padre
+// l'oggetto contiene medie, conteggi e recensioni
 const props = defineProps({
     dati_report: { type: Object, required: true },
 })
 </script>
 
 <style scoped>
-/* Layout e Spaziature */
+
 .griglia_principale {
     padding: 0vw;
 }
 
 .margine_basso_medio {
-    margin-bottom: 1rem; /* ~16px */
+    margin-bottom: 1rem; 
 }
 
 .margine_alto_grande {
-    margin-top: 2rem; /* ~32px */
+    margin-top: 2rem; 
 }
 
 .altezza_piena {
@@ -116,14 +108,13 @@ const props = defineProps({
     flex-direction: column;
 }
 
-/* Stili Card e Ombre */
+/* stile delle card e ombreggiatura */
 .n-card {
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     background-color: var(--pearl-white-bg);
 }
 
-/* Tipografia e Liste */
 .commento_recensione {
     font-style: italic;
     color: var(--color-text-dark);
@@ -147,8 +138,8 @@ const props = defineProps({
 }
 
 .valore_numerico {
-    font-size: 1.5rem; /* ~24px */
-    font-variant-numeric: tabular-nums;
+    font-size: 1.5rem; 
+    font-variant-numeric: tabular-nums; /* forza l'allineamento dei numeri */
     font-weight: bold;
     color: var(--btn-primary-color);
 }
@@ -160,9 +151,10 @@ const props = defineProps({
     min-width: 4rem;
 }
 
-/* Gestione Overflow Recensioni */
+/* limito l'altezza della lista recensioni per evitare che la pagina 
+   diventi troppo lunga*/
 .lista_scorrimento {
-    max-height: 31.25rem; /* 500px */
+    max-height: 31.25rem; 
     overflow-y: auto;
     padding-right: 0.5rem;
 }
@@ -189,9 +181,9 @@ const props = defineProps({
 
     :deep(.n-list-item) {
         padding-left: 4vw!important;
-    padding-right: 4vw!important;
+        padding-right: 4vw!important;
     }
-    /* Su mobile, lasciamo che il titolo del libro occupi più spazio */
+    /* su mobile il titolo del libro occupa più spazio */
     :deep(.n-thing-main) {
         max-width: 100% !important;
     }

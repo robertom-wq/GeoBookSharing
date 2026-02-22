@@ -1,32 +1,17 @@
 <template>
-    <!-- contenitore principale della pagina -->
     <div class="page">
         <section>
-            <!-- intestazione della pagina di login -->
             <div class="intestazione">
-
-                <!-- Titolo principale -->
                 <h1>Login</h1>
-
-                <!-- Sottotitolo -->
                 <p class="sottotitolo">Benvenuto, accedi per entrare nel mondo di GeoBookshelf e condividere i tuoi
                     libri</p>
             </div>
-            <!-- Contenitore della card del login -->
             <div class="contenuto_modulo">
-
-                <!-- card naive che racchiude il form di login -->
                 <n-card title="Accedi" class="scheda_login">
-
-                    <!-- form naive collegato al modello form_data -->
                     <n-form :model="form_data" @submit.prevent="gestisciLogin" :rules="rules">
-
-                        <!-- Campo Username -->
                         <n-form-item label="Username" path="username">
                             <n-input round v-model:value="form_data.username" placeholder="Username" />
                         </n-form-item>
-
-                        <!-- Campo password -->
                         <n-form-item label="Password" path="password">
                             <n-input round v-model:value="form_data.password" type="password" placeholder="Password" />
                         </n-form-item>
@@ -46,8 +31,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useUtentiStore } from '@/stores/utentiStore';
+import { ref } from 'vue'
+import { useUtentiStore } from '@/stores/utentiStore'
 import { useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 
@@ -73,7 +58,7 @@ const rules = {
 
 async function gestisciLogin() {
     // se i campi sono vuoti non effettuo neanche la chiamata API
-    if (!form_data.value.username || !form_data.value.password) return;
+    if (!form_data.value.username || !form_data.value.password) return
 
     try {
         //Non uso Promise.all() in quanto le due chiamate sono dipendenti e quindi ho bisogno di sequenzialita
@@ -94,11 +79,11 @@ async function gestisciLogin() {
 <style scoped>
 
 .contenuto_modulo {
-    display: flex;/* attiva il layout flex */
-    flex-direction: column; /* dispone gli elementi in colonna */
-    align-items: center; /* centra verticalmente */
-    justify-content: center;/* centra orizzontalmente */
-    min-height: 60vh; /* occupa almeno il 60% dell'altezza dello schermo */
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center;
+    min-height: 60vh; 
 }
 
 

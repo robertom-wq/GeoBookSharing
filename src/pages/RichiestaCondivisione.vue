@@ -1,22 +1,17 @@
 <template>
-    <!--contenitore principale della pagina-->
     <div class="page">
-        <!-- intestazione della pagina con titolo e sottotitolo -->
         <div class="intestazione">
             <h1>Richiedi Condivisione</h1>
             <p class="sottotitolo">Compila in form e richiedi il libro scelto</p>
         </div>
-          <!--contenitore del contenuto principale-->
         <div class="contenuto_modulo">
-        <!-- spinner di caricamento durante il recupero di libri o condivisioni -->
         <n-spin :show="libri_store.loading || condivisioni_store.loading">
-            <!-- card contenente modulo di richiesta -->
             <n-card class="scheda_richiesta">
                 <!-- avviso mostrato se il libro non esiste-->                
                 <n-alert v-if="!libri_store.loading && !libro" title="Non Disponibile" type="error" class="avviso_disponibilita">
                     Siamo spiacenti, questo libro non esiste o non è stato trovato.
                 </n-alert>
-                 <!-- form per invio della richiesta di condivisione -->
+                 <!-- form per invio della richiesta di condivisione se libro esiste -->
                 <n-form v-else
                     ref="form_ref"
                     :model="form"
@@ -24,11 +19,9 @@
                     label-placement="top"
                     @submit.prevent="inviaDati"
                 >
-                    <!-- campo con il nome del proprietario del libro -->
                     <n-form-item label="Proprietario" v-if="libro">
                         <n-input :value="libro.proprietario?.username || 'Sconosciuto'" disabled />
                     </n-form-item>
-                    <!-- campo con il titolodel libro -->
                     <n-form-item label="Libro" v-if="libro">
                         <n-input :value="libro?.titolo || 'Sconosciuto'" disabled />
                     </n-form-item>
@@ -68,9 +61,7 @@
                     </n-form-item>
 
                     <n-divider />
-                    <!--pulsanti azioni del form -->
                     <n-space justify="end">
-                        <!-- invio della richiesta -->
                         <n-button 
                             type="primary" 
                             attr-type="submit"
@@ -109,7 +100,7 @@ const message = useMessage()
 const form_ref = ref(null)
 const range_date = ref(null) //il range di date dal al è memorizzato in un array di timestamp
 const libro_id = route.params.id
-const oggi = new Date().setHours(0, 0, 0, 0); //riferimento per il calcolo delle date passate oggi alle 00:00
+const oggi = new Date().setHours(0, 0, 0, 0) //riferimento per il calcolo delle date passate oggi alle 00:00
 
 const form = ref({
     libro_id: Number(libro_id) || null,
@@ -129,7 +120,6 @@ const rules = {
     }
 }
 
-// recupero dettagli del libro selezionato
 const libro = computed(() => {
     return libri_store.libro_selezionato_dettagli
 })
@@ -144,7 +134,6 @@ const lista_tipi_condivisione = computed(() => {
         value: t.id
     }))
 })
-
 
 const tipo_condivisione_selezionato = computed(()=>{
     return lista_tipi_condivisione.value.find(t =>
@@ -165,16 +154,16 @@ function isDateDisabilitate(timestamp) {
 }
 
 // watch per la conversione dei timestamp in stringhe iso
-watch(range_date, (newRange) => {
+watch(range_date, (nuovo_range) => {
     //verifico che il nuovo range esista e che abbia entrambi gli elementi
-    if (newRange && newRange.length === 2) {
+    if (nuovo_range && nuovo_range.length === 2) {
         // [data_dal, data_al] sono timestamp, li converto in oggetti Date per il form
-        form.value.data_dal = new Date(newRange[0]).toISOString().split('T')[0];
-        form.value.data_al = new Date(newRange[1]).toISOString().split('T')[0];
+        form.value.data_dal = new Date(nuovo_range[0]).toISOString().split('T')[0]
+        form.value.data_al = new Date(nuovo_range[1]).toISOString().split('T')[0]
     } else {
         //reset dei campi data
-        form.value.data_dal = null;
-        form.value.data_al = null;
+        form.value.data_dal = null
+        form.value.data_al = null
     }
 })
 
@@ -215,14 +204,12 @@ onMounted(async ()=>{
 
 <style scoped>
 
-
-/*spaziature avvisi */
 .avviso_disponibilita {
     margin-bottom: 1.25rem; 
 }
 
 .avviso_date {
-    margin-bottom: 1rem; /* 15px */
+    margin-bottom: 1rem;
 }
 
 .selettore_date {

@@ -5,29 +5,34 @@
       <p class="sottotitolo">Pagina di controllo per i supervisori</p>
     </div>
     <div class="contenuto_amministrazione">
+      <!--  tab per navigazione operazioni amministratore -->
       <n-tabs type="card" animated class="distanziatore_verticale">
+        <!-- statistiche varie -->
         <n-tab-pane name="dashboard" tab="Dashboard Generale">
-          
           <n-grid cols="1 s:2 m:3" x-gap="12" y-gap="12" responsive="screen">
             <n-gi>
+              <!-- totale utenti registrati -->
               <n-card size="small" class="scheda_altezza_massima">
                 <n-statistic label="Utenti Totali" :value="nr_utenti_totali" />
               </n-card>
             </n-gi>
             <n-gi>
+              <!-- libro con maggior numero di visualizzazioni -->
               <n-card size="small" class="scheda_altezza_massima">
                 <n-statistic label="Top Visualizzati Libri" :value="libri_top[0]?.visualizzazioni" />
               </n-card>
             </n-gi>
             <n-gi>
+              <!-- conteggio errori api giornalieri -->
               <n-card size="small" class="scheda_altezza_massima">
                 <n-statistic label="Errori API Oggi" :value="conteggio_errori_oggi" />
               </n-card>
             </n-gi>
           </n-grid>
-
+          <!-- sezione ranking e grafici -->
           <n-grid cols="1 m:2" x-gap="16" y-gap="16" responsive="screen" class="distanziatore_verticale">
             <n-gi>
+              <!-- lista libri ordinata per visualizzazioni -->
               <n-card title="Top 5 Libri più visitati" class="scheda_altezza_massima">
                 <n-list bordered hoverable>
                   <n-list-item v-for="(libro, index) in libri_top.slice(0, 5)" :key="libro.id">
@@ -39,6 +44,7 @@
                           <span>{{ libro.titolo }}</span>
                         </n-space>
                       </template>
+                      <!-- numero visualizzazioni -->
                       <template #description>{{ libro.visualizzazioni }} visualizzazioni</template>
                     </n-thing>
                   </n-list-item>
@@ -57,8 +63,9 @@
             </n-gi>
           </n-grid>
         </n-tab-pane>
-
+        <!-- gestione utenti-->>
         <n-tab-pane name="utenti" tab="Gestione Utenti">
+          <!-- avviso per dispositivi mobili rotazione schermo-->
             <div class="avviso_rotazione_local">
                 <n-icon size="40">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.48 2.52c3.27 1.55 5.61 4.72 5.97 8.48h2l-3 3l-3-3h2c-.35-3.11-2.2-5.74-4.89-7.04L16.48 2.52zM8.23 21H16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H8.23c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2zM8 5h8v14H8V5zM7.52 21.48C4.25 19.94 1.91 16.76 1.55 13h-2l3-3l3 3h-2c.35 3.11 2.2 5.74 4.89 7.04l-1.03 1.44z" fill="currentColor"/></svg>
@@ -80,7 +87,7 @@
                 </n-space>
             </n-card>
         </n-tab-pane>
-
+        <!--log -->
         <n-tab-pane name="logs" tab="Log di Sistema">
           <n-card title="Archivio Log Giornalieri">
               <n-grid cols="1 s:2 m:4" x-gap="12" y-gap="12" class="distanziatore_verticale" responsive="screen">
@@ -109,7 +116,6 @@
               />
               <n-empty v-if="dati_log.length === 0 && !loading_logs" description="Nessun log trovato per questa data" class="distanziatore_verticale" />
           </n-card>
-
           <n-modal v-model:show="mostra_modale_log" preset="card" title="Dettaglio Log" class="testo_messaggio_log">
               <div v-if="log_selezionato">
                 <n-descriptions label-placement="left" bordered :column="1">
@@ -147,7 +153,7 @@ const libri_store = useLibriStore()
 const message = useMessage()
 const router = useRouter()
 
-// STATO
+// Stati
 const libri_top = ref([])
 const lista_utenti = ref([])
 const nr_utenti_totali = ref(0)
@@ -182,24 +188,22 @@ const opzioni_livello = [
     { label: 'ERROR', value: 'error' }
 ]
 
-// UTILS
-const getDataFormattata = (dateObj) => {
-    const d = new Date(dateObj);
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const getDataFormattata = (data_obj) => {
+    const d = new Date(data_obj)
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 // Mapping per i colori dei tag nel log
-const tag_messagi_log = {
+const tag_messaggi_log = {
   error: 'error',
   warn: 'warning',
   info: 'info'
-};
+}
 
 const getTipoMessaggio = (livello) => {
-  return tag_messagi_log[livello] || 'default';
-};
+  return tag_messaggi_log[livello] || 'default'
+}
 
-// COMPUTED
 const data_formattata = computed(() => getDataFormattata(data_selezionata.value))
 const conteggio_errori_oggi = computed(() => dati_log.value.filter(l => l.level === 'error').length)
 const logs_filtrati = computed(() => filtro_livello.value ? dati_log.value.filter(l => l.level === filtro_livello.value) : dati_log.value)
@@ -257,9 +261,9 @@ const dati_per_grafico = computed(() => {
 
 const opzioni_grafico = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
 
-// CONFIGURAZIONE TABELLE
+//configurazione tabelle
 const proprietaRiga = (riga) => ({
-    style: 'cursor: pointer;',
+    style: 'cursor: pointer',
     onClick: () => {
         log_selezionato.value = riga
         mostra_modale_log.value = true
@@ -280,7 +284,7 @@ const colonne_utenti = [
     //Il parametro riga viene passato direttamente e implicitamente dal componente <n-data-table>
     //Per ogni utente, Naive UI esegue la funzione e invia l'oggetto dell'utente corrente come primo argomento.
     { title: 'Stato', render: (riga) => {
-        //t rappresenta un array di stati infatti, potrebbe essere che un utente si trovi
+        //t rappresenta un array di stati, infatti potrebbe essere che un utente si trovi
         //sia in uno stato di bannato che in eliminazione
         const t = []
         if (riga.bannato) t.push({ type: 'error', label: 'BANNATO' })
@@ -297,9 +301,7 @@ const colonne_utenti = [
                                                                       { default: () => 'Gestisci' }) }
 ]
 
-// AZIONI
-
-//recupero i dati di tutti gli utenti (con eventuale parametro)
+//recupero i dati di tutti gli utenti
 async function getUtenti() {
     try {
         const res = await utenti_store.getAllUtenti(parametri_query.value)
@@ -326,8 +328,9 @@ async function getLogs() {
     }
 }
 
-// WATCHERS
+
 // Aggiorno istantaneamente la tabella dei log visualizzando i dati relativi al nuovo giorno scelto
+//appena data_selezionata cambia
 watch(data_selezionata, getLogs)
 
 // Quando cambio la stringa di ricerca, riporto alla prima pagina per non perdere i risultati
@@ -365,7 +368,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Layout e Spaziature Principali */
 .pagina_supervisione {
   padding: 2vw;
   max-width: var(--container-max-width, 1400px);
@@ -386,14 +388,12 @@ onMounted(async () => {
   margin-bottom: 1.5rem;
 }
 
-/* Griglie e Schede */
 .scheda_altezza_massima {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-/* Grafico Generi (Rimosso stile inline) */
 .area_grafico_generi {
   height: clamp(250px, 40vh, 400px);
   display: flex;
@@ -402,10 +402,9 @@ onMounted(async () => {
   width: 100%;
 }
 
-/* Filtri Gestione Utenti */
 .input_ricerca_utente {
   width: 100%;
-  max-width: 25rem; /* ~400px */
+  max-width: 25rem; 
 }
 
 .contenitore_tabella_adattiva {
@@ -414,11 +413,9 @@ onMounted(async () => {
   -webkit-overflow-scrolling: touch;
 }
 
-
-/* Dettagli Modale Log (Rimosso stile inline) */
 :deep(.modale_dettaglio_log) {
   width: 95vw !important;
-  max-width: 37.5rem !important; /* 600px */
+  max-width: 37.5rem !important; 
 }
 
 .testo_messaggio_log {
@@ -436,7 +433,7 @@ onMounted(async () => {
 }
 
 .codice_dati_json {
-  font-size: 0.75rem; /* 12px */
+  font-size: 0.75rem; 
   overflow: auto;
   max-height: 15rem;
 }
@@ -444,7 +441,7 @@ onMounted(async () => {
 .avviso_rotazione_local {
     display: none; /*nascosto di default su desktop e landscape*/
     background-color: var(--n-card-color); /*usa lo stesso colore delle card di naive*/
-    border: 1px dashed #ccc; /*bordo tratteggiato per indicare un'area di attesa*/
+    border: 1px dashed #ccc; /*bordo tratteggiato*/
     border-radius: 8px;
     padding: 3rem 1rem;
     flex-direction: column;
@@ -454,7 +451,7 @@ onMounted(async () => {
     text-align: center;
 }
 
-/* animazione discreta dell'icona */
+/* animazione dell'icona */
 .avviso_rotazione_local n-icon {
     animation: rotate-hint 3s infinite ease-in-out; /*suggerimento visivo della rotazione*/
 }
@@ -475,14 +472,14 @@ onMounted(async () => {
 /* logica di attivazione mirata solo alla sezione utenti */
 @media (max-width: 600px) and (orientation: portrait) {
     
-    /* mostriamo l'avviso locale */
+    /* mostra l'avviso locale */
     .avviso_rotazione_local {
         display: flex; /*appare solo quando il dispositivo è in verticale*/
     }
 
-    /* nascondiamo la card con la tabella per non creare confusione */
+    /* nasconde la card con la tabella per non creare confusione */
     .scheda_utenti_container {
-        display: none !important; /*rimozione della tabella dal flusso visivo mobile*/
+        display: none !important; 
     }
 }
 

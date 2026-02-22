@@ -1,33 +1,24 @@
 <template>
-    <!-- contenitore principale della pagina -->
     <div class="page">
         <section>
-            <!-- spinner di caricamento durante attesa dati libro -->
             <n-spin :show="loading_libro">
-                <!-- mostra contenuto quando il caricamento è terminato -->
                 <div v-show="libro || !loading_libro">
 
-                    <!-- intestazione della pagina -->
                     <div class="intestazione">
                         <h1>{{ titolo_pagina }}</h1>
                     </div>
-                    <!-- sottotitolo con nome utente -->
                     <p class="sottotitolo">
                     Ciao {{ utenti_store.utente.nome.toUpperCase() }}, modifica i tuoi libri 
                     </p>
-                    <!-- contenitore principale modulo -->
                     <div class="contenuto_modulo">
-                        <!-- card modifica/creazione libro -->
                         <n-card v-if="form" class="libro_card" :bordered="true" title="Modifica Libro">
-                            <!-- form dati -->
                             <n-form :model="form" :rules="rules" ref="form_ref" label-placement="top"
                                 :disabled="is_disabilitato">
-                                <!--Copertina-->
                                 <n-form-item class="sezione_copertina_avatar" label="Copertina">
                                     <div class="avatar_copertina_container">
-                                        <!-- anteprima copertina -->
                                         <n-avatar :src="copertina_src" round size="large" class="avatar_copertina_img"/>
-                                        <!-- upload copertina -->
+                                        <!--:default-upload="false" perché non voglio che il file venga inviato al back-end appena selezionato
+                                        ma solo quando l'utente invia il form-->
                                         <n-upload @before-upload="controlloPreUpload" :show-file-list="false" :default-upload="false"
                                             accept="image/*" :max-count="1" v-model:file-list="lista_files"
                                             @update:file-list="gestisciCaricamentoFile">
@@ -38,47 +29,38 @@
                                         </n-upload>
                                     </div>
                                 </n-form-item>
-                                <!--titolo-->
                                 <n-form-item label="Titolo" path="titolo">
                                     <n-input round v-model:value="form.titolo" />
                                 </n-form-item>
-                                <!--autore-->
                                 <n-form-item label="Autore" path="autore">
                                     <n-input round v-model:value="form.autore" />
                                 </n-form-item>
-                                <!--anno-->
                                 <n-form-item label="Anno" path="anno">
                                     <n-input round v-model:value="form.anno" />
                                 </n-form-item>
-                                <!--descrizione-->
                                 <n-form-item label="Descrizione" path="descrizione">
                                     <n-input type="textarea" round v-model:value="form.descrizione" :autosize="{
                                         minRows: 3,
                                         maxRows: 6
                                     }" />
                                 </n-form-item>
-                                <!--scaffale-->
                                 <n-form-item v-if="libri_store.sono_proprietario_libro || !libro_id " label="Scaffale"
                                     path="scaffale_id">
                                     <n-select round v-model:value="form.scaffale_id"
                                         :options="lista_scaffali_disponibili" placeholder="Seleziona lo scaffale" />
                                 </n-form-item>
-                                <!--genere-->
                                 <n-form-item label="Genere" path="genere_id">
                                     <n-select round v-model:value="form.genere_id" :options="lista_generi"
                                         placeholder="Genere Letterario" />
                                 </n-form-item>
-                                <!--condivisione-->
                                 <n-form-item label="Tipo di Condivisione" path="tipo_condivisione_id">
                                     <n-select round v-model:value="form.tipo_condivisione_id"
                                         :options="lista_tipi_condivisione" placeholder="Tipo di Condivisione" />
                                 </n-form-item>
                                 <n-divider v-show="libri_store.sono_proprietario_libro" />
-                                <!--data modifica elemento-->
                                 <div v-show="libri_store.sono_proprietario_libro">
                                     <p>Ultima modifica: {{ data_formattata }}</p>
                                 </div>
-                                <!-- conteggio viualizzazioni-->
                                 <div  style=" display: flex; font-size: 1.1rem; justify-content: center;">
                                     <p>Visualizzazioni: <span class="statistiche_visualizzazioni">{{ libro?.visualizzazioni }}</span></p>
                                 </div>
@@ -87,16 +69,12 @@
                         </n-card>
                         <n-divider/>
                             <n-space justify="end">
-                                <!-- bottone pagina precedente -->
                                 <n-button type="info" primary ghost @click="router.back()">Indietro</n-button>
-                                <!-- bottone richiesta condivisione -->
                                 <n-button v-if="!libri_store.sono_proprietario_libro && libro_id" type="warning" block
                                     @click="richiediCondivisione(libro_id)">Richiedi Libro</n-button>
-                                <!-- bottone salvataggio o creazione libro -->
                                 <n-button v-if="libri_store.sono_proprietario_libro || !libro_id" type="warning" block
                                     @click="inviaDati" :loading="libri_store.loading">{{ libro_id ? 'Salva' :
                                     'Crea'}}</n-button>
-                                <!-- bottone eliminazione libro -->
                                 <n-button v-if="libri_store.sono_proprietario_libro && libro_id" type="error"
                                     @click="mostra_modale_conferma = true"
                                     :loading="libri_store.loading_eliminazione">Elimina</n-button>
@@ -172,7 +150,7 @@ const rules = {
 
 //computed dedicato alla scelta di cosa visualizzare nel riquadro della copertina
 const copertina_src = computed(() => {
-    // mostra anteprima locale se utente ha appena caricato foto
+    // mostra anteprima locale se utente ha appena caricato immagine
     if (anteprima.value) {
         return anteprima.value
     }
@@ -204,7 +182,6 @@ const lista_tipi_condivisione = computed(() => {
 
 //lista che permette di scegliere dove inserire il nuovo libro o dove spostare quello esistente
 const lista_scaffali_disponibili = computed(() => {
-    //recupero la lista degli scaffali dallo store
     const miei_scaffali = scaffali_store.scaffali_utente || []
     
     //trasformo l'array appena resrituito nel formato {label, value}
@@ -230,21 +207,18 @@ const titolo_pagina = computed(() => {
 })
 
 
-//inizializzaazione pagina
 async function inizializzaPagina() {
     pulisciStatoFile() //resetta variabili upload
-    await caricaDatiLibro()//carica info libro
+    await caricaDatiLibro()
 }
 
-//caricamento dati dell'utente
 async function caricaDatiLibro() {
     libro.value = null
     if (libro_id) {
         try {
             const risposta_libro = await libri_store.getLibroByID(libro_id)
-            //libro.value = risposta_libro.data
             libro.value = libri_store.libro_selezionato_dettagli
-            console.log(libro.value)
+            //console.log(libro.value)
 
             form.value = {
                 ...libro.value,
@@ -295,7 +269,7 @@ function controlloPreUpload({ file }) {
         return false
     }
 
-    return true // solo se valido
+    return true
 }
 
 // configuro come voglio visualizzare la data (stile italiano gg/mm/aaaa)
@@ -315,33 +289,33 @@ const data_formattata = computed(() => {
 
     // controllo se il valore è presente (dovrebbe essere una stringa ISO)
     if (data_str) {
-        const dataObj = new Date(data_str)
+        const data_obj = new Date(data_str)
         // uso opzioni già definite, 'it-IT' per l'ordine gg/mm/aaaa
-        return dataObj.toLocaleString('it-IT', opzioni)
+        return data_obj.toLocaleString('it-IT', opzioni)
     }
     return 'Non disponibile'
 })
 
 // gestisco il file quando viene selezionato e creo l'anteprima
 function gestisciCaricamentoFile(upload) {
-    console.log("gestisciCaricamentoFile chiamata con parametro", upload)
+    //console.log("gestisciCaricamentoFile chiamata con parametro", upload)
     if (upload.length > 1) {
         // Se l'utente ha aggiunto più file forzo la lista a prendere solo l'ultimo.
         upload = [upload[upload.length - 1]]
     }
     lista_files.value = upload
     const f = lista_files.value[0]?.file
-    console.log("gestisciCaricamentoFile chiamata -> f", lista_files.value[0]?.file)
+    //console.log("gestisciCaricamentoFile chiamata -> f", lista_files.value[0]?.file)
     if (!f) {
         file.value = null
         anteprima.value = null
-        console.log("Nessun File")
+        //console.log("Nessun File")
         return
     }
-    console.log("File caricato", f)
+    //console.log("File caricato", f)
     file.value = f
     anteprima.value = URL.createObjectURL(f) // URL temporaneo
-    console.log("anteprima Value:", anteprima.value)
+    //console.log("anteprima Value:", anteprima.value)
 }
 
 async function inviaDati() {
@@ -353,9 +327,9 @@ async function inviaDati() {
 
         for (const key in form.value) {
             //forzo l'anno a stringa se è un numero per evitare il warning di Naive UI
-            const valore = (key === 'anno') ? String(form.value[key]) : form.value[key];
+            const valore = (key === 'anno') ? String(form.value[key]) : form.value[key]
             if (valore === null || valore === undefined) {
-                continue; // non aggiungo campo al FormData
+                continue // non aggiungo campo al FormData
             }
             if (key === 'descrizione') {
                 fd.append(key, String(troncaStringa(valore, 500) ?? ''))
@@ -364,9 +338,9 @@ async function inviaDati() {
             }
         }
 
-        //verifico la presenza del file di copertina ed eventualmente lo aggiungo
+        //verifico la presenza del file di copertina ed eventualmente lo aggiungo al FormData
         if (file.value instanceof File) {
-            console.log("file.value è istanza di File")
+            //console.log("file.value è istanza di File")
             fd.append('type', 'copertina')
             fd.append('file', file.value)
         }
@@ -378,10 +352,8 @@ async function inviaDati() {
             //Aggiorna il form con i nuovi dati
             if (risposta && risposta.data) {
                 form.value = { ...form.value, // prendo i dati attuali del form
-                    ...libri_store.libro_selezionato_dettagli,
-                    //...risposta.data, //li sovrascrivo con quelli nuovi restituiti
+                    ...libri_store.libro_selezionato_dettagli,  //li sovrascrivo con quelli nuovi
                     anno: String(libri_store.libro_selezionato_dettagli.anno)
-                    //anno: String(risposta.libro.anno) //FORZO l'anno a stringa per Naive UI
                     }
             }
 

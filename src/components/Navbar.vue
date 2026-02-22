@@ -1,33 +1,24 @@
 <template>
-    <!-- header principale della barra di navigazione -->
     <n-layout-header class="navbar_intestazione" bordered>
-
-        <!-- contenitore interno per allineare logo e menu -->
         <div class="navbar_contenitore">
 
-            <!-- il logo funge anche da link alla homepage -->
             <div class="logo_navigazione">
-                <img class="immagine_logo" src="/logo_trasparente.png" alt="GeoBookSharing logo"
+                <img class="immagine_logo" src="/logo_trasparente_2.png" alt="GeoBookSharing logo"
                     @click="router.push('/')">
             </div>
 
-            <!-- visibile solo su schermi medio-grandi -->
             <n-space class="collegamenti_desktop" size="large" align="center">
 
-                <!-- generazione dinamica dei link di navigazione -->
                 <n-button v-for="link in links" :key="link.to" text :class="{ active: isLinkAttivo(link.to) }"
                     @click="gestioneLink(link.to)">
                     {{ link.label }}
                 </n-button>
             </n-space>
 
-            <!--modalità hamburger per mobile-->
             <div class="versione_mobile">
 
-                <!-- bottone hamburger visibile solo su mobile -->
                 <n-button quaternary circle @click="show_menu = true">
 
-                    <!-- icona SVG inline per evitare dipendenze esterne -->
                     <n-icon size="24">
                         <template #default>
                             <svg width="24" height="24" viewBox="0 0 24 24">
@@ -40,17 +31,14 @@
             </div>
         </div>
 
-        <!-- menu laterale che si apre da destra su dispositivi mobili -->
         <n-drawer v-model:show="show_menu" placement="right" width="200" :z-index="3000" :style="{
             top: '4rem',
             height: 'calc(100vh - 14rem)'
         }" :mask-style="{ top: '4rem' }">
             <n-drawer-content title="Menu" closable class="contenitore_menu">
 
-                <!-- spazio verticale per i pulsanti del menu -->
                 <n-space vertical size="large" class="space_menu_mobile">
 
-                    <!-- stessi link del desktop -->
                     <n-button class="pulsanti_menu_mobile" v-for="link in links" :key="link.to" text
                         @click="gestioneLink(link.to)">
                         {{ link.label }}
@@ -65,16 +53,16 @@
 
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useUtentiStore } from '@/stores/utentiStore';
+import { useUtentiStore } from '@/stores/utentiStore'
 import { useMessage } from 'naive-ui'
 
 
-const router = useRouter() // per spostarsi tra le pagine
-const route = useRoute()    //per leggere informazioni sulla pagina attuale
-const utenti_store = useUtentiStore() //per recuperare informazioni dallo store utenti
+const router = useRouter() 
+const route = useRoute()   
+const utenti_store = useUtentiStore() 
 const message = useMessage()
 
-const show_menu = ref(false) //Stato per l'apertura/chiusura del menu mobile
+const show_menu = ref(false) 
 
 //Qui si decide cosa verrà visualizato. Se sei loggato mostra i link dedicati, altrimenti solo login e registrati.
 const links = computed(() => {
@@ -111,10 +99,10 @@ const links = computed(() => {
 function isLinkAttivo(path) {
     if (path === '/') {
         // Se il link è la Home deve essere attivo SOLO se il path è esattamente '/'
-        return route.path === '/';
+        return route.path === '/'
     }
     // Per gli altri link, controlo se il path inizia con la rotta del link
-    return route.path.startsWith(path);
+    return route.path.startsWith(path)
 }
 
 
@@ -187,7 +175,6 @@ async function gestioneLink(path) {
     object-fit: contain;
 }
 
-/* Modalità Desktop */
 .collegamenti_desktop {
     display: flex;
 }
@@ -205,12 +192,12 @@ async function gestioneLink(path) {
 .collegamenti_desktop :deep(.n-button.active) {
     font-weight: 700;
     color: var(--text-color-light);
-    /* Una linea sottile sotto il link attivo */
+    /* linea sottile sotto il link attivo */
     border-bottom: 0.125rem solid var(--navbar-text-hover);
     border-radius: 0;
 }
 
-/* Modalità Hamburger (Mobile) */
+/* Modalità Hamburger disattivata su desktop */
 .versione_mobile {
     display: none;
 }
@@ -241,7 +228,7 @@ async function gestioneLink(path) {
     /* Gestione link dentro il Drawer (Menu Mobile) */
     .pulsanti_menu_mobile {
         width: 100%;
-        justify-content: flex-start !important; /* Allinea il testo a sinistra */
+        justify-content: flex-start !important; 
         padding: 0.75rem 1rem !important;
         font-size: 1.1rem !important;
         color: var(--color-text-dark) !important;

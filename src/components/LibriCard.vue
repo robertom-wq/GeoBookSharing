@@ -1,29 +1,22 @@
 <template>
   <!-- card che mostra una miniatura del libro con informazioni a seguito di ricerca -->
   <n-card hoverable class="libro_card"  @click="$emit('click-dettagli-libro')">
-
-     <!-- contenuto principale della card -->
     <div class="card_container">
 
-      <!-- immagine di copertina con fallback -->
       <img 
         :src="immagine ? (url_immagine + '/' + immagine) : immagine_placeholder" 
         :alt="alt || 'Copertina libro'" 
         class="immagine_sfondo"
         @error="gestisciErroreCaricamentoIMG"
       >
-
-      <!-- dati del libro -->
       <div class="dati_libro">
         <div class="content_text">
           <p class="titolo">{{ troncaStringa(titolo, 80) }}</p>
 
-          <!-- area info aggiuntive libro -->
           <div class="info_aggiuntive">
             <p class="autore">di {{ troncaStringa(info_autore, 50) || 'Sconosciuto' }}</p>
             <p v-if="info_anno" class="anno">Edizione: {{ info_anno }}</p>
 
-            <!-- informazioni proprietario e vicinanza-->
             <div v-if="info_scaffale_proprietario" class="scaffale_box">
               <n-tag :bordered="false" size="small" type="info">
                 Proprietario: {{ info_scaffale_proprietario }}
@@ -34,7 +27,6 @@
             </div>
           </div>
         </div>
-        <!-- footer della card con bottone -->
         <div v-if="visualizza_footer" class="footer_action">
           <n-button secondary type="primary" size="small" block @click.stop="$emit('click-richiedi-condivisione')">
             Richiedi Condivisione
@@ -72,14 +64,14 @@ const props = defineProps({
 const emit = defineEmits(['click-dettagli-libro', 'click-richiedi-condivisione'])
 
 const gestisciErroreCaricamentoIMG = (event) => {
-  // Sostituisce l'src che ha dato errore con il path del placeholder
+  // sostituisco l'src che ha dato errore con il path del placeholder
   event.target.src = props.immagine_placeholder
 }
 </script>
 
 <style scoped>
 .libro_card {
-  /* Uso i rem in modo tale che se l'utente cambia la dimensione del font nel browser, la card scala correttamente */
+  /* uso i rem in modo tale che se l'utente cambia la dimensione del font nel browser, la card scala correttamente */
   width: 100%; /* La card occupa tutto lo spazio del suo contenitore (griglia) */
   max-width: 20rem!important; 
   height: 25rem !important; 
@@ -112,7 +104,8 @@ const gestisciErroreCaricamentoIMG = (event) => {
   cursor: pointer;
 }
 
-/* L'Overlay Glassmorphism */
+/* effetto Glassmorphism, sfondo semitrasparente con sfocatura degli elementi sottostanti
+ (copertina) per migliorare la leggibilità del testo */
 .dati_libro {
   position: absolute;
   bottom: 0;
@@ -140,13 +133,13 @@ const gestisciErroreCaricamentoIMG = (event) => {
   }
 
   .libro_card:hover .immagine_sfondo {
-    transform: scale(1.1); /* Leggero zoom della copertina al passaggio del mouse */
+    transform: scale(1.1); /* zoom della copertina al passaggio del mouse */
   }
 
   .libro_card:hover .info_aggiuntive,
   .libro_card:hover .footer_action {
     opacity: 1;
-    transition-delay: 0.1s; /* Aspetta 100ms prima prima di mostrare il contenuto dei dettagli */
+    transition-delay: 0.1s; /* 100ms prima prima di mostrare il contenuto dei dettagli */
   }
 }
 
@@ -193,8 +186,8 @@ const gestisciErroreCaricamentoIMG = (event) => {
 /* Ottimizzazione per mobile (tablet e smartphone) */
 @media (max-width: 768px) {
   .libro_card {
-    max-width: 100%; /* Su mobile le card possono allargarsi nella griglia */
-    height: 25rem; /* Leggermente più alta per facilitare il tocco */
+    max-width: 100%; /* su mobile le card possono allargarsi nella griglia */
+    height: 25rem; /* più alta per facilitare il tocco */
   }
 
   .dati_libro {
@@ -208,7 +201,7 @@ const gestisciErroreCaricamentoIMG = (event) => {
   }
 
   .titolo {
-    font-size: 1.1rem!important; /* Titolo leggermente più grande per leggibilità */
+    font-size: 1.1rem!important; /* Titolo più grande per leggibilità */
   }
 }
 </style>

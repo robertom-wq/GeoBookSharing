@@ -18,7 +18,8 @@ export default defineConfig({
     },
   },
     server: {
-    host: '0.0.0.0',   // espone in LAN
+    host: 'localhost',
+    //host: '0.0.0.0',   // utilizzato per prove in LAN
     port: 5173,
     strictPort: true,
     proxy: {

@@ -2,7 +2,7 @@
   --dark_gray: #5c5b5be0;
   --text-color-light: #ffffff;
   --white-bg: #ffffff;
-  --box-shadow: 0 7px 7px rgba(81, 86, 150, 0.623); /* Ombra più morbida e professionale */
+  --box-shadow: 0 7px 7px rgba(81, 86, 150, 0.623); /* ombra più morbida e professionale */
   --border-radius: 12px;
   --pearl-white-bg: rgb(241, 238, 238); 
   /*--color-text-dark: #333333;*/
@@ -11,23 +11,21 @@
   --btn-primary-color : #3194E7;
   --btn-primary-color-text: #ffffff;
 
-  --section-spacing: clamp(1rem, 5vw, 2.5rem); /* Spaziatura tra sezioni elastica */
-  --container-max-width: 1400px;
+  --section-spacing: clamp(1rem, 5vw, 2.5rem); /* spaziatura tra sezioni elastica */
+  --container-max-width: 1900px;
   --transition-speed: 0.3s;
-}
-
-.page {
-  /*max-width: 1100px;*/
-  padding: 3vw; 
-  max-width: 1200px;
 }
 
 body {
   font-family: 'Poppins', sans-serif;
   color: var(--color-text-dark); /* grigio scuro */
-  line-height: 1.6; /* Aumenta l'aria tra le righe */
+  line-height: 1.6; /* aumenta l'aria tra le righe */
   margin: 0;
   padding: 0;
+}
+
+.page {
+  padding: 3vw; 
 }
 
 .intestazione {
@@ -38,8 +36,8 @@ body {
 .intestazione h1 {
   /* font-size: minimo 20px, ideale 4% dello schermo, massimo 36px */
   font-size: clamp(1.25rem, 30vw, 2.25rem)!important;
-  font-weight: 300; /* Peso leggero per un look sofisticato */
-  letter-spacing: -0.02em; /* Stringe leggermente le lettere, tocco professionale */
+  font-weight: 300; /* leggero per uno stile moderno */
+  letter-spacing: -0.02em; /* stringe leggermente le lettere */
   line-height: 1.3;
   opacity: 0.9;
 }
@@ -51,7 +49,7 @@ body {
   opacity: 0.9;
 }
 
-/*Schede principali con moduli*/
+/*schede principali con moduli*/
 .scheda_richiesta, .scheda_registrazione, .profilo_card, .scheda_login, .scheda_libro, .libro_card {
     max-width: clamp(18.75rem, 90vw, 38rem); 
     margin: 3rem auto;
@@ -61,7 +59,7 @@ body {
     box-shadow: var(--box-shadow);
 }
 
-/* Contenitore dei pulsanti*/
+/* contenitore dei pulsanti*/
 .pulsanti_azione {
     padding-top: 2rem; /*distanzia i bottoni dal testo */
     width: 100%;

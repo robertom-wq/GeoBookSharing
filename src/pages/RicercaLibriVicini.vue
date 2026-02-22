@@ -1,21 +1,15 @@
 <template>
-    <!-- contenitore principale della pagina -->
     <div class="page">
         <section>
-            <!-- intestazione della pagina -->
             <div class="intestazione">
                 <h1>Cerca Libri</h1>
-                <!-- sottotitolo -->
                 <p class="sottotitolo">Ciao {{ utenti_store.utente?.nome.toUpperCase() }}. Trova i libri
                     disponibili nelle librerie di altri
                     utenti attorno a te. Seleziona un'area e avvia la ricerca.
                 </p>
             </div>
-            <!-- contenitore della ricerca libro -->
             <div class="contenuto_ricerca">
-                <!-- spinner caricamento dei libri -->
                 <n-spin :show="libri_store.loading">
-                    <!-- Contenitore mappa -->
                     <div id="scheda_mappa_ricerca">
                         <Mappa 
                         :dati_libri="libri_in_mappa"
@@ -27,18 +21,15 @@
                     </div>
                         <!--controlli ricerca-->
                         <n-flex class="barra_controlli_ricerca">
-                            <!-- ricerca per titolo o autore -->
                             <n-input
                             v-model:value="query_ricerca"
                             placeholder="Cerca titolo o autore..."
                             clearable
                             class="input_ricerca_testo" />
-                            <!-- selezione raggio di ricerca -->
                             <n-select 
                             v-model:value="distanza"
                             :options="opzioni_distanza"
                             class="selettore_raggio"/>
-
                             <n-button 
                             type="primary"
                             @click="eseguiRicerca"
@@ -50,14 +41,11 @@
                     
                 </n-spin>
                 <n-divider/>
-                <!--nessun risulato-->
                 <n-empty description="Nessun Libro trovato per la ricerca" v-if="!ricerca_ha_risultati" />
 
-                <!-- risultati ricerca-->
+                <!-- risultati ricerca se ricerca_ha_risultati===true -->
                 <div v-else>
-                    <!-- conteggio libri trovati -->
                     <n-h2>Libri Trovati: {{ libri_store.libri_all.length }}</n-h2>
-                    <!-- griglia risultati -->
                     <div class="griglia_risultati_libri">
                         <div v-for="libro in libri_paginati" :key="libro.id">
                             <!-- card singolo libro -->
@@ -74,7 +62,6 @@
                                 />
                         </div>
                     </div>
-                    <!--pagination-->
                     <n-flex justify="center" class="area_paginazione">
                         <n-pagination
                             v-model:page="pagina_corrente"
@@ -183,7 +170,6 @@ const centro_iniziale = computed(()=>{
     return { lat: 45.6667, lng: 12.2416, zoom: 15 }
 })
 
-//AZIONI
 // aggiorno coordinate quando utente sposta il cursore sulla mappa
 function gestisciMovimentoMappa(coordinate) {
     coordinate_centro_mappa.value = {
@@ -206,10 +192,10 @@ async function eseguiRicerca() {
         limit: limit_ricerca.value,
         q: query_ricerca.value || undefined
     }
-    console.log("limite", dati_query.limit)
+    //console.log("limite", dati_query.limit)
 
     try {
-        const libri_trovati = await libri_store.getLibriVicini(dati_query);
+        const libri_trovati = await libri_store.getLibriVicini(dati_query)
 
         if(!ricerca_ha_risultati) {
             message.info("Ricerca completata, nessun libro trovato nel raggio selezionato!")
@@ -229,7 +215,7 @@ function richiediCondivisione(id){
     router.push({ name: 'RichiestaCondivisione', params: { id }})
 }
 
-// resetto risultati ricerca alla chiusura o caricamento
+// resetto risultati ricerca al caricamento
 onMounted(()=>{
     libri_store.resetLibriVicini()
 })
@@ -238,22 +224,10 @@ onMounted(()=>{
 
 <style scoped>
 
-/* spaziatura per titolo e descrizione della pagina */
-.testata_sezione {
-    margin-bottom: 2rem;
-}
-
-/* font del sottotitolo dinamico */
-.testo_sottotitolo {
-    font-size: clamp(1rem, 2vw, 1.2rem);
-    line-height: 1.5;
-    opacity: 0.9;
-}
-
 /* contenitore mappa con altezza dinamica e bordi arrotondati */
 #scheda_mappa_ricerca {    
     width: 100%;
-    height: clamp(20rem, 50vh, 35rem); /* altezza si adatta alla dimensione dello schermo */
+    height: clamp(20rem, 50vh, 35rem); /* altezza dinamica */
     overflow: hidden !important;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
@@ -295,7 +269,6 @@ onMounted(()=>{
     max-width: 10rem; 
 }
 
-/* griglia dei risultati */
 .griglia_risultati_libri {
     display: flex;
     flex-wrap: wrap;
@@ -305,7 +278,6 @@ onMounted(()=>{
     margin-top: 1.5rem;
 }
 
-/* paginazione */
 .area_paginazione {
     margin-top: 2.5rem; 
     margin-bottom: 1.25rem;
@@ -322,11 +294,11 @@ onMounted(()=>{
 
     .input_ricerca_testo, 
     .selettore_raggio {
-        max-width: 100%; /* Occupano tutta la larghezza */
+        max-width: 100%; 
     }
 
     #scheda_mappa_ricerca {
-        height: 28rem; /* Altezza fissa aumentata per l'uso touch della mappa */
+        height: 28rem; 
     }
 
     .griglia_risultati_libri {

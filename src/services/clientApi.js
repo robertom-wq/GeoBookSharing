@@ -1,6 +1,6 @@
 // questa utility semplifica e standardizza tutte le chiamate API verso il backend
 
-//estraggo il token CSRF dai cookie del browser
+//estraggo il token CSRF dal LocalStorage o dai cookie del browser
 function getCsrfToken() {
     //Provo dal LocalStorage
     const local = localStorage.getItem('csrf_token')

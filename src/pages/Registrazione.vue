@@ -1,50 +1,32 @@
 <template>
-    <!-- contenitore principale della pagina -->
     <div class="page">
         <section>
-            <!-- intestazione della pagina di registrazione -->
             <div class="intestazione">
-
-                <!-- Titolo principale -->
                 <h1>Registrati</h1>
-
-                <!-- Sottotitolo -->
                 <p class="sottotitolo">Benvenuto, crea un account ed inizia subito a condividere i tuoi libri con
                     GeoBookSharing</p>
             </div>
-
-            <!-- Contenitore della card di registrazione -->
             <div class="contenuto_modulo">
-
-                <!-- card naive che racchiude il form di registrazione -->
                 <n-card title="Registrati" class="scheda_registrazione">
-
-                    <!-- form naive collegato al modello form_value -->
                     <n-form :model="form_value" @submit.prevent="gestisciRegistrazione" :rules="rules">
-                        <!-- Campo Nome -->
                         <n-form-item label="Nome" path="nome">
                             <n-input v-model:value="form_value.nome" placeholder="Nome" />
                         </n-form-item>
-                        <!-- Campo Cognome -->
                         <n-form-item label="Cognome" path="cognome">
                             <n-input v-model:value="form_value.cognome" placeholder="Cognome" />
                         </n-form-item>
-                        <!-- Campo Email -->
                         <n-form-item label="Email" path="email">
                             <n-input v-model:value="form_value.email" placeholder="Email" type="email" />
                         </n-form-item>
-                        <!-- Campo Username -->
                         <n-form-item label="Username" path="username">
                             <n-input v-model:value="form_value.username" placeholder="Username" />
                         </n-form-item>
-                        <!-- Campo Password -->
                         <n-form-item label="Password" path="password">
                             <n-input v-model:value="form_value.password" type="password" placeholder="Password" />
                         </n-form-item>
-                        <!-- Accettazione termini privacy -->
                         <n-form-item label="Privacy" path="privacy_policy_accettata">
                             <n-checkbox v-model:checked="form_value.privacy_policy_accettata"
-                                >Accetta i <a @click="showPrivacyModal = true" class="link-privacy">termini sulla privacy</a></n-checkbox>
+                                >Accetta i <a @click="mostra_modale_privacy = true" class="link-privacy">termini sulla privacy</a></n-checkbox>
                         </n-form-item>
                         <n-form-item>
                             <div class="pulsanti_azione">
@@ -61,7 +43,7 @@
         </section>
     </div>
     <n-modal
-        v-model:show="showPrivacyModal"
+        v-model:show="mostra_modale_privacy"
         preset="card"
         style="width: 600px; max-width: 90vw"
         title="Informativa sulla Privacy (GDPR)"
@@ -82,7 +64,7 @@
             <p>Puoi richiedere la cancellazione dal profilo. I dati verranno eliminati definitivamente dopo 10 giorni (periodo di ripensamento).</p>
         </div>
         <template #footer>
-            <n-button type="primary" @click="showPrivacyModal = false">Ho capito</n-button>
+            <n-button type="primary" @click="mostra_modale_privacy = false">Ho capito</n-button>
         </template>
     </n-modal>
 </template>
@@ -108,7 +90,9 @@ const form_value = ref({
   password: '',
   privacy_policy_accettata: false
 })
-const showPrivacyModal = ref(false)
+
+const mostra_modale_privacy = ref(false)
+
 // Regole di validazione
 const rules = {
   nome: { required: true, message: 'Nome obbligatorio', trigger: 'blur' },
@@ -117,13 +101,11 @@ const rules = {
   privacy_policy_accettata : [
 {
     validator: (rule, value, callback) => {
-      // Logga il valore per debuggare in console (aprila con F12)
-      console.log("Valore privacy:", value); 
-      
+      //console.log("Valore privacy:", value)
       if (value === true) {
-        callback(); // Successo
+        callback() // Successo
       } else {
-        callback(new Error('Accettare le Privacy Policy per completare la registrazione')); // Errore
+        callback(new Error('Accettare le Privacy Policy per completare la registrazione'))
       }
     },
     trigger: ['blur', 'change'] // Ascolta entrambi gli eventi
@@ -143,7 +125,7 @@ const rules = {
 
 async function gestisciRegistrazione() {
     try {
-        //Tento la registrazione sul server.
+        //Tento la registrazione
         await utenti_store.registrati(form_value.value)
         //console.log(JSON.stringify(form_value.value))
     } catch (err) {
@@ -168,17 +150,16 @@ async function gestisciRegistrazione() {
 
 <style scoped>
 
-/* Contenitore div del modulo per la centratura */
 .contenuto_modulo {
-    display: flex; /* attiva il layout flex */
-    flex-direction: column; /* dispone gli elementi in colonna */
-    align-items: center; /* centra verticalmente */
-    justify-content: center; /* centra orizzontalmente */
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    justify-content: center; 
     min-height: 60vh; /* occupa almeno il 60% dell'altezza dello schermo */
 }
 
 .link-privacy {
-    color: #3194E7; /* Il tuo --btn-primary-color */
+    color: var(--btn-primary-color);
     text-decoration: underline;
     margin-left: 4px;
     font-weight: 500;

@@ -81,10 +81,10 @@ export const useScaffaliStore = defineStore('scaffali', () => {
             const scaffale_aggiornato = scaffale.data
             
             if (scaffale_selezionato.value) {
-                // Se c'è già qualcosa (non è null), facciamo il merge dei dati
+                // Se c'è già qualcosa (non è null), faccio il merge dei dati
                 Object.assign(scaffale_selezionato.value, scaffale_aggiornato)
             } else {
-                // Se è null, dobbiamo per forza assegnare l'oggetto intero
+                // Se è null, si deve per forza assegnare l'oggetto intero
                 scaffale_selezionato.value = scaffale_aggiornato
             }
             return scaffale
@@ -121,39 +121,39 @@ export const useScaffaliStore = defineStore('scaffali', () => {
 
     // carica uno scaffale per la pagina di dettaglio
     async function getScaffaleById(id) {
-        scaffale_selezionato.value = null; // Pulisce lo stato precedente
+        scaffale_selezionato.value = null // Pulisce lo stato precedente
         try {
-            const scaffale = await chiamaAPI(`/scaffali/${id}`);
+            const scaffale = await chiamaAPI(`/scaffali/${id}`)
             // come sopra rendo le coordinate usabili per la mappa
-            const coordinate = parsePosizione(scaffale.data.posizione);
+            const coordinate = parsePosizione(scaffale.data.posizione)
             const scaffale_parsificato = {
-                ...scaffale,
+                ...scaffale.data,
                 lat: coordinate.lat,
                 lng: coordinate.lng
-            };
+            }
 
             // 3. Salva nello stato reattivo e restituisce
-            scaffale_selezionato.value = scaffale_parsificato;
-            console.log("Scaffale parsificato", scaffale_parsificato)
-            return scaffale_parsificato;
+            scaffale_selezionato.value = scaffale_parsificato
+            //console.log("Scaffale parsificato", scaffale_parsificato)
+            return scaffale_parsificato
 
         } catch (err) {
-            console.error(`Errore durante il caricamento dello scaffale ${id}:`, err);
+            console.error(`Errore durante il caricamento dello scaffale ${id}:`, err)
             // Non lanciare l'errore, ma ritorna null o gestisci il fallimento
-            throw err;
+            throw err
         }
     }
 
 
     // Esporto tutto per usarlo nei componenti
     return {
-        //STATI//
+        //STATI
         scaffali_utente,
         scaffale_selezionato,
         loading,
         conteggio_scaffali_totali,
 
-        //AZIONI//
+        //AZIONI
         getMieiScaffali,
         createScaffale,
         deleteScaffale,

@@ -85,8 +85,7 @@ export const useLibriStore = defineStore('libri', () => {
             const libro_aggiornato = await chiamaAPI(`/libri/${libro_id}`, {
                 method: 'PATCH',
                 body: libro,
-                
-            })
+                })
 
             // Se ci sono già i dettagli caricati, faccio il merge per non perdere nulla
             if (libro_selezionato_dettagli.value) {
@@ -222,7 +221,7 @@ export const useLibriStore = defineStore('libri', () => {
             generi_letterari.value = generi.data
             return generi
         } catch (err) {
-            console.error("", err)
+            console.error("Impossibile recuperare la lista dei generi letterari", err)
             throw err
         } finally {
             loading.value = false
@@ -235,9 +234,9 @@ export const useLibriStore = defineStore('libri', () => {
         try {
             const tipi_condivisione_res = await chiamaAPI('/libri/tipiCondivisione')
             tipi_condivisione.value = tipi_condivisione_res.data
-            return tipi_condivisione
+            return tipi_condivisione_res
         } catch (err) {
-            console.error("", err)
+            console.error("Impossibile recuperare la lista dei tipi di condivisione", err)
             throw err
         } finally {
             loading.value = false

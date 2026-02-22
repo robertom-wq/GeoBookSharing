@@ -23,8 +23,8 @@ export const useCondivisioniStore = defineStore('condivisioni', () => {
             mie_condivisioni_richiedente.value = c_richiedente.data || []
             mie_condivisioni_proprietario.value = c_proprietario.data || []
 
-            console.log("Proprietario",mie_condivisioni_proprietario.value )
-            console.log("Richiedente",mie_condivisioni_richiedente.value )
+            //console.log("Proprietario",mie_condivisioni_proprietario.value )
+            //console.log("Richiedente",mie_condivisioni_richiedente.value )
 
         } catch (err) {
             console.error("Impossibile recuperare le mie richieste di condivisione come richiedente", err)
@@ -62,7 +62,7 @@ export const useCondivisioniStore = defineStore('condivisioni', () => {
         //data es {id: 10, azione: 'accetta', note:'test'}
         loading.value = true
         const { id, ...parametri } = dati_condivisione //scorporo id dai dati necessari nel body
-        console.log('data', dati_condivisione)
+        //console.log('data', dati_condivisione)
         try {
             const condivisione_aggiornata = await chiamaAPI(`/condivisioni/${id}/stato`, {
                 method: 'PATCH',
@@ -114,7 +114,7 @@ export const useCondivisioniStore = defineStore('condivisioni', () => {
         try {
             const eliminata = await chiamaAPI(`/condivisioni/${id}`, {
                 method: 'DELETE',
-                body: { motivo}
+                body: { motivo }
             })
 
             //rimuovo la condivisione da entrambe le liste

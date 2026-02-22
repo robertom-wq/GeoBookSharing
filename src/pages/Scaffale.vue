@@ -1,33 +1,22 @@
 <template>
-    <!-- contenitore principale della pagina -->
     <div class="page">
         <section>
-            <!-- spinner di caricamento, attivo finché i dati dello scaffale non sono disponibili -->
             <n-spin :show="scaffali_store.loading || !scaffale">
-
                 <!-- contenuto visibile solo quando lo scaffale è caricato -->
                 <div v-if="scaffale">
-                    <!-- intestazione dello scaffale -->
                     <div class="intestazione">
                         <h1>{{ scaffale.data.nome }}</h1>
-
-                        <!-- descrizione dello scaffale -->
                         <p class="sottotitolo">{{ scaffale.data.descrizione }}</p>
                     </div>
-
-                    <!-- contenuto principale dello scaffale -->
                     <div class="contenuto_scaffale">
                         <template v-if="scaffale">
 
-                            <!-- contenitore della mappa (Leaflet) -->
                             <div class="contenitore_mappa" v-if="!is_cancellazione_in_corso">
                                 <Mappa :centra_mappa="{ lat: scaffale.lat, lng: scaffale.lng }"
                                         :dati_scaffali="[scaffale]" :is_home_scaffali="true" />
                             </div>
                             <n-divider />
-                            <!-- titolo sezione libri -->
                             <n-h3>Libri contenuti</n-h3>
-
                             <!-- stato vuoto se nessun libro presente -->
                             <n-empty description="Nessun Libro trovato in questo scaffale"
                                 v-if="scaffale.data.libri?.length === 0 || !scaffale.data.libri" />
@@ -46,31 +35,25 @@
                             </div>
                             <div>
                                 <n-divider />
-                                <!-- sezione azioni utente -->
                                 <div class="azioni_utente">
 
                                     <!-- azioni disponibili solo al proprietario dello scaffale -->
                                     <n-space v-if="is_utente_proprietario">
-                                        <!-- aggiunta manuale di un nuovo libro -->
                                         <n-button @click="aggiungiLibro" type="primary" ghost
                                             title="Crea e aggiungi un nuovo libro">Aggiungi Libro
                                         </n-button>
-                                         <!-- aggiunta libro da catalogo Master tramite ISBN -->
                                         <n-button @click="aggiungiLibroISBN" type="primary" ghost
                                             title="Aggiungi un libro da catalogo Master">Nuovo da Master
                                         </n-button>
-                                        <!-- modifica dei dati dello scaffale -->
                                         <n-button @click="vaiModificaScaffale" type="warning"
                                             title="Modifica Scaffale">Modifica Scaffale
                                         </n-button>
-                                        <!-- eliminazione definitiva dello scaffale -->
                                         <n-button @click="deleteScaffale" title="Elimina Scaffale" type="error">Elimina
                                             Scaffale
                                         </n-button>
                                     </n-space>
                                 </div>
                             </div>
-                            <!-- modale di conferma eliminazione scaffale -->
                             <ModaleConferma v-model:show="mostra_modale_conferma" titolo="Elimina Scaffale"
                                 :messaggio="'Sei sicuro di voler eliminare lo scaffale ' + scaffale?.data.nome + '? L\'azione è irreversibile.'"
                                 testoConferma="Elimina Definitivamente" tipo="warning"
@@ -100,8 +83,8 @@
     const router = useRouter()
 
     //STATI
-    const scaffale = ref(null) // oggetto reattivo per i dati dello scaffale
-    const mostra_modale_conferma = ref(false) // flag per visibilita modale cancellazione
+    const scaffale = ref(null) 
+    const mostra_modale_conferma = ref(false) 
     const is_cancellazione_in_corso = ref(false)
     //verifico proprietà dello scaffale
     const is_utente_proprietario = computed(() => {
@@ -113,16 +96,14 @@
         return scaffale.value.data.utente.id === utenti_store.utente.id
     })
 
-    //AZIONI
     //permette di aggiungere libri manualmente
     function aggiungiLibro() {
-        console.log("aggiungiLibro")
+        //console.log("aggiungiLibro")
         router.push({ name: 'AggiungiLibro' })
     }
 
-    //permette di aggiungere libri tramite codice ISBN
     function aggiungiLibroISBN() {
-        console.log("aggiungiLibroISBN") 
+        //console.log("aggiungiLibroISBN") 
         router.push({ name: 'CatalogoLibriMaster'})
     }
 
@@ -132,7 +113,7 @@
 
     //permette di visualizzare i dettagli del libro selezionato 
     function vaiAlLibroId(id) {
-        console.log("vaiAlLibroId")
+        //console.log("vaiAlLibroId")
         router.push({ name: 'ModificaLibro', params:{id}})
     }
 
@@ -151,10 +132,10 @@
             mostra_modale_conferma.value = false
             message.success("Scaffale eliminato correttamente")
 
-            router.replace({ name: 'Libreria' }) //'replace' è meglio dopo una cancellazione perché impedisce di tornare indietro con il tasto "Back" su un elemento morto
+            router.replace({ name: 'Libreria' }) //'replace' è meglio dopo una cancellazione perché impedisce di tornare indietro su un elemento morto
 
         } catch (err) {
-            mostra_modale_conferma.value = false // chiude la modale
+            mostra_modale_conferma.value = false
             is_cancellazione_in_corso.value = false 
             message.error(err.message || 'Errore durante l\'eliminazione')
             console.error('Errore durante l\'eliminazione', err)
@@ -164,7 +145,7 @@
     onMounted(async () => {
         //ottengo l'id dal parametro nell'URL
         const scaffale_id = route.params.id
-        console.log(scaffale_id)        
+        //console.log(scaffale_id)        
 
         // controllo validita id
         if (!scaffale_id || isNaN(scaffale_id)) {
@@ -174,9 +155,7 @@
         }
 
         try {
-            // recupero dati dal server tramite store scaffali_store
             const scaffale_recuperato = await scaffali_store.getScaffaleById(scaffale_id)
-
             // se lo scaffale non esiste nel db
             if (!scaffale_recuperato.data) {
                 router.push({ name: 'Libreria' }) // torno alla libreria
@@ -186,7 +165,7 @@
             // assegno i dati allo stato locale
             //scaffale.value = scaffale_recuperato.data
             scaffale.value = scaffali_store.scaffale_selezionato
-            console.log("Scaffale recuperato",scaffale.value)
+            //console.log("Scaffale recuperato",scaffale.value)
 
             // controllo se chi visualizza è il proprietario
             if (!is_utente_proprietario.value) {
@@ -206,12 +185,12 @@
 
 
 <style scoped>
-/* Area Mappa */
+
 .contenitore_mappa {
     margin-bottom: 2rem; /* spazio sotto il contenitore della mappa */
     box-shadow: var(--box-shadow);
     border-radius: var(--border-radius);
-    height: clamp(18.75rem, 40vh, 31.25rem);/* definisce l'altezza della card dinamicamente tra 300px e 500px in base all'altezza dello schermo */
+    height: clamp(18.75rem, 40vh, 31.25rem);/* altezza della card dinamica */
     overflow: hidden;/* nasconde le parti di mappa che escono dagli angoli arrotondati */
 }
 
@@ -221,29 +200,26 @@
     height: 100%; /* assicura che il contenuto occupi tutta l'altezza disponibile */
 }
 
-/* griglia dei libri */
 .griglia_libri {
-    display: flex; /* attiva layout flessibile */
+    display: flex; 
     flex-wrap: wrap;/* permette agli elementi di andare a capo se non c'e spazio */
     gap: 1.5rem;/* spazio tra le card */
-    width: 100%; /* occupa tutta la larghezza */
-    justify-content: center; /* centra le card orizzontalmente nella riga */
+    width: 100%; 
+    justify-content: center; 
     padding: 1rem 0; /* spazio verticale sopra e sotto la griglia */
 }
 
 .contenuto_scaffale {
-    width: 100%; /* larghezza piena */
-    display: flex;/* layout flessibile */
+    width: 100%; 
+    display: flex;
     flex-direction: column; /* dispone gli elementi in colonna verticale mappa, carousel e bottoni*/
 }
 
-/* Elemento singolo libro (per gestire il layout) */
 .scheda_libro_singola {
     flex: 0 1 auto; /* il libro non cresce ma puo ridursi se necessario */
     
 }
 
-/* Area pulsanti azioni */
 .azioni_utente {
     margin-top: 2rem; /* distanzia dalla griglia dei libri sopra */
     padding-bottom: 2rem; /* spazio in fondo alla pagina */
@@ -264,7 +240,7 @@
     }
 
     .contenitore_mappa {
-        height: 15.625rem; /* altezza fissa su mobile circa 250px */
+        height: 15.625rem; 
         margin-bottom: 1.25rem; /* riduce margine inferiore */
     }
 }
