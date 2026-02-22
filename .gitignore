@@ -1,0 +1,29 @@
+# --- Generali ---
+node_modules/
+.env
+.env.local
+.DS_Store
+Thumbs.db
+
+# --- Backend (Prisma & Logs) ---
+/GeoBookSharing_backend/node_modules/
+/GeoBookSharing_backend/dist/
+/GeoBookSharing_backend/logs/
+/GeoBookSharing_backend/files_vari/
+/GeoBookSharing_backend/.env
+*.log
+npm-debug.log*
+
+# --- Frontend (Vue / Vite) ---
+/GeoBookSharing_frontend_vue/node_modules/
+/GeoBookSharing_frontend_vue/dist/
+/GeoBookSharing_frontend_vue/dist-ssr/
+GeoBookSharing_frontend_vue/.env
+*.local
+
+# --- IDE / Editor ---
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.swp
+*.suo

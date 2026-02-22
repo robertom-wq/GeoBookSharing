@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: postgis/postgis:18-3.6
+    container_name: geobooksharing_db_docker
+    restart: always
+    environment:
+      POSTGRES_USER: geo_user
+      POSTGRES_PASSWORD: geo_password
+      POSTGRES_DB: geobooksharing_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - geobook_data:/var/lib/postgresql
+      - ./db-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U geo_user -d geobooksharing_db"]
+      interval: 10s 
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: 
+      context: ./GeoBookSharing_backend
+      dockerfile: Dockerfile
+    container_name: geobooksharing_backend
+    env_file:
+      - ./GeoBookSharing_backend/.env
+    restart: always
+    volumes:
+      - ./GeoBookSharing_backend:/usr/src/app
+      - /usr/src/app/node_modules 
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./GeoBookSharing_frontend_vue
+      dockerfile: Dockerfile
+    container_name: geobooksharing_frontend_vue
+    env_file:
+      - ./GeoBookSharing_frontend_vue/.env
+    restart: always
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./GeoBookSharing_frontend_vue:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  geobook_data:

@@ -15,6 +15,6 @@ COPY . .
 # Espone la porta di Vite
 EXPOSE 5173
 
-# CMD fondamentale: aggiungiamo --host per rendere accessibile Vite fuori dal container
+# CMD fondamentale: aggiungo --host per rendere accessibile Vite fuori dal container
 # e --port per forzare la 5173 definita nel compose
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
