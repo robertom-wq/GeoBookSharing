@@ -30,13 +30,19 @@
 
 Per eseguire l'intero ecosistema su un nuovo PC, non è necessario installare Node.js o PostgreSQL. È richiesto solo:
 
-* **Docker Desktop** (per Windows o Mac) oppure **Docker Engine** (per Linux).
+* [**Docker Desktop**](https://www.docker.com/products/docker-desktop/)  (per Windows o Mac) oppure **Docker Engine** (per Linux).
 
 ---
 
 ## Guida all'avvio rapido
 
 Segui questi passaggi per configurare l'ambiente in pochi minuti:
+
+### 0. Verifica lo stato di Docker
+Prima di lanciare i comandi, assicurati che il motore di Docker sia in funzione:
+* **Verifica visiva:** Se sei in ambiente Windows l'icona della balena nella barra di sistema deve essere presente.
+* **Verifica da terminale:** Esegui il comando `docker ps`. Se ricevi un messaggio di errore (daemon not running), **avvia Docker Desktop** e attendi il caricamento completo.
+
 
 1. **Clona il progetto o copia la cartella:**
 ```bash
@@ -45,7 +51,7 @@ cd GeoBookSharing
 
 ```
 
-2. **Rinomina i file .env_example e aggiungere chiave API nel file GeoBookSharing_backend/.env :**
+2. **Importante!!: Rinomina i file .env_example e aggiungere chiave API nel file GeoBookSharing_backend/.env :**
 - GeoBookSharing_backend/.env_example ->  GeoBookSharing_backend/.env
 - GeoBookSharing_frontend_vue/.env_example ->  GeoBookSharing_frontend_vue/.env
 - Aggiungere chiave API fornita nell'elaborato all'interno di GeoBookSharing_backend/.env

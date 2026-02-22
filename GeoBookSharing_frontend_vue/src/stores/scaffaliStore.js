@@ -127,12 +127,12 @@ export const useScaffaliStore = defineStore('scaffali', () => {
             // come sopra rendo le coordinate usabili per la mappa
             const coordinate = parsePosizione(scaffale.data.posizione)
             const scaffale_parsificato = {
-                ...scaffale.data,
+                ...scaffale,
                 lat: coordinate.lat,
                 lng: coordinate.lng
             }
 
-            // 3. Salva nello stato reattivo e restituisce
+            //  Salva nello stato reattivo e restituisce
             scaffale_selezionato.value = scaffale_parsificato
             //console.log("Scaffale parsificato", scaffale_parsificato)
             return scaffale_parsificato

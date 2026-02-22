@@ -28,6 +28,11 @@ export const schema_registrazione = Joi.object({
         "string.min" : "La password deve avere almeno 6 caratteri",
         "any.required" : "La password è obbligatoria",
         "string.empty": "Il campo password non può essere vuoto.",
+    }),
+    privacy_policy_accettata: Joi.boolean().valid(true).required().messages({
+        "any.only": "Devi accettare la privacy policy per continuare",
+        "any.required": "L'accettazione della privacy policy è obbligatoria",
+        "boolean.base": "Il campo privacy policy deve essere un valore booleano"
     })
 }).options({ stripUnknown: true}) // rimuove i campi extra non definiti
 
