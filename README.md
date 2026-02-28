@@ -7,7 +7,6 @@
 </p>
 
 
- 
 > **Disclaimer sui dati di test**\
  Tutti i dati contenuti nel presente progetto (nomi, email, password) sono inventati al solo scopo dimostrativo e **NON** contengono informazioni reali riguardanti persone o organizzazioni esistenti.
 >
@@ -54,34 +53,42 @@ Per eseguire l'intero ecosistema su un nuovo PC, **non** è necessario installar
 
 Segui questi passaggi per configurare l'ambiente in pochi minuti:
 
-### 0. Verifica lo stato di Docker
+### 0. **Verifica lo stato di Docker**
 Prima di lanciare i comandi, assicurati che il motore di Docker sia in funzione:
 * **Verifica visiva:** Se sei in ambiente Windows l'icona della balena nella barra di sistema deve essere presente.
 * **Verifica da terminale:** Esegui il comando `docker ps`. Se ricevi un messaggio di errore (daemon not running), **avvia Docker Desktop** e attendi il caricamento completo.
 
 
-1. **Clona il progetto o copia la cartella:**
-```bash
-git clone https://github.com/robertom-wq/GeoBookSharing
-cd GeoBookSharing
+### 1. **Clona il progetto o copia la cartella:**
+* **Via Terminale (Raccomandato):**
+    ```bash
+    git clone https://github.com/robertom-wq/GeoBookSharing
+    cd GeoBookSharing
+    ```
+* **Senza Git (Download Diretto):**
+    1. Clicca sul tasto verde **"<> Code"** e seleziona **"Download ZIP"**.
+    2. Estrai l'archivio sul tuo PC (otterrai la cartella `GeoBookSharing-main`).
+    3. Entra nella cartella tramite terminale:
+    ```bash
+    cd GeoBookSharing-main
+    ```
 
-```
 
-2. **Importante!!: Rinomina i file .env_example e aggiungi chiave API nel file GeoBookSharing_backend/.env :**
+### 2. **Importante!!: Rinomina i file .env_example e aggiungi chiave API nel file GeoBookSharing_backend/.env :**
 - GeoBookSharing_backend/.env_example ->  GeoBookSharing_backend/.env
 - GeoBookSharing_frontend_vue/.env_example ->  GeoBookSharing_frontend_vue/.env
 - Aggiungere chiave API fornita nell'elaborato all'interno di **GeoBookSharing_backend/.env**, oppure una in tuo posseso.
 
-3. **Avvia i container con build automatica:**
+### 3. **Avvia i container con build automatica:**
 ```bash
 docker-compose up --build
 
 ```
 
 
->*Nota: Durante il primo avvio, Docker scaricherà le immagini, installerà le dipendenze (npm install) e popolerà il database.*
+>*Nota: Durante il primo avvio, Docker scaricherà le immagini, installerà le dipendenze (npm install) e popolerà il database. L'operazione potrebbe richiedere alcuni minuti*
 
-4. **Accedi ai servizi:**
+### 4. **Accedi ai servizi:**
 * **App Frontend:** [http://localhost:5173](http://localhost:5173)
 * **API Backend:** [http://localhost:3000]
 * **Utenti di test**: 

@@ -19,7 +19,7 @@ export default defineConfig({
   },
     server: {
     //host: 'localhost',
-    host: '0.0.0.0',  
+    host: '0.0.0.0',   // utilizzato per prove in LAN
     port: 5173,
     strictPort: true,
     watch: {
@@ -31,7 +31,7 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/nominatim-api/, ''),
         headers: {
-          'User-Agent': 'GeoBooksharing/1.0 (gbs@example.com)',
+          'User-Agent': 'GeoBooksharing/1.0 (contatto@tuamail.com)',
           'Referer': 'https://nominatim.openstreetmap.org/'
         }
       }

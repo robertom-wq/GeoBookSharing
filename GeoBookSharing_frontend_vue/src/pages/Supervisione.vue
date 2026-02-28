@@ -418,6 +418,13 @@ onMounted(async () => {
   max-width: 37.5rem !important; 
 }
 
+:deep(.n-space){
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 1rem !important;
+  padding-bottom: 2rem;
+}
+
 .testo_messaggio_log {
   white-space: pre-wrap;
   word-break: break-all;

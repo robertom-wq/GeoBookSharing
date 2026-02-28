@@ -97,7 +97,7 @@
 import { LocationSharp } from '@vicons/ionicons5'
 import { useMessage } from 'naive-ui'
 import { LMap, LTileLayer, LMarker, LTooltip, LPopup, LIcon } from '@vue-leaflet/vue-leaflet'
-import { ref, defineEmits, defineProps, watch, computed, nextTick, onBeforeUnmount } from 'vue'
+import { ref, defineEmits, watch, computed, nextTick, onBeforeUnmount } from 'vue'
 import leaflet from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -242,7 +242,7 @@ let limite_risultati = 5
 // debounce aspetta che l'utente finisca di scrivere
 function gestisciInputRicerca() {
     clearTimeout(timeout_ricerca) 
-    timeout_ricerca = setTimeout(cercaIndirizzo, 200)
+    timeout_ricerca = setTimeout(cercaIndirizzo, 800)
 }
 
 // chiama api nominatim per cercare indirizzo
