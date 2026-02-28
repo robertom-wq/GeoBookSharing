@@ -13,8 +13,9 @@
                 </p>
                 <div class="pulsanti_azione" v-if="!utenti_store.utente">
                     <NButton  @click="router.push('/login')" type="info">Accedi</NButton>
-                    <NButton  @click="router.push('/registrati')">Registrati</NButton>
+                    <NButton  @click="router.push('/registrati')" type="warning" ghost >Registrati</NButton>
                 </div>
+                
                 <div class="pulsanti_azione" v-else>
                     <NButton @click="router.push('/profilo')" type="info">Vai al profilo</NButton>
                 </div>
@@ -76,7 +77,12 @@ const utenti_store = useUtentiStore()
     margin: 2rem;
     position: relative;
     padding: 1rem;
-    text-align: center; 
+    text-align: center;
+    background-image: linear-gradient(to top, rgb(255 255 255), #ffffff24 30%), linear-gradient(to bottom, rgb(255 255 255), #ffffff94 30%), url(/sfondo_hero.webp);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+     
 }
 
 .schermata_iniziale h1 {
@@ -118,7 +124,7 @@ const utenti_store = useUtentiStore()
 
 /* Card sezione contenitore_funzionalita, NON uso :deep in quanto l'elemento è già definito nel template */
 .n-card {
-    max-width: 300px !important; 
+    max-width: 350px !important; 
     background: var( --white-bg);
     border-radius: var(--border-radius);
     text-align: center;
@@ -149,7 +155,12 @@ const utenti_store = useUtentiStore()
 /* Ottimizzazione per mobile (tablet e smartphone) */
 @media (max-width: 768px) {
     .schermata_iniziale .contenuto_principale {
-       margin: 2rem 0 0 0; 
+        margin: 2rem 0 0 0;
+        background-image: linear-gradient(to top, rgb(255 255 255), #ffffff94 30%),
+                          linear-gradient(to bottom, rgb(255 255 255), #ffffff94 30%),
+                          url(/sfondo_hero.webp);
+        background-size: cover;
+        background-position: right; 
     }
     .contenitore_funzionalita {
         margin: 1.5rem 1rem;

@@ -189,7 +189,7 @@ onBeforeUnmount(() => {
 
 // osservo cambio coordinate dal padre
 watch(() => props.centra_mappa, (nuovo_centro) => {
-    // Controllo sicurezza, se la mappa non c'è o non ha coordinate valide, esci
+    // controllo sicurezza, se la mappa non c'è o non ha coordinate valide, esci
     if (!mappa_ref.value || !mappa_ref.value._container || !nuovo_centro) return
 
     if (nuovo_centro.lat !== undefined && nuovo_centro.lng !== undefined) {

@@ -10,9 +10,6 @@ import { TipiAzione } from '@prisma/client'
 /*
 Restituisce la lista di tutti gli utenti, funzionalità utile per gli admin per 
 eseguire successivi cambi di ruolo, oppure attivare o disattivare il ban.
-Utile anche per gli utenti, i quali
-vedranno campi limitati, per trovare un utente e vedere il suo ranking.
-Accetta parametri di ricerca "q"
 */
 export const getAllUtenti = async (req, res) => {
     //estrae la proprietà q dall'oggetto req.query. Se non esiste sarà "undefined"

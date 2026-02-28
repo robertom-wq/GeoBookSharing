@@ -56,7 +56,7 @@ export const addLibroMasterFromISBN = async (req, res) => {
         // eseguo la fetch verso google Book API (es https://www.googleapis.com/books/v1/volumes?q=isbn:9791280623508)
         /*
         Durante la fase di sviluppo, è stata riscontrata una criticità relativa ai limiti di quota delle API di Google (HTTP 429).
-        Il problema è stato risolto tramite l'implementazione di una API Key dedicata e l'astrazione delle credenziali
+        Il problema è stato risolto tramite l'utilizzo di una API Key dedicata e l'astrazione delle credenziali
         tramite variabili d'ambiente, garantendo così la stabilità del servizio di importazione automatica dei volumi
         */
         const url = `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn_pulito.replaceAll('-','')}&key=${GOOGLE_BOOKS_KEY}`
@@ -77,8 +77,9 @@ export const addLibroMasterFromISBN = async (req, res) => {
         // in modo da averli tradotti in italiano
         const genere_nome = tabella_conversioni_generi[libro_trovato.categories?.[0].toUpperCase()] || 'Non definito' 
         //console.log("GENERE", libro_trovato.categories?.[0].toUpperCase(), genere_nome)
-        //verifico esistenza genere nel db, se non esiste lo crea upsert(). Questo fa si che chi sceglierà di creare un libro da 0
-        // utilizzera generi prestabiliti, in modo da essere uniformi e ottenere statistiche sui generi uniformi
+
+        //verifico esistenza genere nel db, se non esiste lo crea upsert().
+        // Questo è utile quando il genere viene fornito da Google Book API
         const genere = await prisma.generi.upsert({
             where: {dettagli : genere_nome},
             update : {},
@@ -211,8 +212,6 @@ export const getLibroMasterById = async (req, res) => {
         console.error('Errore "getLibroMasterById":', err)
         return res.status(500).json({ error: `Errore server - Impossibile recuperare libro Master con id ${targetId}`})        
     }
-
-
 }
 
 
@@ -248,7 +247,7 @@ export const createLibroMaster = async (req, res) => {
                 const response = await axios.get(url, {timeout: 10000})
 
                 if(response.data.items?.length > 0){
-                    return res.status(400).json({ error: 'Libro trovato su Google Books, aggiungilo al catalogo globale tramite ISBN', suggerimento: 'Usa /fromISBN'})
+                    return res.status(400).json({ error: 'Libro trovato su Google Books, aggiungilo al catalogo globale tramite ISBN', suggerimento: 'Usa /isbn'})
                 }
             } catch (err) {
                 logger.error(`[${req.ip}] Errore createLibroMaster -> : Impossibile verificare su google books presenza di ISBN ${isbn_pulito}`, err)

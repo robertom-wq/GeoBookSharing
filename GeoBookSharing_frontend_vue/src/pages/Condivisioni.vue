@@ -20,7 +20,7 @@
                                             <n-tag type="warning" size="small" round>In attesa</n-tag>
                                             <div class="header_richiesta">
                                                 <n-avatar round size="small" :src="`${image_url}/${richiesta.richiedente.avatar}`" />
-                                                <span @click="apriDettaglioUtente(richiesta.richiedente_id)" class="nome_utente_enfasi">{{ richiesta.richiedente.username }}</span>
+                                                <span @click="apriDettaglioUtente(richiesta.richiedente_id)" class="nome_utente_cliccabile">{{ richiesta.richiedente.username }}</span>
                                                 <div class="badge_voti">
                                                     <n-icon size="14" color="#fbb337">
                                                         <Star />
@@ -68,7 +68,7 @@
                                             <n-tag :type="getStatoCondivisione(elemento).type" size="small" ghost>{{ getStatoCondivisione(elemento).text }}</n-tag>
                                             <div class="header_richiesta">
                                                 <n-avatar round size="small" :src="elemento.is_inviata ? `${image_url}/${elemento.proprietario.avatar}` : `${image_url}/${elemento.richiedente.avatar}`" />
-                                                <span @click="apriDettaglioUtente(elemento.richiedente_id)" class="nome_utente_enfasi">{{ elemento.is_inviata ? elemento.proprietario.username : elemento.richiedente.username }}</span>
+                                                <span @click="apriDettaglioUtente(elemento.is_inviata ? elemento.proprietario_id : elemento.richiedente_id)" class="nome_utente_cliccabile">{{ elemento.is_inviata ? elemento.proprietario.username : elemento.richiedente.username }}</span>
                                             </div>
                                         </div>
                                     </template>
@@ -127,7 +127,7 @@
             </template>
         </n-modal>
 
-        <n-modal v-model:show="mostra_modale_dettaglio" preset="card" title="Profilo Utente" class="modale_profilo" style="width: 400px;">
+        <n-modal v-model:show="mostra_modale_dettaglio" preset="card" title="Profilo Utente" id="modale_profilo" style="width: 400px;">
             <div class="dettaglio_utente_container" v-if="utente_selezionato">
                 <div class="testata_profilo">
                     <n-avatar round :size="80" :src="`${image_url}/${utente_selezionato.avatar}`" fallback-src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg" />
@@ -276,7 +276,7 @@ async function gestisciDeleteCondivisione(is_inviata, is_completato, id_elemento
 async function apriDettaglioUtente(utente_id) {
     try {
         const utente = await utenti_store.getUtenteByID(utente_id)
-        utente_selezionato.value = utente.utente
+        utente_selezionato.value = utente.data
         mostra_modale_dettaglio.value = true
     } catch (err) {
         console.error("Impossibile recuperare dettagli", err)
@@ -463,9 +463,10 @@ onMounted(async () => {
 }
 
 /*username utente */
-.nome_utente_enfasi { 
+.nome_utente_cliccabile { 
     font-weight: bold;
-    color: var(--color-text-dark); 
+    color: var(--color-text-dark);
+    cursor: pointer; 
 }
 
 /* Sezione con titolo del libro richiesto */
@@ -522,7 +523,24 @@ onMounted(async () => {
     border: none;
 }
 
+.testata_profilo {
+    align-content: center;
+    text-align: center;
+}
+.dettaglio_utente_container {
+    padding:1rem;
+    text-align: justify;
+}
+ 
+:global(#modale_profilo) {
+    margin:1rem!important;
+}
 
+/* Non riuscendo ad intercettare il genitore in altro modo utilizzo :has 
+sfruttando il nome del selettore figlio*/
+:global(div:has(> #modale_profilo)) {
+    justify-content: center!important;
+}
 /* Ottimizzazione per mobile (tablet e smartphone) */
 @media (max-width: 768px) {
     .header_prioritario {
@@ -540,5 +558,6 @@ onMounted(async () => {
     .area_azioni_condivisione :deep(.n-button) { 
         width: 100%; 
     }
+
 }
 </style>

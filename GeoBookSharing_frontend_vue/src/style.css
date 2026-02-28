@@ -4,7 +4,7 @@
   --white-bg: #ffffff;
   --box-shadow: 0 7px 7px rgba(81, 86, 150, 0.623); /* ombra più morbida e professionale */
   --border-radius: 12px;
-  --pearl-white-bg: rgb(241, 238, 238); 
+  --pearl-white-bg: rgb(252, 252, 252); 
   /*--color-text-dark: #333333;*/
   --color-text-dark: #434343;
   --navbar-text-hover: #82c4f7;
@@ -61,7 +61,6 @@ body {
 
 /* contenitore dei pulsanti*/
 .pulsanti_azione {
-    padding-top: 2rem; /*distanzia i bottoni dal testo */
     width: 100%;
     display: flex; /* layout Flexbox  */
     gap: 1.5rem !important; /* Spazio piu largo tra i bottoni per agevolare click */
@@ -70,6 +69,10 @@ body {
 
 .contenuto_modulo {
     margin-top: 2rem;
+    background-image: linear-gradient(to top, rgb(255 255 255), #ffffff24 30%), linear-gradient(to bottom, rgb(255 255 255), #ffffff94 30%), url(/sfondo_hero.webp);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 /*centratura titolo della card */
@@ -151,5 +154,11 @@ body {
     }
     .contenuto_modulo  {
         padding: 0 0rem;/* rimuovo il padding laterale per aumentare spazio disponibile*/
+        background-image: none;
     }
+
+    .pulsanti_azione {
+        padding-top: 1rem;
+    }    
+
 }

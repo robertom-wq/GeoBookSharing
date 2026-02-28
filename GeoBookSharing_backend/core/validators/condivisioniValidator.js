@@ -24,7 +24,7 @@ export const createCondivisioniSchema = Joi.object({
         return helpers.message('La data di inizio deve essere antecedente o uguale alla data di fine')
     }
     return value
-}).options({stripUnknown: true, convert:true})
+}).options({convert:true})
 
 export const updateStatoCondivisioniSchema = Joi.object({
     azione: Joi.string().valid('accetta','rifiuta').required().messages({

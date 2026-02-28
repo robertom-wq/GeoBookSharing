@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "WebApp volta a favorire la condivisione “peer-to-peer” del patrimonio librario privato, sfruttando la geolocalizzazione per connettere gli utenti residenti in prossimità - Backend",
   "keywords": [],
-  "license": "ISC",
+  "license": "MIT",
   "author": "Roberto Marongiu",
   "type": "module",
   "main": "server.js",

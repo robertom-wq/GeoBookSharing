@@ -129,7 +129,7 @@ export const aggiornaStatoCondivisione = async (req, res) => {
         let data = {}
         let is_accettata
         if (dati_validati.azione === 'accetta') {
-            data = { is_confermato: true, note: null }
+            data = { is_confermato: true }
             is_accettata = true
         } else if (dati_validati.azione === 'rifiuta') {
             data = { is_completato: true, note: `[Rifiutata dal proprietario] ${dati_validati.note}`, data_completato: new Date() }

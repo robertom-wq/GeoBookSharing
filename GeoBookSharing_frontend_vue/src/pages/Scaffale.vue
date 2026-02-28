@@ -243,6 +243,8 @@
         height: 15.625rem; 
         margin-bottom: 1.25rem; /* riduce margine inferiore */
     }
+
+
 }
 
 

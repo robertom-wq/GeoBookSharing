@@ -167,7 +167,7 @@ export const getLibroById = async (req, res) => {
 //Ricerca libri con query di ricerca autore, titolo o genere
 export const getAllLibri = async (req, res) => {
     const mioId = req.userID
-     // utilizzo la paginazione, il risultato potrebbe contenere parecchi elementi
+     // utilizzo la paginazione, il risultato potrebbe contenere numerosi elementi
     // vedo se nella req esiste una query con pagina e limit
     const queryPagina = req.query.pagina
     const queryLimit = req.query.limit
@@ -193,7 +193,7 @@ export const getAllLibri = async (req, res) => {
             // elimino spazi bianchi
             const queryString = q.trim()
             where.OR = [
-                    // username like %queryString%
+                    // titolo like %queryString%
                     {titolo: { contains: queryString, mode: 'insensitive'}},
                     {autore: { contains: queryString, mode: 'insensitive'}},
                     {genere: { dettagli: { contains: queryString, mode: 'insensitive'}}}
@@ -213,7 +213,7 @@ export const getAllLibri = async (req, res) => {
                 skip: skipElementi
             }),
             prisma.libri.count({ // Query per il conteggio
-                where // calusola where dinamicamente popolata
+                where // calusola where popolata dinamicamente
             })
         ])
 
@@ -425,7 +425,7 @@ export const deleteLibro = async (req, res) => {
 }
 
 /*
-Permette di creare un libro da un modello Master scaricato da googleBook, questo permette
+Permette di creare un libro da un modello Master, questo permette
 di avere già tutti i dettagli del libro
 */
 export const createLibroFromMaster = async (req, res) => {
@@ -490,7 +490,7 @@ export const getLibriPiuVisitati = async (req, res) => {
             orderBy: {visualizzazioni: 'desc'},
             include : { genere : { select : {dettagli : true}}}
         })
-        return res.status(201).json({message:'Top 10 dei libri piu ricercati e di cui è stata visualizzata anteprima', data: libriPiuVisitati})
+        return res.status(201).json({message:'Top 5 dei libri piu ricercati e di cui è stata visualizzata anteprima', data: libriPiuVisitati})
      } catch (err) {
         logger.error("["+ req.ip +"] Errore getLibriPiuVisitati -> : Errore generico",err)
         console.error('Errore "getLibriPiuVisitati":', err)
@@ -571,7 +571,7 @@ export const getLibriVicini = async (req, res) => {
                 ORDER BY distanza_metri ASC
                 LIMIT ${limit_num}
         `
-        //esegu la query appena creata, tramite $queryRaw in quanto prisma non gestisce nativamente query con dati geospaziali
+        //eseguo la query appena creata, tramite $queryRaw in quanto prisma non gestisce nativamente query con dati geospaziali
         const libri = await prisma.$queryRaw(sql_query)
 
         //mappo il risultato

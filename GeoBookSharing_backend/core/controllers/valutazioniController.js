@@ -61,7 +61,6 @@ export const creaValutazione = async (req, res) => {
 
 }
 
-
 //Restituisce votazione media piu ultime 5 recensioni
 export const getVotazioneMediaUtente = async (req, res) => {
     //console.log("Dentro getVotazioneMediaUtente")

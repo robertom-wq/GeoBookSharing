@@ -4,7 +4,7 @@
             <p class="testo_citazione_footer">
                 GeoBookSharing – Leggere è viaggiare senza muoversi
             </p>
-            <small class="testo_copyright">© {{ new Date().getFullYear() }} GeoBookshelf</small>
+            <small class="testo_licenza">© {{ new Date().getFullYear() }} GeoBookshelf – Rilasciato sotto Licenza MIT</small>
         </div>
     </n-layout-footer>
 </template>
@@ -46,7 +46,7 @@
 }
 
 /* testo del copyright */
-.testo_copyright {
+.testo_licenza {
     /* Font size adattivo tra 11px e 13px non invadente*/
     font-size: clamp(0.7rem, 1.5vw, 0.8125rem);
     opacity: 0.7; /* leggermente piu trasparente delal citazione*/

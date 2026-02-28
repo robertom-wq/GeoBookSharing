@@ -67,18 +67,20 @@
                                 <n-divider />
                             </n-form>
                         </n-card>
-                        <n-divider/>
-                            <n-space justify="end">
-                                <n-button type="info" primary ghost @click="router.back()">Indietro</n-button>
-                                <n-button v-if="!libri_store.sono_proprietario_libro && libro_id" type="warning" block
-                                    @click="richiediCondivisione(libro_id)">Richiedi Libro</n-button>
-                                <n-button v-if="libri_store.sono_proprietario_libro || !libro_id" type="warning" block
-                                    @click="inviaDati" :loading="libri_store.loading">{{ libro_id ? 'Salva' :
-                                    'Crea'}}</n-button>
-                                <n-button v-if="libri_store.sono_proprietario_libro && libro_id" type="error"
-                                    @click="mostra_modale_conferma = true"
-                                    :loading="libri_store.loading_eliminazione">Elimina</n-button>
-                            </n-space>
+                    </div>
+                    <div>
+                    <!--n-divider/-->
+                        <n-space justify="end">
+                            <n-button type="info" primary ghost @click="router.back()">Indietro</n-button>
+                            <n-button v-if="!libri_store.sono_proprietario_libro && libro_id" type="warning" block
+                                @click="richiediCondivisione(libro_id)">Richiedi Libro</n-button>
+                            <n-button v-if="libri_store.sono_proprietario_libro || !libro_id" type="warning" block
+                                @click="inviaDati" :loading="libri_store.loading">{{ libro_id ? 'Salva' :
+                                'Crea'}}</n-button>
+                            <n-button v-if="libri_store.sono_proprietario_libro && libro_id" type="error"
+                                @click="mostra_modale_conferma = true"
+                                :loading="libri_store.loading_eliminazione">Elimina</n-button>
+                        </n-space>
                     </div>
                 </div>
             </n-spin>

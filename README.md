@@ -2,6 +2,16 @@
 
 **GeoBookSharing** è una WebApp progettata per favorire la condivisione "peer-to-peer" del patrimonio librario privato. Il sistema sfrutta la geolocalizzazione per connettere utenti residenti in prossimità, permettendo lo scambio di libri basato sulla posizione geografica reale.
 
+![Ricerca Libri sulla Mappa](screenshot_applicazione/06-ricerca_libri_vicini.jpg)
+
+---
+
+[!IMPORTANT]  
+**Disclaimer:** Tutti i dati contenuti nel presente progetto (nomi, email, password) sono inventati al solo scopo dimostrativo e **NON** contengono informazioni reali riguardanti persone o organizzazioni esistenti.
+>Dati Personali Immaginari: Tutti i nomi, cognomi, indirizzi email, biografie e log delle attività appartengono a utenti inventati. Qualsiasi somiglianza con persone, indirizzi o eventi reali è puramente casuale.
+>Dati di Geolocalizzazione (PostGIS): Le coordinate geografiche presenti nel database (ad esempio nella tabella scaffali) sono state utilizzate unicamente per testare e dimostrare il funzionamento delle query spaziali dell'applicazione. Sebbene i punti possano ricadere su una mappa reale, sono stati assegnati in modo arbitrario e non corrispondono ad abitazioni, posizioni o spostamenti di utenti reali.
+
+**In un ambiente di produzione reale, la privacy e la sicurezza dei dati degli utenti vengono trattate con la massima priorità e nel pieno rispetto delle normative vigenti (es. GDPR). Nessun dato personale, sensibile o di geolocalizzazione di utenti reali verrebbe mai esposto o pubblicato in questo modo**
 ---
 
 ## Tecnologie Utilizzate
@@ -46,15 +56,15 @@ Prima di lanciare i comandi, assicurati che il motore di Docker sia in funzione:
 
 1. **Clona il progetto o copia la cartella:**
 ```bash
-git clone <url-del-repo>
+git clone https://github.com/robertom-wq/GeoBookSharing
 cd GeoBookSharing
 
 ```
 
-2. **Importante!!: Rinomina i file .env_example e aggiungere chiave API nel file GeoBookSharing_backend/.env :**
+2. **Importante!!: Rinomina i file .env_example e aggiungi chiave API nel file GeoBookSharing_backend/.env :**
 - GeoBookSharing_backend/.env_example ->  GeoBookSharing_backend/.env
 - GeoBookSharing_frontend_vue/.env_example ->  GeoBookSharing_frontend_vue/.env
-- Aggiungere chiave API fornita nell'elaborato all'interno di GeoBookSharing_backend/.env
+- Aggiungere chiave API fornita nell'elaborato all'interno di **GeoBookSharing_backend/.env**, oppure una in tuo posseso.
 
 3. **Avvia i container con build automatica:**
 ```bash
@@ -68,8 +78,21 @@ docker-compose up --build
 * **App Frontend:** [http://localhost:5173](http://localhost:5173)
 * **API Backend:** [http://localhost:3000]
 
+* **Utenti di test**
+Puoi utilizzare le seguenti credenziali per testare i diversi livelli di accesso:
 
+[!NOTE]
+**Dati di test:** Tutti i dati (nomi, email, credenziali) sono generati casualmente a scopo dimostrativo e non si riferiscono a persone reali.
 
+| username | password | ruolo | note
+| :--- | :--- | :--- | :---
+| marco.rossi | password | admin | Accesso completo a gestione utenti/libri
+| greta.rosa | password | user | Visualizzazione e gestione propri scaffali
+| silvia.nero | password | user |
+| francesco.marrone | password | user |
+| tommaso.azzurro | password | user | 
+| davide.arancio | password | user |
+| utente.bannato | password | user | Utente bannato - Login vietato
 ---
 
 ## Database e Persistenza

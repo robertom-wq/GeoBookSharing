@@ -34,7 +34,7 @@ export const schema_registrazione = Joi.object({
         "any.required": "L'accettazione della privacy policy è obbligatoria",
         "boolean.base": "Il campo privacy policy deve essere un valore booleano"
     })
-}).options({ stripUnknown: true}) // rimuove i campi extra non definiti
+})
 
 export const schema_login = Joi.object({
     username: Joi.string().pattern(/^[a-zA-Z0-9._-]+$/).min(3).max(30).required().messages({

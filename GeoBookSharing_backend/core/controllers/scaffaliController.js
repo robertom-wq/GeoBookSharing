@@ -14,7 +14,7 @@ export const createScaffale = async (req, res) => {
 
 
     try {
-        //destructuring, $queryRaw restituisce i risultati sotto forma di un array do oggetti, usando [scaffale],
+        //destructuring, $queryRaw restituisce i risultati sotto forma di un array di oggetti, usando [scaffale],
         // si evita di dover accedere ai singoli nome, descrizione etc senza usare una sintassi tipo
         //scaffale[0].nome 
         const [scaffale] = await prisma.$queryRaw`

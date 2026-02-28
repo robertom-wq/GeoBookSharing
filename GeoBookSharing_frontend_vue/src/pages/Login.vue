@@ -8,23 +8,20 @@
             </div>
             <div class="contenuto_modulo">
                 <n-card title="Accedi" class="scheda_login">
-                    <n-form :model="form_data" @submit.prevent="gestisciLogin" :rules="rules">
+                    <n-form :model="form_data" ref="form_ref" :rules="rules">
                         <n-form-item label="Username" path="username">
                             <n-input round v-model:value="form_data.username" placeholder="Username" />
                         </n-form-item>
                         <n-form-item label="Password" path="password">
                             <n-input round v-model:value="form_data.password" type="password" placeholder="Password" />
                         </n-form-item>
-                        <n-form-item>
-                            <div class="pulsanti_azione">
-                                <NButton attr-type="submit" type="primary" :loading="utenti_store.loading">
-                                    Login
-                                </NButton>
-                            </div>
-                        </n-form-item>
                     </n-form>
                 </n-card>
-
+            </div>
+            <div class="pulsanti_azione">
+                <NButton attr-type="submit" type="primary" ghost :loading="utenti_store.loading" @click="validaEInvia">
+                    Login
+                </NButton>
             </div>
         </section>
     </div>
@@ -40,6 +37,8 @@ const utenti_store = useUtentiStore()
 const router = useRouter()
 const message = useMessage()
 
+const form_ref = ref(null);
+
 // Modello
 const form_data = ref({
     username: '',
@@ -54,6 +53,19 @@ const rules = {
     password: [
         { required: true, message: "Password obbligatoria", trigger: "blur" }
     ]
+}
+
+async function validaEInvia() {
+    try {
+        // Forza la validazione delle rules di Naive UI
+        await form_ref.value?.validate();
+
+        await gestisciLogin(); 
+        
+    } catch (err) {
+        message.error(err.message || 'Errore durante la validazione')
+        console.warn("Errori di validazione:", err);
+    }
 }
 
 async function gestisciLogin() {
@@ -77,17 +89,12 @@ async function gestisciLogin() {
 </script>
 
 <style scoped>
-
 .contenuto_modulo {
     display: flex;
-    flex-direction: column; 
-    align-items: center; 
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    min-height: 60vh; 
+    min-height: 40vh;
 }
-
-
-
-
 
 </style>

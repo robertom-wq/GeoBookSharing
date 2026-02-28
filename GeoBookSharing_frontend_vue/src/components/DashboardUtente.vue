@@ -52,7 +52,8 @@
         </n-gi>
 
         <n-gi>
-            <n-card title="Ultime 10 recensioni ricevute" class="altezza_piena">
+            <div class="recensioni_ricevute">
+            <n-card title="Ultime 5 recensioni ricevute" class="altezza_piena">
                 <n-empty v-if="!dati_report.recensioni.length" description="Nessuna recensione ricevuta" />
                 <n-list v-else bordered class="lista_scorrimento">
                     <n-list-item v-for="rec in dati_report.recensioni" :key="rec.id">
@@ -73,6 +74,7 @@
                     </n-list-item>
                 </n-list>
             </n-card>
+            </div>
         </n-gi>
 
     </n-grid>
@@ -157,6 +159,11 @@ const props = defineProps({
     max-height: 31.25rem; 
     overflow-y: auto;
     padding-right: 0.5rem;
+    
+}
+
+.contenitore_statistiche, .recensioni_ricevute {
+    margin: 0.5rem;
 }
 
 :deep(.n-card__content){
@@ -172,6 +179,7 @@ const props = defineProps({
 :deep(.n-list){
         border-radius: var(--border-radius)!important;
     }
+
 
 /* Ottimizzazione per mobile (tablet e smartphone) */
 @media (max-width: 768px) {

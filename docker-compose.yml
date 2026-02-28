@@ -26,6 +26,7 @@ services:
     env_file:
       - ./GeoBookSharing_backend/.env
     restart: always
+    command: npm run dev
     volumes:
       - ./GeoBookSharing_backend:/usr/src/app
       - /usr/src/app/node_modules 
@@ -43,6 +44,7 @@ services:
     env_file:
       - ./GeoBookSharing_frontend_vue/.env
     restart: always
+    command: npm run dev
     ports:
       - "5173:5173"
     volumes:

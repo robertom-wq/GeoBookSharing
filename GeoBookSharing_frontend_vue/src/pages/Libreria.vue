@@ -180,6 +180,9 @@ onMounted(async () => {
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     height: 95%; /* lascio un piccolo margine verticale */
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    width: auto;
 }
 
 .corpo_scheda {
@@ -227,6 +230,9 @@ onMounted(async () => {
     #contenitore_mappa {
         height: 15.625rem; /* altezza fissa su mobile circa 250px */
         margin-bottom: 1.25rem; /* riduce margine inferiore */
+    }
+    .testo_descrizione {
+        margin: auto 1rem!important;
     }
 }
 </style>

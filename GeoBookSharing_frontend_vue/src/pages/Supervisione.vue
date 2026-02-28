@@ -370,7 +370,7 @@ onMounted(async () => {
 <style scoped>
 .pagina_supervisione {
   padding: 2vw;
-  max-width: var(--container-max-width, 1400px);
+  max-width: var(--container-max-width, 88rem);
   margin: 0 auto;
 }
 
@@ -395,7 +395,7 @@ onMounted(async () => {
 }
 
 .area_grafico_generi {
-  height: clamp(250px, 40vh, 400px);
+  height: clamp(15rem, 40vh, 25rem);
   display: flex;
   align-items: center;
   justify-content: center;

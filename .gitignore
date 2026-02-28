@@ -5,7 +5,7 @@ node_modules/
 .DS_Store
 Thumbs.db
 
-# --- Backend (Prisma & Logs) ---
+# --- Backend ---
 /GeoBookSharing_backend/node_modules/
 /GeoBookSharing_backend/dist/
 /GeoBookSharing_backend/logs/
@@ -14,7 +14,7 @@ Thumbs.db
 *.log
 npm-debug.log*
 
-# --- Frontend (Vue / Vite) ---
+# --- Frontend ---
 /GeoBookSharing_frontend_vue/node_modules/
 /GeoBookSharing_frontend_vue/dist/
 /GeoBookSharing_frontend_vue/dist-ssr/

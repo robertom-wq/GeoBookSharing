@@ -173,7 +173,7 @@ router.beforeEach(async (to, from, next) => {
       await utenti_store.getUtente()
     } catch (err) {
       console.warn("Sessione non valida o scaduta")
-      // Non facciamo nulla: utenti_store.utente rimarrà null
+      // Non faccio nulla: utenti_store.utente rimarrà null
     }
   }
 

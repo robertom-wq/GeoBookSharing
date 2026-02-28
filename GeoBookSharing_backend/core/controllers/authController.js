@@ -9,7 +9,6 @@ ridotta a pochi minuti (e.g., 15m), implementando un meccanismo di Refresh Token
 per mitigare il rischio di furto del token (XSS).
 */
 
-//import { PrismaClient } from "@prisma/client"
 import bcrypt from 'bcryptjs'
 import jwt  from 'jsonwebtoken'
 import { generateCsrfToken, CSRF_COOKIE_OPTIONS } from "../middleware/csrf.js"
@@ -17,12 +16,8 @@ import { generateCsrfToken, CSRF_COOKIE_OPTIONS } from "../middleware/csrf.js"
 import prisma from '../config/prisma.js'
 import logger from '../config/logging.js'
 
-
-//SETUP INIZIALE JWT E COOKIES
 const JWT_SECRET = process.env.JWT_SECRET
 const JWT_EXPIRATION = '7d'
-
-
 
 // Settagio parametri dei cookies
 const COOKIE_OPTIONS = {
@@ -32,8 +27,7 @@ const COOKIE_OPTIONS = {
     maxAge:  7*24*60*60 *1000// 7 giorni
 }
 
-
-//REGISTRAZIONE UTENTE
+//Registrazione
 export const registrazione = async (req, res) => {
     const { email, cognome, nome, password, username, privacy_policy_accettata} = req.dati_validati    
     try {
@@ -112,7 +106,7 @@ export const registrazione = async (req, res) => {
 
 }
 
-//LOGIN UTENTE
+//Login
 export const login = async (req, res) => {
     const { username, password } = req.dati_validati //destructuring, etraggo username e password dal body della richiesta
     try {
@@ -170,7 +164,7 @@ export const login = async (req, res) => {
     }
 }
 
-//LOGOUT
+//Logout
 export const logout = (req, res) => {
     // invalida entrambi i cookies
     res.cookie('jwt', '', { ...COOKIE_OPTIONS, maxAge: 0})

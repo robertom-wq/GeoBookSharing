@@ -19,7 +19,7 @@
                         
                         <!-- TAB: Modifica Profilo -->
                         <n-tab-pane :tab="`Dati Profilo`" name="profilo">
-
+                            <div id="contenuto_modulo">
                             <n-card v-if="form_data" class="profilo_card" title="Modifica Profilo" :bordered="true">
                                 <n-form :model="form_data" :rules="rules" ref="form_ref" label-width="120px"
                                     class="responsive-form">
@@ -80,17 +80,18 @@
                                         </n-form-item>
                                     </div>
 
-                                    <n-divider />
+                                    <!--n-divider /-->
 
-                                    <div class="pulsanti_azione">
-                                        <n-button type="primary" :loading="utenti_store.loading"
-                                            @click="inviaDati">Salva Modifiche</n-button>
-                                        <n-button v-if="is_admin_modifica && form_data.richiesta_eliminazione"
-                                            type="warning" @click="mostra_modale_conferma = true">Elimina
-                                            utente</n-button>
-                                    </div>
                                 </n-form>
                             </n-card>
+                            </div>
+                            <div class="pulsanti_azione">
+                                <n-button type="primary" :loading="utenti_store.loading"
+                                    @click="inviaDati">Salva Modifiche</n-button>
+                                <n-button v-if="is_admin_modifica && form_data?.richiesta_eliminazione"
+                                    type="warning" @click="mostra_modale_conferma = true">Elimina
+                                    utente</n-button>
+                            </div>
                         </n-tab-pane>
                         <!-- TAB: Dashboard utente, visibile solo all'utente -->
                         <n-tab-pane v-if="!is_admin_modifica" :tab="`Le tue Statistiche`" name="dashboard">
@@ -252,7 +253,6 @@ async function getStatisticheLibriUtente() {
     const ultime_valutazioni = [...valutazioni_store.mie_valutazioni_ricevute].sort((a, b) => new Date(b.data_creazione) - new Date(a.data_creazione)).slice(0, 5)
     dati_report.value.media_voto = parseFloat(voto.media_voto)
     dati_report.value.recensioni = ultime_valutazioni
-
 }
 
 //gestione pre upload dei files
@@ -402,12 +402,22 @@ onBeforeUnmount(() => {
 .scheda_tab {
     margin-top: 2rem; /* spazio sopra le tab per separarle dall'intestazione */
 }
+#contenuto_modulo {
+    background-image: linear-gradient(to top, rgb(255 255 255), #ffffff24 30%), linear-gradient(to bottom, rgb(255 255 255), #ffffff94 30%), url(/sfondo_hero.webp);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
 
-@media (max-width: 500px) {
+
+@media (max-width: 768px) {
   .modale_conferma_eliminazione {
       display: flex!important;
       justify-content: flex-end!important;
   }
+  #contenuto_modulo {
+    background-image: none;
+}
 }
 
 </style>

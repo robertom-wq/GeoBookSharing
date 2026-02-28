@@ -5,7 +5,7 @@
                 <h1>Cerca Libri</h1>
                 <p class="sottotitolo">Ciao {{ utenti_store.utente?.nome.toUpperCase() }}. Trova i libri
                     disponibili nelle librerie di altri
-                    utenti attorno a te. Seleziona un'area e avvia la ricerca.
+                    utenti attorno a te. Cerca una località o trascina il marker blu e avvia la ricerca.
                 </p>
             </div>
             <div class="contenuto_ricerca">
@@ -23,7 +23,7 @@
                         <n-flex class="barra_controlli_ricerca">
                             <n-input
                             v-model:value="query_ricerca"
-                            placeholder="Cerca titolo o autore..."
+                            placeholder="Cerca titolo, autore o genere..."
                             clearable
                             class="input_ricerca_testo" />
                             <n-select 
@@ -138,7 +138,7 @@ const libri_in_mappa = computed(()=>{
     }
     //ho bisogno di un elenco che contenga tutti gli scaffali, contati una sola volta. per es se cerco per autore
     //nella stessa libreria potrebbero esserci piu libri e mi verrebbe conteggiato piu volte lo stesso scaffale.
-    //con le posizioni geografiche per usarle sulla mappa. per questo uso map
+    //con le posizioni geografiche per usarle sulla mappa. per questo uso la struttura dati map
     const scaffali_unici = new Map()
 
     libri_store.libri_all.forEach(libro => {

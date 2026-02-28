@@ -61,7 +61,7 @@
                             </n-form>
                         </n-card>                        
                     </div>
-                    <n-divider />
+                    <!--n-divider /-->
                     <n-space justify="end">
                         <n-button type="info"
                             primary 
