@@ -2,17 +2,23 @@
 
 **GeoBookSharing** è una WebApp progettata per favorire la condivisione "peer-to-peer" del patrimonio librario privato. Il sistema sfrutta la geolocalizzazione per connettere utenti residenti in prossimità, permettendo lo scambio di libri basato sulla posizione geografica reale.
 
-![Ricerca Libri sulla Mappa](screenshot_applicazione/06-ricerca_libri_vicini.jpg)
+<p align="center">
+  <img src="screenshot_applicazione/06-ricerca_libri_vicini.png" alt="Ricerca Libri sulla Mappa" width="800">
+</p>
 
 ---
-
-[!IMPORTANT]  
-**Disclaimer:** Tutti i dati contenuti nel presente progetto (nomi, email, password) sono inventati al solo scopo dimostrativo e **NON** contengono informazioni reali riguardanti persone o organizzazioni esistenti.
->Dati Personali Immaginari: Tutti i nomi, cognomi, indirizzi email, biografie e log delle attività appartengono a utenti inventati. Qualsiasi somiglianza con persone, indirizzi o eventi reali è puramente casuale.
->Dati di Geolocalizzazione (PostGIS): Le coordinate geografiche presenti nel database (ad esempio nella tabella scaffali) sono state utilizzate unicamente per testare e dimostrare il funzionamento delle query spaziali dell'applicazione. Sebbene i punti possano ricadere su una mappa reale, sono stati assegnati in modo arbitrario e non corrispondono ad abitazioni, posizioni o spostamenti di utenti reali.
-
-**In un ambiente di produzione reale, la privacy e la sicurezza dei dati degli utenti vengono trattate con la massima priorità e nel pieno rispetto delle normative vigenti (es. GDPR). Nessun dato personale, sensibile o di geolocalizzazione di utenti reali verrebbe mai esposto o pubblicato in questo modo**
----
+ 
+> **Disclaimer sui dati di test**\
+ Tutti i dati contenuti nel presente progetto (nomi, email, password) sono inventati al solo scopo dimostrativo e **NON** contengono informazioni reali riguardanti persone o organizzazioni esistenti.
+>
+> **Dati Personali Immaginari**\
+ Tutti i nomi, cognomi, indirizzi email, biografie e log delle attività appartengono a utenti inventati. Qualsiasi somiglianza con persone, indirizzi o eventi reali è puramente casuale.
+>
+> **Dati di Geolocalizzazione (PostGIS)**\
+Le coordinate geografiche presenti nel database (ad esempio nella tabella scaffali) sono state utilizzate unicamente per testare e dimostrare il funzionamento delle query spaziali dell'applicazione. Sebbene i punti possano ricadere su una mappa reale, sono stati assegnati in modo arbitrario e non corrispondono ad abitazioni, posizioni o spostamenti di utenti reali.
+>
+>**In un ambiente di produzione reale, la privacy e la sicurezza dei dati degli utenti vengono trattate con la massima priorità e nel pieno rispetto delle normative vigenti (es. GDPR). Nessun dato personale, sensibile o di geolocalizzazione di utenti reali verrebbe mai esposto o pubblicato in questo modo**
+>
 
 ## Tecnologie Utilizzate
 
@@ -30,7 +36,7 @@
 * **Prisma ORM**
 * **PostgreSQL** con estensione **PostGIS** (Dati spaziali)
 
-### Infrastructure
+### Infrastruttura
 
 * **Docker & Docker Compose**
 
@@ -38,7 +44,7 @@
 
 ## Requisiti Minimi
 
-Per eseguire l'intero ecosistema su un nuovo PC, non è necessario installare Node.js o PostgreSQL. È richiesto solo:
+Per eseguire l'intero ecosistema su un nuovo PC, **non** è necessario installare Node.js o PostgreSQL. È richiesto solo:
 
 * [**Docker Desktop**](https://www.docker.com/products/docker-desktop/)  (per Windows o Mac) oppure **Docker Engine** (per Linux).
 
@@ -73,16 +79,14 @@ docker-compose up --build
 ```
 
 
-*Nota: Durante il primo avvio, Docker scaricherà le immagini, installerà le dipendenze (npm install) e popolerà il database.*
+>*Nota: Durante il primo avvio, Docker scaricherà le immagini, installerà le dipendenze (npm install) e popolerà il database.*
+
 4. **Accedi ai servizi:**
 * **App Frontend:** [http://localhost:5173](http://localhost:5173)
 * **API Backend:** [http://localhost:3000]
-
-* **Utenti di test**
+* **Utenti di test**: 
 Puoi utilizzare le seguenti credenziali per testare i diversi livelli di accesso:
 
-[!NOTE]
-**Dati di test:** Tutti i dati (nomi, email, credenziali) sono generati casualmente a scopo dimostrativo e non si riferiscono a persone reali.
 
 | username | password | ruolo | note
 | :--- | :--- | :--- | :---
@@ -93,7 +97,8 @@ Puoi utilizzare le seguenti credenziali per testare i diversi livelli di accesso
 | tommaso.azzurro | password | user | 
 | davide.arancio | password | user |
 | utente.bannato | password | user | Utente bannato - Login vietato
----
+
+>Nota: Tutti i dati (nomi, email, credenziali) sono generati casualmente a scopo dimostrativo e non si riferiscono a persone reali.
 
 ## Database e Persistenza
 
@@ -123,6 +128,8 @@ docker-compose up
 ├── GeoBookSharing_backend/       # Server Express, Prisma Schema e Logica
 ├── GeoBookSharing_frontend_vue/  # Web App Vue 3 con Pinia e Naive UI
 ├── db-init/                      # Script SQL per il popolamento automatico (init.sql)
+├── diagrammi_uml                 # Diagrammi UML del progetto
+├── screenshot_applicazione       # Screenshot dell'applicazione lato Frontend
 ├── docker-compose.yml            # Orchestrazione di Database, Backend e Frontend
 └── README.md                     # Documentazione del progetto
 
