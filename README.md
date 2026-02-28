@@ -3,10 +3,10 @@
 **GeoBookSharing** è una WebApp progettata per favorire la condivisione "peer-to-peer" del patrimonio librario privato. Il sistema sfrutta la geolocalizzazione per connettere utenti residenti in prossimità, permettendo lo scambio di libri basato sulla posizione geografica reale.
 
 <p align="center">
-  <img src="screenshot_applicazione/06-ricerca_libri_vicini.png" alt="Ricerca Libri sulla Mappa" width="800">
+  <img src="screenshot_applicazione/06-ricerca_libri_vicini.PNG" alt="Ricerca Libri sulla Mappa" width="800">
 </p>
 
----
+
  
 > **Disclaimer sui dati di test**\
  Tutti i dati contenuti nel presente progetto (nomi, email, password) sono inventati al solo scopo dimostrativo e **NON** contengono informazioni reali riguardanti persone o organizzazioni esistenti.
