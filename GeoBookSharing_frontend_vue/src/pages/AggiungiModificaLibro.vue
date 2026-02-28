@@ -8,7 +8,7 @@
                         <h1>{{ titolo_pagina }}</h1>
                     </div>
                     <p class="sottotitolo">
-                    Ciao {{ utenti_store.utente.nome.toUpperCase() }}, modifica i tuoi libri 
+                    Ciao {{ utenti_store.utente?.nome.toUpperCase() }}, modifica i tuoi libri 
                     </p>
                     <div class="contenuto_modulo">
                         <n-card v-if="form" class="libro_card" :bordered="true" title="Modifica Libro">

@@ -4,7 +4,7 @@ import winston from 'winston'
 import 'winston-daily-rotate-file'
 
 const transport = new winston.transports.DailyRotateFile({
-  dirname: 'logs',                      // cartella dei log
+  dirname: 'logs',                      // cartella dei log, se non esiste la crea
   filename: 'app-%DATE%.log',           // nome con data
   datePattern: 'YYYY-MM-DD',            // rotazione giornaliera
   zippedArchive: false,                 // Se true, comprime i vecchi log in .gz

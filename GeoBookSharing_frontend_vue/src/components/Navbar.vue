@@ -109,6 +109,7 @@ function isLinkAttivo(path) {
 async function gestioneLink(path) {
 
      if (path === '/logout') {
+        show_menu.value = false
         router.push('/')
         await utenti_store.logout()
         message.success('Logout effettuato con successo!')

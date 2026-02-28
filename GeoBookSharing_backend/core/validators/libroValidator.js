@@ -64,11 +64,11 @@ export const updateLibroSchema = Joi.object({
         'string.min': 'Il codice isbn deve contenere almeno 10 caratteri.',
         'string.max': 'Il codice isbn non può superare i 20 caratteri.',
     }),
-    anno: Joi.number().integer().min(1000).max(new Date().getFullYear() + 1).optional().messages({
+    anno: Joi.number().integer().min(1000).max(new Date().getFullYear()).optional().messages({
         'number.base': 'L\'anno deve essere un numero intero.',
         'number.integer': 'L\'anno deve essere un numero intero.',
         'number.min': 'L\'anno minimo valido è 1000.',
-        'number.max': `L\'anno non può superare l'anno corrente più uno.`
+        'number.max': `L\'anno non può superare l'anno corrente.`
     }),
     descrizione: Joi.string().max(1000).empty('').optional().messages({
         'string.base': 'La descrizione deve essere una stringa di testo.',

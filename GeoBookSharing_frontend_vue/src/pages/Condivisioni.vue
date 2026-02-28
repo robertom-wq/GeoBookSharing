@@ -2,7 +2,7 @@
     <div class="page">
         <div class="intestazione">
             <h1>Condivisioni</h1>
-            <p class="sottotitolo">Gestisci le tue condivisioni</p>
+            <p class="sottotitolo">Ciao {{ utenti_store.utente?.nome.toUpperCase() }}, gestisci le tue condivisioni</p>
         </div>
         <div class="contenuto_principale">
             <n-spin :show="condivisioni_store.loading">

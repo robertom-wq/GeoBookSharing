@@ -9,7 +9,7 @@
                     <span class="testo_evidenziato">{{ username_target }}</span>
                 </p>
                 <p v-else>
-                    Ciao {{utenti_store.utente.nome.toUpperCase() }}, modifica il tuo profilo o accedi alle tue statistiche
+                    Ciao {{utenti_store.utente?.nome.toUpperCase() }}, modifica il tuo profilo o accedi alle tue statistiche
                 </p>
             </div>
             <div class="contenuto_modulo">
@@ -351,6 +351,11 @@ async function inviaDati() {
         }
 
         message.success('Profilo aggiornato!')
+        
+        // se admin ha modificato il profilo di utente, viene riportato nella AdminPage
+        if(is_admin_modifica.value) {
+            router.push({name: 'AdminPage'})
+        }
 
 
     } catch (err) {
