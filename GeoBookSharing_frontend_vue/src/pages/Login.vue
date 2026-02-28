@@ -7,22 +7,26 @@
                     libri</p>
             </div>
             <div class="contenuto_modulo">
-                <n-card title="Accedi" class="scheda_login">
-                    <n-form :model="form_data" ref="form_ref" :rules="rules">
+
+                <n-form :model="form_data" ref="form_ref" :rules="rules" @submit.prevent="validaEInvia">
+                    <n-card title="Accedi" class="scheda_login">
                         <n-form-item label="Username" path="username">
                             <n-input round v-model:value="form_data.username" placeholder="Username" />
                         </n-form-item>
                         <n-form-item label="Password" path="password">
                             <n-input round v-model:value="form_data.password" type="password" placeholder="Password" />
                         </n-form-item>
-                    </n-form>
-                </n-card>
+                    </n-card>
+                    <div class="pulsanti_azione">
+                        <NButton attr-type="submit" type="primary" ghost :loading="utenti_store.loading">
+                            Login
+                        </NButton>
+
+                    </div>
+                </n-form>
+
             </div>
-            <div class="pulsanti_azione">
-                <NButton attr-type="submit" type="primary" ghost :loading="utenti_store.loading" @click="validaEInvia">
-                    Login
-                </NButton>
-            </div>
+
         </section>
     </div>
 </template>
@@ -60,8 +64,8 @@ async function validaEInvia() {
         // Forza la validazione delle rules di Naive UI
         await form_ref.value?.validate();
 
-        await gestisciLogin(); 
-        
+        await gestisciLogin();
+
     } catch (err) {
         message.error(err.message || 'Errore durante la validazione')
         console.warn("Errori di validazione:", err);
@@ -95,6 +99,17 @@ async function gestisciLogin() {
     align-items: center;
     justify-content: center;
     min-height: 40vh;
+}
+
+:deep(.n-form) {
+        min-width: 60%;
+}
+
+/* Ottimizzazione per mobile (tablet e smartphone) */
+@media (max-width: 748px) {
+    :deep(.n-form) {
+        min-width: 95%;
+    }
 }
 
 </style>

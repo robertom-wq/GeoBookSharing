@@ -7,8 +7,9 @@
                     GeoBookSharing</p>
             </div>
             <div class="contenuto_modulo">
-                <n-card title="Registrati" class="scheda_registrazione">
-                    <n-form :model="form_value" ref="form_ref" :rules="rules">
+
+                <n-form :model="form_value" ref="form_ref" :rules="rules" @submit.prevent="validaEInvia">
+                    <n-card title="Registrati" class="scheda_registrazione">
                         <n-form-item label="Nome" path="nome">
                             <n-input v-model:value="form_value.nome" placeholder="Nome" />
                         </n-form-item>
@@ -29,25 +30,29 @@
                                     @click="mostra_modale_privacy = true" class="link-privacy">termini sulla
                                     privacy</a></n-checkbox>
                         </n-form-item>
-                    </n-form>
-                </n-card>
+                    </n-card>
+                    <div class="pulsanti_azione">
+                        <NButton attr-type="submit" type="primary" ghost :loading="utenti_store.loading">
+                            Registrati
+                        </NButton>
+                    </div>
+                </n-form>
+
             </div>
-            <div class="pulsanti_azione">
-                <NButton attr-type="submit" type="primary" ghost :loading="utenti_store.loading" @click="validaEInvia">
-                    Registrati
-                </NButton>
-            </div>
+
         </section>
     </div>
     <n-modal v-model:show="mostra_modale_privacy" preset="card" style="width: 600px; max-width: 90vw"
         title="Informativa sulla Privacy (GDPR)" class="mobile-pila">
         <div class="testo-privacy">
             <h3>1. Tipologia di Dati Raccolti</h3>
-            <p>I dati raccolti includono: Nome, Cognome, Email, Posizione degli scaffali, Username e Immagine del profilo (Avatar).</p>
+            <p>I dati raccolti includono: Nome, Cognome, Email, Posizione degli scaffali, Username e Immagine del
+                profilo (Avatar).</p>
 
             <h3>2. Visibilità dei Dati</h3>
             <p><strong>Dati Privati:</strong> Nome, Cognome ed Email sono visibili solo a te e agli amministratori.</p>
-            <p><strong>Dati Pubblici:</strong> Username, immagine del profilo e posizione degli scaffali sono visibili agli altri utenti registrati per
+            <p><strong>Dati Pubblici:</strong> Username, immagine del profilo e posizione degli scaffali sono visibili
+                agli altri utenti registrati per
                 facilitare gli scambi.</p>
 
             <h3>3. Cookie</h3>
@@ -121,9 +126,9 @@ const rules = {
 
 async function validaEInvia() {
     try {
-        await form_ref.value?.validate();        
-        await gestisciRegistrazione(); 
-        
+        await form_ref.value?.validate();
+        await gestisciRegistrazione();
+
     } catch (err) {
         message.error(err.message || 'Errore durante la validazione')
         console.warn("Errori di validazione:", err);
@@ -180,6 +185,17 @@ async function gestisciRegistrazione() {
 .testo-privacy h3 {
     margin-top: 15px;
     color: var(--color-text-dark);
+}
+
+:deep(.n-form) {
+        min-width: 60%;
+}
+
+/* Ottimizzazione per mobile (tablet e smartphone) */
+@media (max-width: 748px) {
+    :deep(.n-form) {
+        min-width: 95%;
+    }
 }
 
 </style>

@@ -13,10 +13,10 @@
                         <n-card class="scheda_nuovo_scaffale">
                             <n-form ref="form_ref" :model="form" :rules="rules" label-placement="top"
                                 :validate-on-rule-change="false" @submit.prevent="gestisciSalvataggioScaffale">
-                                <n-form-item label="Nome" , path="nome">
+                                <n-form-item label="Nome" path="nome">
                                     <n-input v-model:value="form.nome" />
                                 </n-form-item>
-                                <n-form-item label="Descrizione" , path="descrizione">
+                                <n-form-item label="Descrizione" path="descrizione">
                                     <n-input v-model:value="form.descrizione" type="textarea" :autosize="{
                                         minRows: 3,
                                         maxRows: 6
