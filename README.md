@@ -8,7 +8,7 @@
 
 
 > **Disclaimer sui dati di test**\
- Tutti i dati contenuti nel presente progetto (nomi, email, password) sono inventati al solo scopo dimostrativo e **NON** contengono informazioni reali riguardanti persone o organizzazioni esistenti.
+ Tutti i dati contenuti nel presente progetto (nomi, email, password) sono inventati al solo scopo dimostrativo e **NON** contengono informazioni reali riguardanti persone o organizzazioni esistenti. Gli avatar degli utenti sono generati tramite [IA](https://gemini.google.com/) e non fanno riferimento a persone reali.
 >
 > **Dati Personali Immaginari**\
  Tutti i nomi, cognomi, indirizzi email, biografie e log delle attività appartengono a utenti inventati. Qualsiasi somiglianza con persone, indirizzi o eventi reali è puramente casuale.
@@ -18,7 +18,7 @@ Le coordinate geografiche presenti nel database (ad esempio nella tabella scaffa
 >
 >**In un ambiente di produzione reale, la privacy e la sicurezza dei dati degli utenti vengono trattate con la massima priorità e nel pieno rispetto delle normative vigenti (es. GDPR). Nessun dato personale, sensibile o di geolocalizzazione di utenti reali verrebbe mai esposto o pubblicato in questo modo**
 >
-
+https://gemini.google.com/
 ## Tecnologie Utilizzate
 
 ### Frontend
