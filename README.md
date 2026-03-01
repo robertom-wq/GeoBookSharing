@@ -18,7 +18,7 @@ Le coordinate geografiche presenti nel database (ad esempio nella tabella scaffa
 >
 >**In un ambiente di produzione reale, la privacy e la sicurezza dei dati degli utenti vengono trattate con la massima priorità e nel pieno rispetto delle normative vigenti (es. GDPR). Nessun dato personale, sensibile o di geolocalizzazione di utenti reali verrebbe mai esposto o pubblicato in questo modo**
 >
-https://gemini.google.com/
+
 ## Tecnologie Utilizzate
 
 ### Frontend
