@@ -178,7 +178,7 @@ async function createLibroMasterDaISBN() {
     try {
         const libro_creato = await libri_master_store.createLibroMasterISBN(codice_isbn.value)
         codice_isbn.value = ''
-        message.success(libro_creato.message)
+        message.success(libro_creato.message || 'Libro Master creato con successo')
         vaiALibroMaster(libro_creato.data.id)
 
     } catch (err) {

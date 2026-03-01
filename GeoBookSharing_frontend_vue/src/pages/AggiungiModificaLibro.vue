@@ -363,7 +363,7 @@ async function inviaDati() {
         } else {
             //modalità creazione libro
             risposta = await libri_store.createLibro(fd)
-            message.success(`Libro "${libri_store.libro_selezionato_dettagli.titolo}" creato con successo!`)
+            message.success(`Libro creato con successo!`)
             router.back()
         }
     } catch (err) {
